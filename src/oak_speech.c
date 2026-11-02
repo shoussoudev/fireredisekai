@@ -63,6 +63,9 @@ static void Task_ControlsGuide_Clear(u8);
 static void Task_PikachuIntro_LoadPage1(u8);
 static void Task_PikachuIntro_HandleInput(u8);
 static void Task_PikachuIntro_Clear(u8);
+static void Task_OakSpeech_ColdOpen(u8);
+static void Task_OakSpeech_ColdOpenWait(u8);
+static void Task_OakSpeech_ColdOpenEnd(u8);
 
 static void Task_OakSpeech_Init(u8);
 static void Task_OakSpeech_WelcomeToTheWorld(u8);
@@ -1095,7 +1098,54 @@ static void Task_PikachuIntro_Clear(u8 taskId)
         FillBgTilemapBufferRect_Palette0(1, 0, 0, 0, 30, 20);
         CopyBgTilemapBufferToVram(1);
         DestroyPikachuOrPlatformSprites(taskId, SPRITE_TYPE_PIKACHU);
-        tTimer = 80;
+        tTimer = 60;
+        gTasks[taskId].func = Task_OakSpeech_ColdOpen;
+    }
+}
+
+// FireRed Isekai: the Truck-kun cold open, white text on a black screen, before Oak appears.
+static const u8 sTextColor_ColdOpen[3] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY};
+static EWRAM_DATA u8 sColdOpenWindowId = 0;
+
+static void Task_OakSpeech_ColdOpen(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    if (tTimer != 0)
+    {
+        tTimer--;
+        return;
+    }
+    // Backdrop is already black and BG1/BG2 are empty or hidden, so only the text shows.
+    // A large centred window (same template the Pikachu intro uses), not the bottom dialogue box.
+    sColdOpenWindowId = AddWindow(&sIntro_WindowTemplates[WIN_INTRO_TEXTBOX]);
+    PutWindowTilemap(sColdOpenWindowId);
+    FillWindowPixelBuffer(sColdOpenWindowId, PIXEL_FILL(0));
+    CopyWindowToVram(sColdOpenWindowId, COPYWIN_FULL);
+    AddTextPrinterParameterized4(sColdOpenWindowId, FONT_NORMAL, 8, 36, 0, 2, sTextColor_ColdOpen,
+                                 sOakSpeechResources->textSpeed, gOakSpeech_Text_ColdOpen);
+    BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
+    gTasks[taskId].func = Task_OakSpeech_ColdOpenWait;
+}
+
+static void Task_OakSpeech_ColdOpenWait(u8 taskId)
+{
+    if (!gPaletteFade.active && !IsTextPrinterActiveOnWindow(sColdOpenWindowId) && JOY_NEW(A_BUTTON | B_BUTTON))
+    {
+        BeginNormalPaletteFade(PALETTES_ALL, 2, 0, 16, RGB_BLACK);
+        gTasks[taskId].func = Task_OakSpeech_ColdOpenEnd;
+    }
+}
+
+static void Task_OakSpeech_ColdOpenEnd(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    if (!gPaletteFade.active)
+    {
+        FillWindowPixelBuffer(sColdOpenWindowId, PIXEL_FILL(0));
+        ClearWindowTilemap(sColdOpenWindowId);
+        CopyWindowToVram(sColdOpenWindowId, COPYWIN_FULL);
+        RemoveWindow(sColdOpenWindowId);
+        tTimer = 40;
         gTasks[taskId].func = Task_OakSpeech_Init;
     }
 }

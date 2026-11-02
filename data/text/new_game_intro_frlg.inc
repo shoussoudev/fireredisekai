@@ -186,7 +186,7 @@ gPikachuIntro_Text_Page3::
 	.string "Press the A Button, and let your\n"
 	.string "adventure begin!$"
 
-gOakSpeech_Text_WelcomeToTheWorld::
+gOakSpeech_Text_ColdOpen::
 	.string "Tuesday. 7:48 p.m.\p"
 	.string "You're in your thirties.\n"
 	.string "A job you don't love.\p"
@@ -202,7 +202,9 @@ gOakSpeech_Text_WelcomeToTheWorld::
 	.string "There's a truck.\p"
 	.string "…Of course there's a truck.\p"
 	.string "HOOOOOONK!\p"
-	.string "… … …\p"
+	.string "… … …$"
+
+gOakSpeech_Text_WelcomeToTheWorld::
 	.string "Hello, there!\n"
 	.string "Glad to meet you!\p"
 	.string "Welcome to the world of POKéMON!\p"
