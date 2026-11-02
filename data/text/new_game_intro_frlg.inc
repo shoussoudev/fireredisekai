@@ -229,6 +229,10 @@ gOakSpeech_Text_TellMeALittleAboutYourself::
 	.string "But first, tell me a little about\n"
 	.string "yourself.\p$"
 
+gOakSpeech_Text_WhatDoesHeLookLike::
+	.string "…Right. And what does this\n"
+	.string "tired man look like?$"
+
 gOakSpeech_Text_YourNameWhatIsIt::
 	.string "Let's begin with your name.\n"
 	.string "What is it?\p$"

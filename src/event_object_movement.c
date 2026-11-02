@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player_look.h"
 #include "malloc.h"
 #include "battle_anim.h"
 #include "battle_pyramid.h"
@@ -532,7 +533,7 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_RubySapphireBrendan,   OBJ_EVENT_PAL_TAG_RS_BRENDAN},
     {gObjectEventPal_RubySapphireMay,       OBJ_EVENT_PAL_TAG_RS_MAY},
 #if IS_FRLG
-    {gObjectEventPal_PlayerFrlg,            OBJ_EVENT_PAL_TAG_PLAYER_RED},
+    {gPlayerLookOverworldPal,               OBJ_EVENT_PAL_TAG_PLAYER_RED}, // FireRed Isekai: chosen look
     {gObjectEventPal_PlayerReflectionFrlg,  OBJ_EVENT_PAL_TAG_PLAYER_RED_REFLECTION},
     {gObjectEventPal_PlayerFrlg,            OBJ_EVENT_PAL_TAG_PLAYER_GREEN},
     {gObjectEventPal_PlayerReflectionFrlg,  OBJ_EVENT_PAL_TAG_PLAYER_GREEN_REFLECTION},
@@ -3366,6 +3367,9 @@ void PatchObjectPaletteRange(const u16 *paletteTags, u8 minSlot, u8 maxSlot)
 static u8 FindObjectEventPaletteIndexByTag(u16 tag)
 {
     u8 i;
+
+    if (tag == OBJ_EVENT_PAL_TAG_PLAYER_RED)
+        PlayerLook_RefreshOverworldPal(); // FireRed Isekai: make sure the chosen look is loaded
 
     for (i = 0; sObjectEventSpritePalettes[i].tag != OBJ_EVENT_PAL_TAG_NONE; i++)
     {

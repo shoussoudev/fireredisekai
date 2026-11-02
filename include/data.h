@@ -391,8 +391,14 @@ static inline const u32 *GetTrainerFrontPicData(enum TrainerPicID trainerPic)
     return gTrainerPicInfo[SanitizeFrontTrainerPic(trainerPic)].frontPic->imageData;
 }
 
+// FireRed Isekai: the player's pics are recoloured to the chosen look.
+const u16 *PlayerLook_GetOverworldPal(void);
+const u16 *PlayerLook_GetFrontPal(void);
+
 static inline const u16 *GetTrainerFrontPicPalette(enum TrainerPicID trainerPic)
 {
+    if (trainerPic == TRAINER_PIC_RED)
+        return PlayerLook_GetFrontPal();
     return gTrainerPicInfo[SanitizeFrontTrainerPic(trainerPic)].frontPic->paletteData;
 }
 
@@ -423,6 +429,8 @@ static inline const union AnimCmd *const *GetTrainerBackPicAnims(enum TrainerPic
 
 static inline const u16 *GetTrainerBackPicPalette(enum TrainerPicID trainerPic)
 {
+    if (trainerPic == TRAINER_PIC_RED)
+        return PlayerLook_GetOverworldPal(); // the back sprite shares the overworld palette
     return gTrainerPicInfo[SanitizeBackTrainerPic(trainerPic)].backPic->paletteData;
 }
 

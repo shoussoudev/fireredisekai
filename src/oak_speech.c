@@ -10,6 +10,7 @@
 #include "naming_screen.h"
 #include "overworld.h"
 #include "palette.h"
+#include "player_look.h"
 #include "pokeball.h"
 #include "random.h"
 #include "scanline_effect.h"
@@ -80,6 +81,8 @@ static void Task_OakSpeech_AskPlayerGender(u8);
 static void Task_OakSpeech_ShowGenderOptions(u8);
 static void Task_OakSpeech_HandleGenderInput(u8);
 static void Task_OakSpeech_ClearGenderWindows(u8);
+static void Task_OakSpeech_ShowLookPicker(u8);
+static void Task_OakSpeech_HandleLookInput(u8);
 static void Task_OakSpeech_LoadPlayerPic(u8);
 static void Task_OakSpeech_YourNameWhatIsIt(u8);
 static void Task_OakSpeech_FadeOutForPlayerNamingScreen(u8);
@@ -335,6 +338,32 @@ static const struct WindowTemplate sIntro_WindowTemplates[NUM_INTRO_WINDOWS + 1]
     },
     DUMMY_WIN_TEMPLATE
 };
+
+// FireRed Isekai: the only answer to "boy or girl?", and the look picker.
+static const struct WindowTemplate sManTired_WindowTemplate =
+{
+    .bg = 0,
+    .tilemapLeft = 17,
+    .tilemapTop = 9,
+    .width = 10,
+    .height = 2,
+    .paletteNum = 15,
+    .baseBlock = 360
+};
+
+static const struct WindowTemplate sLookPicker_WindowTemplate =
+{
+    .bg = 0,
+    .tilemapLeft = 19,
+    .tilemapTop = 9,
+    .width = 10,
+    .height = 2,
+    .paletteNum = 15,
+    .baseBlock = 360
+};
+
+static const u8 sText_ManTired[] = _("MAN (TIRED)");
+static const u8 sText_LookArrows[] = _("{LEFT_ARROW}{STR_VAR_1}{RIGHT_ARROW}");
 
 static const u8 sTextColor_White[] = { 0, 1, 2, 0 };
 static const u8 sTextColor_DarkGray[] = { 0, 2, 3, 0 };
@@ -712,6 +741,7 @@ void StartNewGameSceneFrlg(void)
 #define tMenuWindowId               data[13]
 #define tTextboxWindowId            data[14]
 #define tDelta                      data[15]
+#define tLookChoice                 data[11]
 
 static void Task_NewGameScene(u8 taskId)
 {
@@ -1343,19 +1373,16 @@ static void Task_OakSpeech_ShowGenderOptions(u8 taskId)
 {
     if (!IsTextPrinterActiveOnWindow(WIN_INTRO_TEXTBOX))
     {
-        gTasks[taskId].tMenuWindowId = AddWindow(&sIntro_WindowTemplates[WIN_INTRO_BOYGIRL]);
+        // FireRed Isekai: "Are you a boy? Or are you a girl?" has exactly one answer.
+        gTasks[taskId].tMenuWindowId = AddWindow(&sManTired_WindowTemplate);
         PutWindowTilemap(gTasks[taskId].tMenuWindowId);
         DrawStdFrameWithCustomTileAndPalette(gTasks[taskId].tMenuWindowId, TRUE, STD_WINDOW_BASE_TILE_NUM, 14);
         FillWindowPixelBuffer(gTasks[taskId].tMenuWindowId, PIXEL_FILL(1));
         sOakSpeechResources->textColor[0] = 1;
         sOakSpeechResources->textColor[1] = 2;
         sOakSpeechResources->textColor[2] = 3;
-        AddTextPrinterParameterized3(gTasks[taskId].tMenuWindowId, FONT_NORMAL, 8, 1, sOakSpeechResources->textColor, 0, gText_Boy);
-        sOakSpeechResources->textColor[0] = 1;
-        sOakSpeechResources->textColor[1] = 2;
-        sOakSpeechResources->textColor[2] = 3;
-        AddTextPrinterParameterized3(gTasks[taskId].tMenuWindowId, FONT_NORMAL, 8, 17, sOakSpeechResources->textColor, 0, gText_Girl);
-        InitMenuNormal(gTasks[taskId].tMenuWindowId, FONT_NORMAL, 0, 1, GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT) + 2, 2, 0);
+        AddTextPrinterParameterized3(gTasks[taskId].tMenuWindowId, FONT_NORMAL, 8, 1, sOakSpeechResources->textColor, 0, sText_ManTired);
+        InitMenuNormal(gTasks[taskId].tMenuWindowId, FONT_NORMAL, 0, 1, GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT) + 2, 1, 0);
         CopyWindowToVram(gTasks[taskId].tMenuWindowId, COPYWIN_FULL);
         gTasks[taskId].func = Task_OakSpeech_HandleGenderInput;
     }
@@ -1366,11 +1393,9 @@ static void Task_OakSpeech_HandleGenderInput(u8 taskId)
     s8 input = Menu_ProcessInputNoWrap();
     switch (input)
     {
-    case 0: // BOY
+    case 0: // MAN (TIRED)
         gSaveBlock2Ptr->playerGender = MALE;
-        break;
-    case 1: // GIRL
-        gSaveBlock2Ptr->playerGender = FEMALE;
+        PlayerLook_Set(0);
         break;
     case MENU_B_PRESSED:
     case MENU_NOTHING_CHOSEN:
@@ -1416,9 +1441,64 @@ static void Task_OakSpeech_YourNameWhatIsIt(u8 taskId)
         else
         {
             tTrainerPicPosX = 0;
-            OakSpeechPrintMessage(gOakSpeech_Text_YourNameWhatIsIt, sOakSpeechResources->textSpeed, FALSE);
-            gTasks[taskId].func = Task_OakSpeech_FadeOutForPlayerNamingScreen;
+            OakSpeechPrintMessage(gOakSpeech_Text_WhatDoesHeLookLike, sOakSpeechResources->textSpeed, FALSE);
+            gTasks[taskId].func = Task_OakSpeech_ShowLookPicker;
         }
+    }
+}
+
+static void PrintLookChoice(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    FillWindowPixelBuffer(tMenuWindowId, PIXEL_FILL(1));
+    StringCopy(gStringVar1, gPlayerLookNames[tLookChoice]);
+    StringExpandPlaceholders(gStringVar4, sText_LookArrows);
+    sOakSpeechResources->textColor[0] = 1;
+    sOakSpeechResources->textColor[1] = 2;
+    sOakSpeechResources->textColor[2] = 3;
+    AddTextPrinterParameterized3(tMenuWindowId, FONT_NORMAL, 2, 1, sOakSpeechResources->textColor, 0, gStringVar4);
+    CopyWindowToVram(tMenuWindowId, COPYWIN_FULL);
+}
+
+static void Task_OakSpeech_ShowLookPicker(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    if (!IsTextPrinterActiveOnWindow(WIN_INTRO_TEXTBOX))
+    {
+        tLookChoice = PlayerLook_Get();
+        tMenuWindowId = AddWindow(&sLookPicker_WindowTemplate);
+        PutWindowTilemap(tMenuWindowId);
+        DrawStdFrameWithCustomTileAndPalette(tMenuWindowId, TRUE, STD_WINDOW_BASE_TILE_NUM, 14);
+        PrintLookChoice(taskId);
+        gTasks[taskId].func = Task_OakSpeech_HandleLookInput;
+    }
+}
+
+static void Task_OakSpeech_HandleLookInput(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    s32 delta = 0;
+
+    if (JOY_NEW(DPAD_LEFT))
+        delta = PLAYER_LOOK_COUNT - 1;
+    else if (JOY_NEW(DPAD_RIGHT))
+        delta = 1;
+
+    if (delta != 0)
+    {
+        PlaySE(SE_SELECT);
+        tLookChoice = (tLookChoice + delta) % PLAYER_LOOK_COUNT;
+        LoadPalette(PlayerLook_GetIntroPal(tLookChoice), BG_PLTT_ID(4), sizeof(sOakSpeech_Red_Pal));
+        PrintLookChoice(taskId);
+    }
+    else if (JOY_NEW(A_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        PlayerLook_Set(tLookChoice);
+        ClearStdWindowAndFrameToTransparent(tMenuWindowId, TRUE);
+        RemoveWindow(tMenuWindowId);
+        OakSpeechPrintMessage(gOakSpeech_Text_YourNameWhatIsIt, sOakSpeechResources->textSpeed, FALSE);
+        gTasks[taskId].func = Task_OakSpeech_FadeOutForPlayerNamingScreen;
     }
 }
 
@@ -2025,7 +2105,7 @@ static void LoadTrainerPic(u16 whichPic, u16 tileOffset)
     switch (whichPic)
     {
     case MALE_PLAYER_PIC:
-        LoadPalette(sOakSpeech_Red_Pal, BG_PLTT_ID(4), sizeof(sOakSpeech_Red_Pal));
+        LoadPalette(PlayerLook_GetIntroPal(PlayerLook_Get()), BG_PLTT_ID(4), sizeof(sOakSpeech_Red_Pal));
         DecompressDataWithHeaderVram(sOakSpeech_Red_Tiles, (void *)VRAM + 0x600 + tileOffset);
         break;
     case FEMALE_PLAYER_PIC:
