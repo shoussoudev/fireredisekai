@@ -363,6 +363,7 @@ static const struct WindowTemplate sLookPicker_WindowTemplate =
 };
 
 static const u8 sText_ManTired[] = _("MAN (TIRED)");
+static const u8 sText_RivalBlue[] = _("BLUE");
 static const u8 sText_LookArrows[] = _("{LEFT_ARROW}{STR_VAR_1}{RIGHT_ARROW}");
 
 static const u8 sTextColor_White[] = { 0, 1, 2, 0 };
@@ -1632,9 +1633,12 @@ static void Task_OakSpeech_HandleConfirmNameInput(u8 taskId)
         gTasks[taskId].tTimer = 40;
         if (sOakSpeechResources->hasPlayerBeenNamed == FALSE)
         {
+            // FireRed Isekai: no rival naming. He's Oak's grandson, BLUE.
+            StringCopy(gSaveBlock1Ptr->rivalName, sText_RivalBlue);
+            sOakSpeechResources->hasPlayerBeenNamed = TRUE;
             ClearDialogWindowAndFrame(WIN_INTRO_TEXTBOX, TRUE);
             CreateFadeInTask(taskId, 2);
-            gTasks[taskId].func = Task_OakSpeech_FadeOutPlayerPic;
+            gTasks[taskId].func = Task_OakSpeech_ReshowPlayersPic;
         }
         else
         {

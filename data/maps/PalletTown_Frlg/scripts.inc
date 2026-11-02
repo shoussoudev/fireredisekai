@@ -35,6 +35,7 @@ PalletTown_EventScript_MoveSignLadyToRouteEntrance::
 	return
 
 PalletTown_OnFrame::
+	map_script_2 VAR_ISEKAI_INTRO, 3, PalletTown_EventScript_LandedFromWindow
 	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_OAK, 2, PalletTown_EventScript_OakRatingScene
 	.2byte 0
 
@@ -546,3 +547,24 @@ PalletTown_Text_PressStartToOpenMenuCopy::
 	.string "Press START to open the MENU!$"
 
 
+
+@ FireRed Isekai: landing in the flowerbed after climbing out of Red's window
+PalletTown_EventScript_LandedFromWindow::
+	lockall
+	turnobject LOCALID_PLAYER, DIR_SOUTH
+	delay 20
+	msgbox PalletTown_Text_LandedFromWindow
+	closemessage
+	setvar VAR_ISEKAI_INTRO, 4
+	releaseall
+	end
+
+PalletTown_Text_LandedFromWindow::
+	.string "You land in a flowerbed.\p"
+	.string "Your ankle files a formal complaint.\p"
+	.string "(You'll be walking, not running,\n"
+	.string "until a nurse takes a look at it.)\p"
+	.string "Somewhere inside the house,\n"
+	.string "a woman screams about a window.\p"
+	.string "PROF. OAK's lab is just down the road.\n"
+	.string "Better get there before the police do.$"

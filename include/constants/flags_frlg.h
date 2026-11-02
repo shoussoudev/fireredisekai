@@ -11,6 +11,11 @@
 #define FLAG_0x026               0x026
 #define FLAG_0x027               0x027
 
+// FireRed Isekai story flags (reuse the unused 0x020-0x027 block)
+#define FLAG_ISEKAI_WINDOW_ESCAPE    FLAG_0x020 // left the house through the window
+#define FLAG_ISEKAI_LIMPING          FLAG_0x021 // hurt ankle: walk-only until a Center
+#define FLAG_ISEKAI_MET_REDS_MUM     FLAG_0x022 // frying pan scene seen
+
 // Hide/show flags
 #define FLAG_HIDE_BULBASAUR_BALL                           0x028
 #define FLAG_HIDE_SQUIRTLE_BALL                            0x029

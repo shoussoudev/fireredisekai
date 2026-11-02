@@ -48,6 +48,7 @@
 #define VAR_QUEST_LOG_MON_COUNTS           0x4027
 #define VAR_WONDER_NEWS_STEP_COUNTER_FRLG  0x4028
 #define VAR_0x4029                         0x4029
+#define VAR_ISEKAI_INTRO                   VAR_0x4029 // FireRed Isekai: 0 asleep, 1 awake, 2 left by stairs, 3 landed from window, 4 window scene done
 #define VAR_0x402A                         0x402A
 #define VAR_0x402B                         0x402B
 #define VAR_DAYS_FRLG                      0x402C // was VAR_RESET_RTC_ENABLE
