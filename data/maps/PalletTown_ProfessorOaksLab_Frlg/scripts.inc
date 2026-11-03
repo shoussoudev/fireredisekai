@@ -296,9 +296,7 @@ PalletTown_ProfessorOaksLab_EventScript_RivalBattle::
 	closemessage
 	applymovement LOCALID_OAKS_LAB_PROF_OAK, Common_Movement_FaceDown
 	waitmovement 0
-	goto_if_eq VAR_STARTER_MON, 0, PalletTown_ProfessorOaksLab_EventScript_RivalApproachForBattleCharmander
-	goto_if_eq VAR_STARTER_MON, 1, PalletTown_ProfessorOaksLab_EventScript_RivalApproachForBattleBulbasaur
-	goto_if_eq VAR_STARTER_MON, 2, PalletTown_ProfessorOaksLab_EventScript_RivalApproachForBattleSquirtle
+	goto PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalApproach
 	end
 
 @ The scripts for the rival approaching the player for battle are a bit bloated because
@@ -469,9 +467,9 @@ PalletTown_ProfessorOaksLab_EventScript_EndRivalBattle::
 	msgbox PalletTown_ProfessorOaksLab_Text_RivalGoToughenMyMon
 	closemessage
 	playbgm MUS_RG_RIVAL_EXIT, 0
-	call_if_eq VAR_TEMP_2, 1, PalletTown_ProfessorOaksLab_EventScript_RivalExitAfterBattleLeft
-	call_if_eq VAR_TEMP_2, 2, PalletTown_ProfessorOaksLab_EventScript_RivalExitAfterBattleMid
-	call_if_eq VAR_TEMP_2, 3, PalletTown_ProfessorOaksLab_EventScript_RivalExitAfterBattleRight
+	call_if_eq VAR_TEMP_2, 1, PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalExitLeft
+	call_if_eq VAR_TEMP_2, 2, PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalExitMid
+	call_if_eq VAR_TEMP_2, 3, PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalExitRight
 	removeobject LOCALID_OAKS_LAB_RIVAL
 	playse SE_EXIT
 	fadedefaultbgm
@@ -1068,7 +1066,7 @@ PalletTown_ProfessorOaksLab_EventScript_BulbasaurBall::
 	lock
 	faceplayer
 	setvar PLAYER_STARTER_NUM, 0
-	setvar PLAYER_STARTER_SPECIES, SPECIES_BULBASAUR
+	setvar PLAYER_STARTER_SPECIES, SPECIES_PSYDUCK
 	setvar RIVAL_STARTER_SPECIES, SPECIES_CHARMANDER
 	setvar RIVAL_STARTER_ID, LOCALID_CHARMANDER_BALL
 	goto_if_ge VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 3, PalletTown_ProfessorOaksLab_EventScript_LastPokeBall
@@ -1118,7 +1116,8 @@ PalletTown_ProfessorOaksLab_EventScript_ChoseStarter::
 	setflag FLAG_SYS_POKEMON_GET
 	setflag FLAG_PALLET_LADY_NOT_BLOCKING_SIGN
 	givemon PLAYER_STARTER_SPECIES, 5
-	copyvar VAR_STARTER_MON, PLAYER_STARTER_NUM
+	setvar VAR_STARTER_MON, 0
+	copyvar VAR_ISEKAI_LOANER_SPECIES, PLAYER_STARTER_SPECIES
 	bufferspeciesname STR_VAR_1, PLAYER_STARTER_SPECIES
 	message PalletTown_ProfessorOaksLab_Text_ReceivedMonFromOak
 	waitmessage
@@ -1137,6 +1136,7 @@ EventScript_GiveNicknameToStarter::
 
 PalletTown_ProfessorOaksLab_EventScript_RivalPicksStarter::
 	closemessage
+	goto PalletTown_ProfessorOaksLab_EventScript_IsekaiDeposit
 	goto_if_eq PLAYER_STARTER_NUM, 0, PalletTown_ProfessorOaksLab_EventScript_RivalWalksToCharmander
 	goto_if_eq PLAYER_STARTER_NUM, 1, PalletTown_ProfessorOaksLab_EventScript_RivalWalksToBulbasaur
 	goto_if_eq PLAYER_STARTER_NUM, 2, PalletTown_ProfessorOaksLab_EventScript_RivalWalksToSquirtle
@@ -1211,7 +1211,7 @@ PalletTown_ProfessorOaksLab_EventScript_SquirtleBall::
 	lock
 	faceplayer
 	setvar PLAYER_STARTER_NUM, 1
-	setvar PLAYER_STARTER_SPECIES, SPECIES_SQUIRTLE
+	setvar PLAYER_STARTER_SPECIES, SPECIES_SLOWPOKE
 	setvar RIVAL_STARTER_SPECIES, SPECIES_BULBASAUR
 	setvar RIVAL_STARTER_ID, LOCALID_BULBASAUR_BALL
 	goto_if_ge VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 3, PalletTown_ProfessorOaksLab_EventScript_LastPokeBall
@@ -1223,6 +1223,10 @@ PalletTown_ProfessorOaksLab_EventScript_SquirtleBall::
 PalletTown_ProfessorOaksLab_EventScript_CharmanderBall::
 	lock
 	faceplayer
+	msgbox PalletTown_ProfessorOaksLab_Text_EmptyBall
+	release
+	end
+	@ (original Charmander ball script below is unreachable)
 	setvar PLAYER_STARTER_NUM, 2
 	setvar PLAYER_STARTER_SPECIES, SPECIES_CHARMANDER
 	setvar RIVAL_STARTER_SPECIES, SPECIES_SQUIRTLE
@@ -1299,16 +1303,20 @@ PalletTown_ProfessorOaksLab_EventScript_RightSignAlt::
 	end
 
 PalletTown_ProfessorOaksLab_Text_RivalGrampsIsntAround::
-	.string "{RIVAL}: What, it's only {PLAYER}?\n"
-	.string "Gramps isn't around.$"
+	.string "{RIVAL}: …Who are you?\p"
+	.string "Gramps isn't around, old man.\n"
+	.string "And no, I don't have any spare change.$"
 
 PalletTown_ProfessorOaksLab_Text_RivalFedUpWithWaiting::
-	.string "{RIVAL}: Gramps!\n"
-	.string "I'm fed up with waiting!$"
+	.string "{RIVAL}: Gramps! Finally!\p"
+	.string "…Who's the old guy?$"
 
 PalletTown_ProfessorOaksLab_Text_RivalNoFairWhatAboutMe::
-	.string "{RIVAL}: Hey! Gramps! No fair!\n"
-	.string "What about me?$"
+	.string "{RIVAL}: Wait, Gramps! You're giving\n"
+	.string "HIM a POKéMON?\p"
+	.string "I only got EEVEE last week!\n"
+	.string "And RED ran off with PIKACHU this\l"
+	.string "morning without even saying bye!$"
 
 PalletTown_ProfessorOaksLab_Text_RivalGoChoosePlayer::
 	.string "{RIVAL}: Heh, I don't need to be\n"
@@ -1327,14 +1335,12 @@ PalletTown_ProfessorOaksLab_Text_RivalMyMonLooksTougher::
 	.string "tougher than yours.$"
 
 PalletTown_ProfessorOaksLab_Text_RivalLetsCheckOutMons::
-	.string "{RIVAL}: Wait, {PLAYER}!\n"
-	.string "Let's check out our POKéMON!\p"
-	.string "Come on, I'll take you on!$"
+	.string "{RIVAL}: Hey, old man!\p"
+	.string "Let's see what that rental can do!$"
 
 PalletTown_ProfessorOaksLab_Text_RivalDefeat::
 	.string "WHAT?\n"
-	.string "Unbelievable!\l"
-	.string "I picked the wrong POKéMON!$"
+	.string "Lost to a rental?!$"
 
 @ Also used for early Route 22 battle
 Text_RivalVictory::
@@ -1342,9 +1348,9 @@ Text_RivalVictory::
 	.string "Am I great or what?$"
 
 PalletTown_ProfessorOaksLab_Text_RivalGoToughenMyMon::
-	.string "{RIVAL}: Okay! I'll make my\n"
-	.string "POKéMON battle to toughen it up!\p"
-	.string "{PLAYER}! Gramps!\n"
+	.string "{RIVAL}: Whatever! I'll make EEVEE\n"
+	.string "battle to toughen it up!\p"
+	.string "Gramps! Old man!\n"
 	.string "Smell you later!$"
 
 PalletTown_ProfessorOaksLab_Text_RivalGramps::
@@ -1369,32 +1375,35 @@ PalletTown_ProfessorOaksLab_Text_RivalTellSisNotToGiveYouMap::
 	.string "my place after this!$"
 
 PalletTown_ProfessorOaksLab_Text_OakThreeMonsChooseOne::
-	.string "OAK: {RIVAL}?\n"
-	.string "Let me think…\p"
-	.string "Oh, that's right, I told you to\n"
-	.string "come! Just wait!\p"
-	.string "Here, {PLAYER}.\p"
-	.string "There are three POKéMON here.\p"
-	.string "Haha!\p"
-	.string "The POKéMON are held inside\n"
-	.string "these POKé BALLS.\p"
-	.string "When I was young, I was a serious\n"
-	.string "POKéMON TRAINER.\p"
-	.string "But now, in my old age, I have\n"
-	.string "only these three left.\p"
-	.string "You can have one.\n"
-	.string "Go on, choose!$"
+	.string "OAK: Now then.\p"
+	.string "You're the man who woke up in\n"
+	.string "RED's bed.\p"
+	.string "…\p"
+	.string "Aren't you a bit old to be starting\n"
+	.string "a POKéMON journey?\p"
+	.string "Shouldn't you have a job?\p"
+	.string "…Hmm. You look like someone who's\n"
+	.string "had a job. For a long time.\p"
+	.string "Well. I don't give POKéMON to\n"
+	.string "strangers.\p"
+	.string "But I can LEND you one.\p"
+	.string "Those two on the table were waiting\n"
+	.string "for new homes. Nobody wanted them.\p"
+	.string "Borrow one. Go to ROUTE 1 and catch\n"
+	.string "a POKéMON of your own.\p"
+	.string "Then bring mine back.\p"
+	.string "Of course, I'll need a deposit.\n"
+	.string "How much money do you have?\p"
+	.string "…\p"
+	.string "All of it, then.$"
 
 PalletTown_ProfessorOaksLab_Text_OakBePatientRival::
-	.string "OAK: Be patient, {RIVAL}.\n"
-	.string "You can have one, too!$"
+	.string "OAK: Lending, {RIVAL}. Lending.\n"
+	.string "And he's paying for it.$"
 
 PalletTown_ProfessorOaksLab_Text_OakWhichOneWillYouChoose::
-	.string "OAK: Now, {PLAYER}.\p"
-	.string "Inside those three POKé BALLS are\n"
-	.string "POKéMON.\p"
-	.string "Which one will you choose for\n"
-	.string "yourself?$"
+	.string "OAK: The two POKé BALLS on the\n"
+	.string "left. Which one will you borrow?$"
 
 PalletTown_ProfessorOaksLab_Text_OakHeyDontGoAwayYet::
 	.string "OAK: Hey!\n"
@@ -1407,30 +1416,34 @@ PalletTown_ProfessorOaksLab_Text_OakChoosingCharmander::
 	.string "FIRE POKéMON CHARMANDER?$"
 
 PalletTown_ProfessorOaksLab_Text_OakChoosingSquirtle::
-	.string "Hm! SQUIRTLE is your choice.\n"
-	.string "It's one worth raising.\p"
-	.string "So, {PLAYER}, you've decided on the\n"
-	.string "WATER POKéMON SQUIRTLE?$"
+	.string "SLOWPOKE.\n"
+	.string "Zero thoughts. Just vibes.\p"
+	.string "Its moves sometimes land a turn\n"
+	.string "late. Very relaxing to be around.\p"
+	.string "So, {PLAYER}, you'll borrow\n"
+	.string "SLOWPOKE?$"
 
 PalletTown_ProfessorOaksLab_Text_OakChoosingBulbasaur::
-	.string "I see! BULBASAUR is your choice.\n"
-	.string "It's very easy to raise.\p"
-	.string "So, {PLAYER}, you want to go with\n"
-	.string "the GRASS POKéMON BULBASAUR?$"
+	.string "PSYDUCK.\n"
+	.string "Permanently anxious. Constant\l"
+	.string "headache.\p"
+	.string "Some days it's too stressed to do\n"
+	.string "anything at all. You'll get along.\p"
+	.string "So, {PLAYER}, you'll borrow\n"
+	.string "PSYDUCK?$"
 
 PalletTown_ProfessorOaksLab_Text_OakThisMonIsEnergetic::
-	.string "This POKéMON is really quite\n"
-	.string "energetic!$"
+	.string "OAK: Good. Now, the deposit.$"
 
 PalletTown_ProfessorOaksLab_Text_ReceivedMonFromOak::
-	.string "{PLAYER} received the {STR_VAR_1}\n"
+	.string "{PLAYER} borrowed {STR_VAR_1}\n"
 	.string "from PROF. OAK!$"
 
 PalletTown_ProfessorOaksLab_Text_OakCanReachNextTownWithMon::
-	.string "OAK: If a wild POKéMON appears,\n"
-	.string "your POKéMON can battle it.\p"
-	.string "With it at your side, you should be\n"
-	.string "able to reach the next town.$"
+	.string "OAK: Go to ROUTE 1 and catch a\n"
+	.string "POKéMON that wants to come with you.\p"
+	.string "Then bring mine back.\n"
+	.string "In one piece, ideally.$"
 
 PalletTown_ProfessorOaksLab_Text_OakBattleMonForItToGrow::
 	.string "OAK: {PLAYER}, raise your young\n"
@@ -1655,3 +1668,129 @@ PalletTown_ProfessorOaksLab_Text_RivalIllCompleteThePokedex::
 	.string "ONE ISLAND first…\p"
 	.string "Anyways, I'm outta here!$"
 
+
+@ ---------------------------------------------------------------------------
+@ FireRed Isekai: the loaner deal
+@ ---------------------------------------------------------------------------
+PalletTown_ProfessorOaksLab_EventScript_IsekaiDeposit::
+	textcolor NPC_TEXT_COLOR_NEUTRAL
+	special IsekaiTakeAllMoney
+	playse SE_SHOP
+	msgbox PalletTown_ProfessorOaksLab_Text_HandedOverDeposit
+	textcolor NPC_TEXT_COLOR_MALE
+	msgbox PalletTown_ProfessorOaksLab_Text_BallsAreExtra
+	giveitem ITEM_POKE_BALL, 5
+	textcolor NPC_TEXT_COLOR_MALE
+	msgbox PalletTown_ProfessorOaksLab_Text_OakCanReachNextTownWithMon
+	setflag FLAG_ISEKAI_HAS_LOANER
+	setvar VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 3
+	call_if_set FLAG_OPENED_START_MENU, PalletTown_ProfessorOaksLab_EventScript_ReadyEndSignLadyScene
+	release
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalApproach::
+	call_if_eq VAR_TEMP_2, 1, PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalApproachLeft
+	call_if_eq VAR_TEMP_2, 2, PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalApproachMid
+	call_if_eq VAR_TEMP_2, 3, PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalApproachRight
+	trainerbattle_earlyrival TRAINER_RIVAL_OAKS_LAB_CHARMANDER, RIVAL_BATTLE_TUTORIAL, PalletTown_ProfessorOaksLab_Text_RivalDefeat, Text_RivalVictory
+	goto PalletTown_ProfessorOaksLab_EventScript_EndRivalBattle
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalApproachLeft::
+	applymovement LOCALID_OAKS_LAB_RIVAL, PalletTown_ProfessorOaksLab_Movement_IsekaiRivalApproachLeft
+	waitmovement 0
+	return
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalApproachMid::
+	applymovement LOCALID_OAKS_LAB_RIVAL, PalletTown_ProfessorOaksLab_Movement_IsekaiRivalApproachMid
+	waitmovement 0
+	return
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalApproachRight::
+	applymovement LOCALID_OAKS_LAB_RIVAL, PalletTown_ProfessorOaksLab_Movement_IsekaiRivalApproachRight
+	waitmovement 0
+	return
+
+@ Blue starts at (5,4); the player is at (5,8), (6,8) or (7,8)
+PalletTown_ProfessorOaksLab_Movement_IsekaiRivalApproachLeft::
+	walk_down
+	walk_down
+	walk_down
+	step_end
+
+PalletTown_ProfessorOaksLab_Movement_IsekaiRivalApproachMid::
+	walk_down
+	walk_down
+	walk_right
+	walk_down
+	step_end
+
+PalletTown_ProfessorOaksLab_Movement_IsekaiRivalApproachRight::
+	walk_down
+	walk_down
+	walk_right
+	walk_right
+	walk_down
+	step_end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalExitLeft::
+	applymovement LOCALID_OAKS_LAB_RIVAL, PalletTown_ProfessorOaksLab_Movement_IsekaiRivalExitLeft
+	applymovement LOCALID_PLAYER, PalletTown_ProfessorOaksLab_Movement_PlayerWatchRivalExitAfterBattle
+	waitmovement LOCALID_OAKS_LAB_RIVAL
+	return
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalExitMid::
+	applymovement LOCALID_OAKS_LAB_RIVAL, PalletTown_ProfessorOaksLab_Movement_IsekaiRivalExitMid
+	applymovement LOCALID_PLAYER, PalletTown_ProfessorOaksLab_Movement_PlayerWatchRivalExitAfterBattle
+	waitmovement LOCALID_OAKS_LAB_RIVAL
+	return
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiRivalExitRight::
+	applymovement LOCALID_OAKS_LAB_RIVAL, PalletTown_ProfessorOaksLab_Movement_IsekaiRivalExitRight
+	applymovement LOCALID_PLAYER, PalletTown_ProfessorOaksLab_Movement_PlayerWatchRivalExitAfterBattleRight
+	waitmovement LOCALID_OAKS_LAB_RIVAL
+	return
+
+PalletTown_ProfessorOaksLab_Movement_IsekaiRivalExitLeft::
+	walk_right
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	delay_8
+	step_end
+
+PalletTown_ProfessorOaksLab_Movement_IsekaiRivalExitMid::
+	walk_right
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	delay_8
+	step_end
+
+PalletTown_ProfessorOaksLab_Movement_IsekaiRivalExitRight::
+	walk_left
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	delay_8
+	step_end
+
+PalletTown_ProfessorOaksLab_Text_EmptyBall::
+	.string "It's empty.\p"
+	.string "OAK: Ah. RED took that one this\n"
+	.string "morning. Barely said goodbye.$"
+
+PalletTown_ProfessorOaksLab_Text_HandedOverDeposit::
+	.string "{PLAYER} handed over ¥{STR_VAR_1}.\n"
+	.string "That's everything.$"
+
+PalletTown_ProfessorOaksLab_Text_BallsAreExtra::
+	.string "OAK: Oh, and POKé BALLS are extra.\p"
+	.string "…\p"
+	.string "Fine. Take five. On credit.$"

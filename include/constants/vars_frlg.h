@@ -50,7 +50,9 @@
 #define VAR_0x4029                         0x4029
 #define VAR_ISEKAI_INTRO                   VAR_0x4029 // FireRed Isekai: 0 asleep, 1 awake, 2 left by stairs, 3 landed from window, 4 window scene done
 #define VAR_0x402A                         0x402A
+#define VAR_ISEKAI_LOANER_SPECIES          VAR_0x402A // FireRed Isekai: species borrowed from Oak
 #define VAR_0x402B                         0x402B
+#define VAR_ISEKAI_LOAN_DEPOSIT            VAR_0x402B // FireRed Isekai: money handed to Oak as deposit
 #define VAR_DAYS_FRLG                      0x402C // was VAR_RESET_RTC_ENABLE
 #define VAR_0x402D                         0x402D
 #define VAR_0x402E                         0x402E

@@ -1658,7 +1658,7 @@ static void Task_OakSpeech_HandleConfirmNameInput(u8 taskId)
     }
 }
 
-static void Task_OakSpeech_FadeOutPlayerPic(u8 taskId)
+static void UNUSED Task_OakSpeech_FadeOutPlayerPic(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
 

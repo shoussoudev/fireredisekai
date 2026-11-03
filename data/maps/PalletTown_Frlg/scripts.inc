@@ -450,16 +450,16 @@ PalletTown_EventScript_SignLadyStartShowSign::
 	end
 
 PalletTown_Text_OakDontGoOut::
-	.string "OAK: Hey! Wait!\n"
-	.string "Don't go out!$"
+	.string "OAK: Hey! You! Wait!\n"
+	.string "Don't go in there!$"
 
 PalletTown_Text_OakGrassUnsafeNeedMon::
-	.string "OAK: It's unsafe!\n"
-	.string "Wild POKéMON live in tall grass!\p"
-	.string "You need your own POKéMON for\n"
-	.string "your protection.\p"
-	.string "I know!\n"
-	.string "Here, come with me!$"
+	.string "OAK: Wild POKéMON live in tall\n"
+	.string "grass! Without one of your own,\l"
+	.string "they'll put you in the hospital!\p"
+	.string "…You're the man from RED's room,\n"
+	.string "aren't you? His mother called.\p"
+	.string "Come with me. Now.$"
 
 PalletTown_Text_RaisingMonsToo::
 	.string "I'm raising POKéMON, too.\p"

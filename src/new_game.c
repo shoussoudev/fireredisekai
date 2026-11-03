@@ -1,4 +1,5 @@
 #include "global.h"
+#include "config/fireredisekai.h"
 #include "clock.h"
 #include "new_game.h"
 #include "random.h"
@@ -135,6 +136,19 @@ static void ClearFrontierRecord(void)
 
 static void WarpToTruck(void)
 {
+#if ISEKAI_START_AT == ISEKAI_START_OAKS_LAB
+    // Developer checkpoint: skip the bedroom and Oak's escort, start the lab scene.
+    VarSet(VAR_ISEKAI_INTRO, 4);
+    VarSet(VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 1);
+    VarSet(VAR_MAP_SCENE_PALLET_TOWN_OAK, 1);
+    VarSet(VAR_MAP_SCENE_PALLET_TOWN_PLAYERS_HOUSE_2F, 1);
+    FlagClear(FLAG_HIDE_OAK_IN_HIS_LAB);
+    FlagSet(FLAG_HIDE_OAK_IN_PALLET_TOWN);
+    FlagSet(FLAG_DONT_TRANSITION_MUSIC);
+    SetWarpDestination(MAP_GROUP(MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB), MAP_NUM(MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB), WARP_ID_NONE, 6, 12);
+    WarpIntoMap();
+    return;
+#endif
     if (IS_FRLG)
         SetWarpDestination(MAP_GROUP(MAP_PALLET_TOWN_PLAYERS_HOUSE_2F), MAP_NUM(MAP_PALLET_TOWN_PLAYERS_HOUSE_2F), WARP_ID_NONE, 3, 6); // FireRed Isekai: wake up beside the bed
     else
