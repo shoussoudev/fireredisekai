@@ -235,7 +235,23 @@ gOakSpeech_Text_WhatDoesHeLookLike::
 
 gOakSpeech_Text_YourNameWhatIsIt::
 	.string "Let's begin with your name.\n"
-	.string "What is it?\p$"
+	.string "What is it?$"
+
+@ FireRed Isekai: the difficulty question
+gOakSpeech_Text_HowMuchSleep::
+	.string "One more thing.\n"
+	.string "How much sleep did you get this week?$"
+
+gOakSpeech_Text_SleepPlenty::
+	.string "Good.\n"
+	.string "You'll need it.$"
+
+gOakSpeech_Text_SleepSome::
+	.string "…That's about what I expected.$"
+
+gOakSpeech_Text_SleepNewborn::
+	.string "Oh. Oh, you poor thing.\n"
+	.string "I'll go easy on you.$"
 
 gOakSpeech_Text_SoYourNameIsPlayer::
 	.string "Right…\n"

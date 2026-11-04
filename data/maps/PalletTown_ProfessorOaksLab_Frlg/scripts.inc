@@ -1118,6 +1118,7 @@ PalletTown_ProfessorOaksLab_EventScript_ChoseStarter::
 	givemon PLAYER_STARTER_SPECIES, 5
 	setvar VAR_STARTER_MON, 0
 	copyvar VAR_ISEKAI_LOANER_SPECIES, PLAYER_STARTER_SPECIES
+	special IsekaiRememberLoaner
 	bufferspeciesname STR_VAR_1, PLAYER_STARTER_SPECIES
 	message PalletTown_ProfessorOaksLab_Text_ReceivedMonFromOak
 	waitmessage
@@ -1399,7 +1400,13 @@ PalletTown_ProfessorOaksLab_Text_OakThreeMonsChooseOne::
 
 PalletTown_ProfessorOaksLab_Text_OakBePatientRival::
 	.string "OAK: Lending, {RIVAL}. Lending.\n"
-	.string "And he's paying for it.$"
+	.string "And he's paying for it.\p"
+	.string "{RIVAL}: Why are you even helping\n"
+	.string "some random stranger?\p"
+	.string "OAK: People don't just appear out\n"
+	.string "of nowhere, {RIVAL}.\p"
+	.string "…\p"
+	.string "…Usually.$"
 
 PalletTown_ProfessorOaksLab_Text_OakWhichOneWillYouChoose::
 	.string "OAK: The two POKé BALLS on the\n"
@@ -1678,10 +1685,12 @@ PalletTown_ProfessorOaksLab_EventScript_IsekaiDeposit::
 	playse SE_SHOP
 	msgbox PalletTown_ProfessorOaksLab_Text_HandedOverDeposit
 	textcolor NPC_TEXT_COLOR_MALE
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiRemindsMeOfSomeone
 	msgbox PalletTown_ProfessorOaksLab_Text_BallsAreExtra
 	giveitem ITEM_POKE_BALL, 5
 	textcolor NPC_TEXT_COLOR_MALE
 	msgbox PalletTown_ProfessorOaksLab_Text_OakCanReachNextTownWithMon
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiPewterHint
 	setflag FLAG_ISEKAI_HAS_LOANER
 	setvar VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 3
 	call_if_set FLAG_OPENED_START_MENU, PalletTown_ProfessorOaksLab_EventScript_ReadyEndSignLadyScene
@@ -1794,3 +1803,17 @@ PalletTown_ProfessorOaksLab_Text_BallsAreExtra::
 	.string "OAK: Oh, and POKé BALLS are extra.\p"
 	.string "…\p"
 	.string "Fine. Take five. On credit.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiRemindsMeOfSomeone::
+	.string "OAK: …\p"
+	.string "…You remind me of someone I knew\n"
+	.string "a long time ago.\p"
+	.string "Anyway.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiPewterHint::
+	.string "OAK: And if you're hoping someone\n"
+	.string "can explain how you got here…\p"
+	.string "There's a fellow at the PEWTER\n"
+	.string "MUSEUM who collects that sort of\l"
+	.string "thing. DR. PEBBLE.\p"
+	.string "…I'd keep your expectations low.$"

@@ -48,12 +48,12 @@
 #define VAR_QUEST_LOG_MON_COUNTS           0x4027
 #define VAR_WONDER_NEWS_STEP_COUNTER_FRLG  0x4028
 #define VAR_0x4029                         0x4029
-#define VAR_ISEKAI_INTRO                   VAR_0x4029 // FireRed Isekai: 0 asleep, 1 awake, 2 left by stairs, 3 landed from window, 4 window scene done
 #define VAR_0x402A                         0x402A
-#define VAR_ISEKAI_LOANER_SPECIES          VAR_0x402A // FireRed Isekai: species borrowed from Oak
 #define VAR_0x402B                         0x402B
-#define VAR_ISEKAI_LOAN_DEPOSIT            VAR_0x402B // FireRed Isekai: money handed to Oak as deposit
 #define VAR_DAYS_FRLG                      0x402C // was VAR_RESET_RTC_ENABLE
+// FireRed Isekai note: 0x4029-0x402F look free here but the shared (Emerald-named)
+// field code still writes some of them (e.g. 0x402A = friendship step counter).
+// Isekai vars live in 0x408C+ instead.
 #define VAR_0x402D                         0x402D
 #define VAR_0x402E                         0x402E
 
@@ -157,11 +157,17 @@
 
 
 #define VAR_0x408C                 0x408C
+#define VAR_ISEKAI_INTRO                   VAR_0x408C // FireRed Isekai: 0 asleep, 1 awake, 2 left by stairs, 3 landed from window, 4 window scene done
 #define VAR_0x408D                 0x408D
+#define VAR_ISEKAI_LOANER_SPECIES          VAR_0x408D // FireRed Isekai: species borrowed from Oak
 #define VAR_0x408E                 0x408E
+#define VAR_ISEKAI_LOAN_DEPOSIT            VAR_0x408E // FireRed Isekai: money handed to Oak as deposit
 #define VAR_0x408F                 0x408F
+#define VAR_ISEKAI_DIFFICULTY              VAR_0x408F // FireRed Isekai: B_VAR_DIFFICULTY (0 easy, 1 normal, 2 hard)
 #define VAR_0x4090                 0x4090
+#define VAR_ISEKAI_LOANER_PID_LO           VAR_0x4090 // FireRed Isekai: loaner's personality, low half
 #define VAR_0x4091                 0x4091
+#define VAR_ISEKAI_LOANER_PID_HI           VAR_0x4091 // FireRed Isekai: loaner's personality, high half
 #define VAR_0x4092                 0x4092
 #define VAR_0x4093                 0x4093
 #define VAR_0x4094                 0x4094

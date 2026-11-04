@@ -3,6 +3,7 @@
 #include "data.h"
 #include "decompress.h"
 #include "event_scripts.h"
+#include "fireredisekai.h"
 #include "gpu_regs.h"
 #include "malloc.h"
 #include "math_util.h"
@@ -20,6 +21,7 @@
 #include "task.h"
 #include "text_window.h"
 #include "util.h"
+#include "constants/difficulty.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
 
@@ -81,7 +83,12 @@ static void Task_OakSpeech_AskPlayerGender(u8);
 static void Task_OakSpeech_ShowGenderOptions(u8);
 static void Task_OakSpeech_HandleGenderInput(u8);
 static void Task_OakSpeech_ClearGenderWindows(u8);
+static void Task_OakSpeech_AskSleep(u8);
+static void Task_OakSpeech_ShowSleepOptions(u8);
+static void Task_OakSpeech_HandleSleepInput(u8);
+static void Task_OakSpeech_SleepReactionDone(u8);
 static void Task_OakSpeech_ShowLookPicker(u8);
+static void Task_OakSpeech_MoveRivalDisplayNameOptions(u8);
 static void Task_OakSpeech_HandleLookInput(u8);
 static void Task_OakSpeech_LoadPlayerPic(u8);
 static void Task_OakSpeech_YourNameWhatIsIt(u8);
@@ -362,7 +369,47 @@ static const struct WindowTemplate sLookPicker_WindowTemplate =
     .baseBlock = 360
 };
 
+// Oak's sleep question (difficulty). Tiles start at 1: the dialogue box lives at 0x194.
+static const struct WindowTemplate sSleep_WindowTemplate =
+{
+    .bg = 0,
+    .tilemapLeft = 14,
+    .tilemapTop = 6,
+    .width = 14,
+    .height = 6,
+    .paletteNum = 15,
+    .baseBlock = 1
+};
+
+// Name list: NEW NAME + the five friends.
+static const struct WindowTemplate sPlayerNames_WindowTemplate =
+{
+    .bg = 0,
+    .tilemapLeft = 2,
+    .tilemapTop = 1,
+    .width = 12,
+    .height = 12,
+    .paletteNum = 15,
+    .baseBlock = 1
+};
+
 static const u8 sText_ManTired[] = _("MAN (TIRED)");
+static const u8 sText_SleepPlenty[] = _("PLENTY");
+static const u8 sText_SleepSome[] = _("SOME");
+static const u8 sText_SleepNewborn[] = _("I HAVE A NEWBORN");
+static const u8 *const sSleepOptions[] = {sText_SleepPlenty, sText_SleepSome, sText_SleepNewborn};
+static const u8 sSleepDifficulty[] = {DIFFICULTY_HARD, DIFFICULTY_NORMAL, DIFFICULTY_EASY};
+
+// FireRed Isekai: the suggested names are the friends. (A sixth name works if typed.)
+static const u8 sFriendName_Long[] = _("LONG");
+static const u8 sFriendName_Pablo[] = _("PABLO");
+static const u8 sFriendName_Keezy[] = _("KEEZY");
+static const u8 sFriendName_Axel[] = _("AXEL");
+static const u8 sFriendName_Kevin[] = _("KEVIN");
+static const u8 *const sFriendNameChoices[] =
+{
+    sFriendName_Long, sFriendName_Pablo, sFriendName_Keezy, sFriendName_Axel, sFriendName_Kevin
+};
 static const u8 sText_RivalBlue[] = _("BLUE");
 static const u8 sText_LookArrows[] = _("{LEFT_ARROW}{STR_VAR_1}{RIGHT_ARROW}");
 
@@ -623,7 +670,7 @@ static const u8 *const sControlsGuide_Pages2And3_Strings[CONTROLS_GUIDE_STRINGS_
     gControlsGuide_Text_LRButtons
 };
 
-static const u8 *const sMaleNameChoices[] =
+static const u8 *const UNUSED sMaleNameChoices[] =
 {
 #if defined(FIRERED)
     gNameChoice_Red,
@@ -654,7 +701,7 @@ static const u8 *const sMaleNameChoices[] =
     gNameChoice_Roak
 };
 
-static const u8 *const sFemaleNameChoices[] =
+static const u8 *const UNUSED sFemaleNameChoices[] =
 {
 #if defined(FIRERED)
     gNameChoice_Red,
@@ -1415,7 +1462,77 @@ static void Task_OakSpeech_ClearGenderWindows(u8 taskId)
     ClearDialogWindowAndFrame(tMenuWindowId, TRUE);
     FillBgTilemapBufferRect_Palette0(0, 0, 0, 0, 30, 20);
     CopyBgTilemapBufferToVram(0);
-    gTasks[taskId].func = Task_OakSpeech_LoadPlayerPic;
+    gTasks[taskId].func = Task_OakSpeech_AskSleep;
+}
+
+// FireRed Isekai: "How much sleep did you get this week?" picks the difficulty.
+static void Task_OakSpeech_AskSleep(u8 taskId)
+{
+    OakSpeechPrintMessage(gOakSpeech_Text_HowMuchSleep, sOakSpeechResources->textSpeed, FALSE);
+    gTasks[taskId].func = Task_OakSpeech_ShowSleepOptions;
+}
+
+static void Task_OakSpeech_ShowSleepOptions(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    u8 i;
+
+    if (!IsTextPrinterActiveOnWindow(WIN_INTRO_TEXTBOX))
+    {
+        tMenuWindowId = AddWindow(&sSleep_WindowTemplate);
+        PutWindowTilemap(tMenuWindowId);
+        DrawStdFrameWithCustomTileAndPalette(tMenuWindowId, TRUE, STD_WINDOW_BASE_TILE_NUM, 14);
+        FillWindowPixelBuffer(tMenuWindowId, PIXEL_FILL(1));
+        sOakSpeechResources->textColor[0] = 1;
+        sOakSpeechResources->textColor[1] = 2;
+        sOakSpeechResources->textColor[2] = 3;
+        for (i = 0; i < ARRAY_COUNT(sSleepOptions); i++)
+            AddTextPrinterParameterized3(tMenuWindowId, FONT_NORMAL, 8, 16 * i + 1, sOakSpeechResources->textColor, 0, sSleepOptions[i]);
+        InitMenuNormal(tMenuWindowId, FONT_NORMAL, 0, 1, 16, ARRAY_COUNT(sSleepOptions), 1); // cursor starts on SOME
+        CopyWindowToVram(tMenuWindowId, COPYWIN_FULL);
+        gTasks[taskId].func = Task_OakSpeech_HandleSleepInput;
+    }
+}
+
+static void Task_OakSpeech_HandleSleepInput(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    const u8 *reaction;
+    s8 input = Menu_ProcessInputNoWrap();
+
+    if (input == MENU_NOTHING_CHOSEN || input == MENU_B_PRESSED)
+        return;
+
+    PlaySE(SE_SELECT);
+    gIsekaiChosenDifficulty = sSleepDifficulty[input] + 1;
+    ClearStdWindowAndFrameToTransparent(tMenuWindowId, TRUE);
+    RemoveWindow(tMenuWindowId);
+    tMenuWindowId = WIN_INTRO_TEXTBOX;
+    if (input == 0)
+        reaction = gOakSpeech_Text_SleepPlenty;
+    else if (input == 1)
+        reaction = gOakSpeech_Text_SleepSome;
+    else
+        reaction = gOakSpeech_Text_SleepNewborn;
+    OakSpeechPrintMessage(reaction, sOakSpeechResources->textSpeed, FALSE);
+    tTimer = 40;
+    gTasks[taskId].func = Task_OakSpeech_SleepReactionDone;
+}
+
+static void Task_OakSpeech_SleepReactionDone(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+
+    if (!IsTextPrinterActiveOnWindow(WIN_INTRO_TEXTBOX))
+    {
+        if (tTimer != 0)
+        {
+            tTimer--;
+            return;
+        }
+        ClearDialogWindowAndFrame(WIN_INTRO_TEXTBOX, TRUE);
+        gTasks[taskId].func = Task_OakSpeech_LoadPlayerPic;
+    }
 }
 
 static void Task_OakSpeech_LoadPlayerPic(u8 taskId)
@@ -1499,11 +1616,12 @@ static void Task_OakSpeech_HandleLookInput(u8 taskId)
         ClearStdWindowAndFrameToTransparent(tMenuWindowId, TRUE);
         RemoveWindow(tMenuWindowId);
         OakSpeechPrintMessage(gOakSpeech_Text_YourNameWhatIsIt, sOakSpeechResources->textSpeed, FALSE);
-        gTasks[taskId].func = Task_OakSpeech_FadeOutForPlayerNamingScreen;
+        sOakSpeechResources->hasPlayerBeenNamed = FALSE;
+        gTasks[taskId].func = Task_OakSpeech_MoveRivalDisplayNameOptions;
     }
 }
 
-static void Task_OakSpeech_FadeOutForPlayerNamingScreen(u8 taskId)
+static void UNUSED Task_OakSpeech_FadeOutForPlayerNamingScreen(u8 taskId)
 {
     if (!IsTextPrinterActiveOnWindow(WIN_INTRO_TEXTBOX))
     {
@@ -1561,6 +1679,7 @@ static void Task_OakSpeech_HandleRivalNameInput(u8 taskId)
     case 2: //
     case 3: //
     case 4: //
+    case 5: // FireRed Isekai: fifth friend
         PlaySE(SE_SELECT);
         ClearStdWindowAndFrameToTransparent(tMenuWindowId, TRUE);
         RemoveWindow(tMenuWindowId);
@@ -1577,7 +1696,7 @@ static void Task_OakSpeech_DoNamingScreen(u8 taskId)
 {
     if (!gPaletteFade.active)
     {
-        GetDefaultName(sOakSpeechResources->hasPlayerBeenNamed, 0);
+        GetDefaultName(sOakSpeechResources->hasPlayerBeenNamed, sOakSpeechResources->hasPlayerBeenNamed ? 0 : 0xFF);
         if (sOakSpeechResources->hasPlayerBeenNamed == FALSE)
         {
             DoNamingScreen(NAMING_SCREEN_PLAYER, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_ReturnFromNamingScreen);
@@ -1650,10 +1769,7 @@ static void Task_OakSpeech_HandleConfirmNameInput(u8 taskId)
     case 1: // NO
     case MENU_B_PRESSED:
         PlaySE(SE_SELECT);
-        if (sOakSpeechResources->hasPlayerBeenNamed == FALSE)
-            gTasks[taskId].func = Task_OakSpeech_FadeOutForPlayerNamingScreen;
-        else
-            gTasks[taskId].func = Task_OakSpeech_RepeatNameQuestion;
+        gTasks[taskId].func = Task_OakSpeech_RepeatNameQuestion; // FireRed Isekai: back to the name list
         break;
     }
 }
@@ -2259,18 +2375,27 @@ static void PrintNameChoiceOptions(u8 taskId, u8 hasPlayerBeenNamed)
     const u8 *const *textPtrs;
     u8 i;
 
-    tMenuWindowId = AddWindow(&sIntro_WindowTemplates[WIN_INTRO_NAMES]);
+    u8 count;
+
+    if (hasPlayerBeenNamed == FALSE)
+    {
+        tMenuWindowId = AddWindow(&sPlayerNames_WindowTemplate);
+        textPtrs = sFriendNameChoices;
+        count = ARRAY_COUNT(sFriendNameChoices);
+    }
+    else
+    {
+        tMenuWindowId = AddWindow(&sIntro_WindowTemplates[WIN_INTRO_NAMES]);
+        textPtrs = sRivalNameChoices;
+        count = ARRAY_COUNT(sRivalNameChoices);
+    }
     PutWindowTilemap(tMenuWindowId);
     DrawStdFrameWithCustomTileAndPalette(tMenuWindowId, 1, STD_WINDOW_BASE_TILE_NUM, 14);
     FillWindowPixelBuffer(gTasks[taskId].tMenuWindowId, PIXEL_FILL(1));
     AddTextPrinterParameterized(tMenuWindowId, FONT_NORMAL, gOtherText_NewName, 8, 1, 0, NULL);
-    if (hasPlayerBeenNamed == FALSE)
-        textPtrs = gSaveBlock2Ptr->playerGender == MALE ? sMaleNameChoices : sFemaleNameChoices;
-    else
-        textPtrs = sRivalNameChoices;
-    for (i = 0; i < ARRAY_COUNT(sRivalNameChoices); i++)
+    for (i = 0; i < count; i++)
         AddTextPrinterParameterized(tMenuWindowId, FONT_NORMAL, textPtrs[i], 8, 16 * (i + 1) + 1, 0, NULL);
-    InitMenuNormal(tMenuWindowId, FONT_NORMAL, 0, 1, 16, 5, 0);
+    InitMenuNormal(tMenuWindowId, FONT_NORMAL, 0, 1, 16, count + 1, 0);
     CopyWindowToVram(tMenuWindowId, COPYWIN_FULL);
 }
 
@@ -2281,10 +2406,12 @@ static void GetDefaultName(u8 hasPlayerBeenNamed, u8 nameChoice)
     u8 i;
     if (hasPlayerBeenNamed == FALSE)
     {
-        if (gSaveBlock2Ptr->playerGender == MALE)
-            src = sMaleNameChoices[Random() % ARRAY_COUNT(sMaleNameChoices)];
+        // FireRed Isekai: a friend's name, either the one picked from the list
+        // or (for a blank naming screen) one at random.
+        if (nameChoice < ARRAY_COUNT(sFriendNameChoices))
+            src = sFriendNameChoices[nameChoice];
         else
-            src = sFemaleNameChoices[Random() % ARRAY_COUNT(sFemaleNameChoices)];
+            src = sFriendNameChoices[Random() % ARRAY_COUNT(sFriendNameChoices)];
         dest = gSaveBlock2Ptr->playerName;
     }
     else

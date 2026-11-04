@@ -2466,6 +2466,12 @@ BattleScript_AlreadyBurned::
 	waitmessage B_WAIT_TIME_LONG
 	goto BattleScript_MoveEnd
 
+@ FireRed Isekai: Oak's loaner isn't ready (the message is picked by the C side)
+BattleScript_IsekaiLoanerQuirk::
+	printfromtable gIsekaiLoanerQuirkStringIds
+	waitmessage B_WAIT_TIME_LONG
+	goto BattleScript_MoveEnd
+
 BattleScript_FocusPunchLostFocus::
 	printstring STRINGID_PKMNLOSTFOCUS
 	waitmessage B_WAIT_TIME_LONG

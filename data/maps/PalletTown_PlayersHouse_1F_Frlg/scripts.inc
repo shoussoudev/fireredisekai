@@ -65,20 +65,27 @@ PalletTown_PlayersHouse_1F_EventScript_TV::
 	releaseall
 	end
 
+@ FireRed Isekai: the evening news. Dr. Pebble sets the chapter's first goal.
 PalletTown_PlayersHouse_1F_EventScript_TVScreen::
-	checkplayergender
-	call_if_eq VAR_RESULT, MALE, PalletTown_PlayersHouse_1F_EventScript_TVScreenMale
-	call_if_eq VAR_RESULT, FEMALE, PalletTown_PlayersHouse_1F_EventScript_TVScreenFemale
+	msgbox PalletTown_PlayersHouse_1F_Text_IsekaiTVNews
 	releaseall
 	end
 
-PalletTown_PlayersHouse_1F_EventScript_TVScreenMale::
-	msgbox PalletTown_PlayersHouse_1F_Text_MovieOnTVFourBoysOnRailroad
-	return
-
-PalletTown_PlayersHouse_1F_EventScript_TVScreenFemale::
-	msgbox PalletTown_PlayersHouse_1F_Text_MovieOnTVGirlOnBrickRoad
-	return
+PalletTown_PlayersHouse_1F_Text_IsekaiTVNews::
+	.string "KANTO EVENING NEWS: …and finally\n"
+	.string "tonight, a story from PEWTER CITY.\p"
+	.string "DR. PEBBLE of the PEWTER MUSEUM OF\n"
+	.string "SCIENCE says he is close to\l"
+	.string "explaining what he calls\l"
+	.string "THE PHENOMENA.\p"
+	.string "DR. PEBBLE: Lights over MT. MOON.\n"
+	.string "Objects that appear from nowhere.\p"
+	.string "People who wake up somewhere\n"
+	.string "they've never been.\p"
+	.string "DR. PEBBLE: If anything strange has\n"
+	.string "happened to you, my door is open!\p"
+	.string "You stare at the screen.\p"
+	.string "…PEWTER CITY, then.$"
 
 PalletTown_PlayersHouse_1F_Text_AllBoysLeaveOakLookingForYou::
 	.string "MOM: …Right.\n"

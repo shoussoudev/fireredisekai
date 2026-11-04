@@ -12,6 +12,7 @@
 #include "battle_z_move.h"
 #include "battle_anim_scripts.h"
 #include "item.h"
+#include "fireredisekai.h"
 #include "battle_controllers.h"
 #include "move.h"
 #include "test_runner.h"
@@ -273,6 +274,14 @@ static enum CancelerResult CancelerTruant(struct BattleCalcValues *cv)
         gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_LOAFING;
         gBattlerAbility = cv->battlerAtk;
         gBattlescriptCurrInstr = BattleScript_TruantLoafingAround;
+        gBattleStruct->moveResultFlags[cv->battlerDef] |= MOVE_RESULT_MISSED;
+        return CANCELER_RESULT_FAILURE;
+    }
+    if (IsekaiLoanerLosesTurn(cv->battlerAtk))
+    {
+        // FireRed Isekai: Oak's loaner freezes (Psyduck) or lags (Slowpoke) until the Boulder Badge.
+        CancelMultiTurnMoves(cv->battlerAtk);
+        gBattlescriptCurrInstr = BattleScript_IsekaiLoanerQuirk;
         gBattleStruct->moveResultFlags[cv->battlerDef] |= MOVE_RESULT_MISSED;
         return CANCELER_RESULT_FAILURE;
     }

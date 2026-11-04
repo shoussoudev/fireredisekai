@@ -1,5 +1,6 @@
 #include "global.h"
 #include "config/fireredisekai.h"
+#include "fireredisekai.h"
 #include "clock.h"
 #include "new_game.h"
 #include "random.h"
@@ -245,6 +246,11 @@ void NewGameInitData(void)
     ResetTrainerTowerResults();
     ResetContestLinkResults();
     SetCurrentDifficultyLevel(DIFFICULTY_NORMAL);
+#if IS_FRLG
+    // FireRed Isekai: the answer to Oak's sleep question (stored +1; 0 = not asked)
+    if (gIsekaiChosenDifficulty != 0)
+        SetCurrentDifficultyLevel(gIsekaiChosenDifficulty - 1);
+#endif
     ResetItemFlags();
     ResetDexNav();
     ClearFollowerNPCData();

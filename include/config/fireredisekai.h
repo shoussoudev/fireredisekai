@@ -12,4 +12,8 @@
 #define ISEKAI_START_AT ISEKAI_START_NORMAL
 #endif
 
+// Difficulty ("How much sleep did you get this week?") uses the expansion's
+// DIFFICULTY_EASY/NORMAL/HARD, stored in VAR_ISEKAI_DIFFICULTY (B_VAR_DIFFICULTY).
+// PLENTY = hard, SOME = normal, I HAVE A NEWBORN = easy.
+
 #endif // GUARD_CONFIG_FIREREDISEKAI_H

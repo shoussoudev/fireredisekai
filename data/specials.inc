@@ -19,6 +19,7 @@ gSpecials::
 .endif
 	def_special HealPlayerParty
 	def_special IsekaiTakeAllMoney
+	def_special IsekaiRememberLoaner
 	def_special SetCableClubWarp
 	def_special DoCableClubWarp, waitstate=1
 	def_special ReturnFromLinkRoom, waitstate=1

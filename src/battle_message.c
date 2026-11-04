@@ -904,6 +904,8 @@ const u8 *const gBattleStringsTable[STRINGID_COUNT] =
     [STRINGID_S]                                    = COMPOUND_STRING("s"),
     [STRINGID_LOSTSOMEOFITSHP]                      = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} lost some of its HP!"),
     [STRINGID_BELCHCANTUSE]                         = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} hasn't eaten any held Berries, so it can't possibly belch!\p"),
+    [STRINGID_ISEKAI_PSYDUCKNOTREADY]               = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} is holding its head.\nIt's not ready."),
+    [STRINGID_ISEKAI_SLOWPOKETHINKING]              = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} is still thinking about the last thing you said."),
 };
 
 const u16 gTrainerUsedItemStringIds[] =
@@ -1317,6 +1319,13 @@ const u16 gPrimalWeatherBlocksStringIds[] =
 {
     [B_MSG_PRIMAL_WEATHER_FIZZLED_BY_RAIN]      = STRINGID_MOVEFIZZLEDOUTINTHEHEAVYRAIN,
     [B_MSG_PRIMAL_WEATHER_EVAPORATED_IN_SUN]    = STRINGID_MOVEEVAPORATEDINTHEHARSHSUNLIGHT,
+};
+
+// FireRed Isekai: chosen by IsekaiLoanerLosesTurn (0 Psyduck, 1 Slowpoke)
+const u16 gIsekaiLoanerQuirkStringIds[] =
+{
+    STRINGID_ISEKAI_PSYDUCKNOTREADY,
+    STRINGID_ISEKAI_SLOWPOKETHINKING,
 };
 
 const u16 gInobedientStringIds[] =
