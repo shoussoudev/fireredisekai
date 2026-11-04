@@ -13,6 +13,7 @@
 #define AILMENT_PKRS  6
 #define AILMENT_FNT   7
 #define AILMENT_FRB   8
+#define AILMENT_HURT  9 // FireRed Isekai: Badly Injured
 
 #define PARTY_ACTION_CHOOSE_MON         0
 #define PARTY_ACTION_SEND_OUT           1

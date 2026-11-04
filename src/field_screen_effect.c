@@ -1,4 +1,5 @@
 #include "global.h"
+#include "fireredisekai.h"
 #include "cable_club.h"
 #include "event_data.h"
 #include "fieldmap.h"
@@ -1413,6 +1414,9 @@ static const u8 *GenerateRecoveryMessage(u8 taskId)
     bool32 forfeitTrainer = DidPlayerForfeitNormalTrainerBattle();
     bool32 destinationIsPlayersHouse = (gTasks[taskId].tIsPlayerHouse == TRUE);
 
+    // FireRed Isekai: when the MC himself got hurt, there's no scurrying anywhere.
+    if (IS_FRLG && IsekaiLastDefeat() >= ISEKAI_DEFEAT_WILD)
+        return COMPOUND_STRING("Everything goes dark…\p");
     if (forfeitTrainer && destinationIsPlayersHouse)
         return sText_PlayerRegroupHome;
     else if (forfeitTrainer && !destinationIsPlayersHouse)

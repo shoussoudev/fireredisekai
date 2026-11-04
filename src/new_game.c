@@ -54,6 +54,8 @@
 #include "constants/items.h"
 #include "difficulty.h"
 #include "follower_npc.h"
+#include "script_pokemon_util.h"
+#include "constants/heal_locations.h"
 
 extern const u8 EventScript_ResetAllMapFlags[];
 extern const u8 EventScript_ResetAllMapFlagsFrlg[];
@@ -137,6 +139,34 @@ static void ClearFrontierRecord(void)
 
 static void WarpToTruck(void)
 {
+#if ISEKAI_START_AT == ISEKAI_START_RULES_TEST
+    // Developer checkpoint: the core rules sandbox. Route 22 tall grass (next to Viridian), Oak's PSYDUCK at Lv10
+    // (so its faints count) on 1 HP, a few healing items, Viridian as the last heal spot.
+    {
+        u16 hp = 1;
+        VarSet(VAR_ISEKAI_INTRO, 4);
+        VarSet(VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 3);
+        VarSet(VAR_MAP_SCENE_PALLET_TOWN_OAK, 1);
+        VarSet(VAR_MAP_SCENE_PALLET_TOWN_PLAYERS_HOUSE_2F, 1);
+        VarSet(VAR_STARTER_MON, 0);
+        FlagSet(FLAG_SYS_POKEMON_GET);
+        FlagSet(FLAG_ISEKAI_HAS_LOANER);
+        FlagSet(FLAG_BEAT_RIVAL_IN_OAKS_LAB);
+        FlagSet(FLAG_ISEKAI_LIMPING); // to test the nurse's ankle line
+        ScriptGiveMon(SPECIES_PSYDUCK, 10, ITEM_NONE);
+        SetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HP, &hp);
+        VarSet(VAR_ISEKAI_LOANER_SPECIES, SPECIES_PSYDUCK);
+        IsekaiRememberLoaner();
+        AddBagItem(ITEM_POKE_BALL, 10);
+        AddBagItem(ITEM_POTION, 3);
+        AddBagItem(ITEM_REVIVE, 2);
+        AddBagItem(ITEM_MAX_REVIVE, 1);
+        SetLastHealLocationWarp(HEAL_LOCATION_VIRIDIAN_CITY);
+        SetWarpDestination(MAP_GROUP(MAP_ROUTE22), MAP_NUM(MAP_ROUTE22), WARP_ID_NONE, 37, 11); // in the tall grass
+        WarpIntoMap();
+        return;
+    }
+#endif
 #if ISEKAI_START_AT == ISEKAI_START_OAKS_LAB
     // Developer checkpoint: skip the bedroom and Oak's escort, start the lab scene.
     VarSet(VAR_ISEKAI_INTRO, 4);
@@ -250,6 +280,7 @@ void NewGameInitData(void)
     // FireRed Isekai: the answer to Oak's sleep question (stored +1; 0 = not asked)
     if (gIsekaiChosenDifficulty != 0)
         SetCurrentDifficultyLevel(gIsekaiChosenDifficulty - 1);
+    IsekaiNewGameInit(); // lives, running shoes
 #endif
     ResetItemFlags();
     ResetDexNav();

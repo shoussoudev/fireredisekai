@@ -1,10 +1,11 @@
 EventScript_AfterWhiteOutHeal_Frlg::
 	lockall
 	textcolor NPC_TEXT_COLOR_FEMALE
+	call IsekaiEventScript_WakeUp @ FireRed Isekai: waiting room, human ward, or the end
+	textcolor NPC_TEXT_COLOR_FEMALE
 	msgbox gText_FirstShouldRestoreMonsHealth
 	call EventScript_PkmnCenterNurse_TakeAndHealPkmn_Frlg
-	call_if_unset FLAG_DEFEATED_BROCK, EventScript_AfterWhiteOutHealMsgPreFirstBoss
-	call_if_set FLAG_DEFEATED_BROCK, EventScript_AfterWhiteOutHealMsg
+	call IsekaiEventScript_CenterWard
 	applymovement VAR_LAST_TALKED, Movement_Bow
 	waitmovement 0
 	fadedefaultbgm
@@ -26,16 +27,23 @@ EventScript_PkmnCenterNurse_HealPkmn_Frlg::
 	message Text_TakeYourPkmnForFewSeconds_Frlg
 	waitmessage
 	call EventScript_PkmnCenterNurse_TakeAndHealPkmn_Frlg
+	call IsekaiEventScript_CenterWard @ FireRed Isekai: Badly Injured POKéMON
 	goto EventScript_PkmnCenterNurse_CheckTrainerTowerAndUnionRoom_Frlg
 	end
 
 EventScript_PkmnCenterNurse_TakeAndHealPkmn_Frlg::
+	getpartysize
+	goto_if_eq VAR_RESULT, 0, EventScript_PkmnCenterNurse_NoPkmnToHeal_Frlg @ FireRed Isekai: nobody left to heal
 	applymovement VAR_LAST_TALKED, Common_Movement_WalkInPlaceFasterLeft
 	waitmovement 0
 	dofieldeffect FLDEFF_POKECENTER_HEAL
 	waitfieldeffect FLDEFF_POKECENTER_HEAL
 	applymovement VAR_LAST_TALKED, Common_Movement_WalkInPlaceFasterDown
 	waitmovement 0
+	special HealPlayerParty
+	return
+
+EventScript_PkmnCenterNurse_NoPkmnToHeal_Frlg:
 	special HealPlayerParty
 	return
 

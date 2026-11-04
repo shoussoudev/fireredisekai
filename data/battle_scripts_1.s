@@ -3044,6 +3044,11 @@ BattleScript_WildMonFled::
 	waitmessage B_WAIT_TIME_LONG
 	end
 
+@ FireRed Isekai: gym leaders, the League, Giovanni, Red... (string picked on the C side)
+BattleScript_IsekaiNoForfeit::
+	printfromtable gIsekaiNoForfeitStringIds
+	end
+
 BattleScript_PrintCantRunFromTrainer::
 	printstring STRINGID_NORUNNINGFROMTRAINERS
 	end

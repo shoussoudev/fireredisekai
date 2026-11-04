@@ -16,6 +16,8 @@
 #define FLAG_ISEKAI_LIMPING          FLAG_0x021 // hurt ankle: walk-only until a Center
 #define FLAG_ISEKAI_MET_REDS_MUM     FLAG_0x022 // frying pan scene seen
 #define FLAG_ISEKAI_HAS_LOANER       FLAG_0x023 // borrowed Oak's Psyduck/Slowpoke
+#define FLAG_ISEKAI_LOANER_DIED      FLAG_0x024 // Oak's loaner died
+#define FLAG_ISEKAI_SEEN_WARD        FLAG_0x025 // the nurse has explained the lives rule
 
 // Hide/show flags
 #define FLAG_HIDE_BULBASAUR_BALL                           0x028

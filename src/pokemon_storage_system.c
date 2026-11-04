@@ -1,4 +1,5 @@
 #include "global.h"
+#include "fireredisekai.h"
 #include "malloc.h"
 #include "bg.h"
 #include "data.h"
@@ -6574,6 +6575,13 @@ static void ReleaseMon(void)
                 item = GetBoxMonDataAt(boxId, sCursorPosition, MON_DATA_HELD_ITEM);
         }
 
+        if (IS_FRLG) // FireRed Isekai: releasing on its home route
+        {
+            if (boxId == TOTAL_BOXES_COUNT)
+                IsekaiOnMonReleased(&gParties[B_TRAINER_PLAYER][sCursorPosition].box);
+            else
+                IsekaiOnMonReleased(GetBoxedMonPtr(boxId, sCursorPosition));
+        }
         PurgeMonOrBoxMon(boxId, sCursorPosition);
         if (item != ITEM_NONE)
             AddBagItem(item, 1);

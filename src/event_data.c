@@ -1,4 +1,5 @@
 #include "global.h"
+#include "fireredisekai.h"
 #include "event_data.h"
 #include "pokedex.h"
 
@@ -221,6 +222,11 @@ u8 *GetFlagPointer(u16 id)
 u8 FlagSet(u16 id)
 {
     u8 *ptr = GetFlagPointer(id);
+#if IS_FRLG
+    // FireRed Isekai: each new badge gives the MC a life back.
+    if (id >= FLAG_BADGE01_GET && id <= FLAG_BADGE08_GET && ptr && !(*ptr & (1 << (id & 7))))
+        IsekaiBadgeEarned();
+#endif
     if (ptr)
         *ptr |= 1 << (id & 7);
     return 0;

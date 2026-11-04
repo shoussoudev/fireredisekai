@@ -1046,6 +1046,7 @@ gStdScripts_End::
 	.include "data/text/ingame_trade_frlg.inc"
 	.include "data/scripts/flavor_text.inc"
 	.include "data/scripts/pkmn_center_nurse_frlg.inc"
+	.include "data/scripts/fireredisekai_rules.inc"
 
 .endif
 
@@ -1085,6 +1086,8 @@ EventScript_AfterWhiteOutHealMsg::
 
 EventScript_AfterWhiteOutMomHeal::
 	lockall
+	textcolor NPC_TEXT_COLOR_FEMALE
+	call IsekaiEventScript_WakeUpHome @ FireRed Isekai
 	textcolor NPC_TEXT_COLOR_FEMALE
 	applymovement LOCALID_PLAYERS_HOUSE_1F_MOM, Common_Movement_WalkInPlaceFasterDown
 	waitmovement 0

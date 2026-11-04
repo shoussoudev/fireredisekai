@@ -727,6 +727,12 @@ enum StringID
     STRINGID_BELCHCANTUSE,
     STRINGID_ISEKAI_PSYDUCKNOTREADY,  // FireRed Isekai: loaner quirk
     STRINGID_ISEKAI_SLOWPOKETHINKING, // FireRed Isekai: loaner quirk
+    STRINGID_ISEKAI_BALLBOUNCED,      // FireRed Isekai: unwilling wild Pokémon
+    STRINGID_ISEKAI_MANKEYIGNORES,    // FireRed Isekai: the Center's grumpy loaner
+    STRINGID_ISEKAI_NOFORFEIT_LEADER, // FireRed Isekai: no forfeit
+    STRINGID_ISEKAI_NOFORFEIT_ROCKET,
+    STRINGID_ISEKAI_NOFORFEIT_OAK,
+    STRINGID_ISEKAI_NOFORFEIT_PEAK,
     STRINGID_COUNT
 };
 

@@ -325,6 +325,13 @@ BattleScript_TrainerSlideMsg::
 	handletrainerslidemsg BS_SCRIPTING, RESTORE_BATTLER_SLIDE_CONTROL
 	end3
 
+@ FireRed Isekai: an unwilling wild Pokémon
+BattleScript_IsekaiBallBounced::
+	waitmessage B_WAIT_TIME_LONG
+	printstring STRINGID_ISEKAI_BALLBOUNCED
+	waitmessage B_WAIT_TIME_LONG
+	finishaction
+
 BattleScript_GhostBallDodge::
 	waitmessage B_WAIT_TIME_LONG
 	printstring STRINGID_ITDODGEDBALL

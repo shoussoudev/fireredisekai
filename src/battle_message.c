@@ -1,4 +1,5 @@
 #include "global.h"
+#include "fireredisekai.h"
 #include "battle.h"
 #include "battle_anim.h"
 #include "battle_ai_record.h"
@@ -88,6 +89,10 @@ static const u8 sText_TwoWildFled[] = _("{PLAY_SE SE_FLEE}{B_LINK_OPPONENT1_NAME
 static const u8 sText_PlayerDefeatedLinkTrainerTrainer1[] = _("You defeated {B_TRAINER1_NAME_WITH_CLASS}!\p");
 static const u8 sText_OpponentMon1Appeared[] = _("{B_OPPONENT_MON1_NAME} appeared!\p");
 static const u8 sText_WildPkmnAppeared[] = _("You encountered a wild {B_OPPONENT_MON1_NAME}!\p");
+// FireRed Isekai: the battle intro shows whether this one would accept a POKé BALL.
+static const u8 sText_IsekaiWildCurious[] = _("You encountered a wild {B_OPPONENT_MON1_NAME}!\p{B_OPPONENT_MON1_NAME} watches you with curiosity.\p");
+static const u8 sText_IsekaiWildUnwilling[] = _("You encountered a wild {B_OPPONENT_MON1_NAME}!\p{B_OPPONENT_MON1_NAME} is having none of this.\p");
+static const u8 sText_IsekaiWildOverCaught[] = _("You encountered a wild {B_OPPONENT_MON1_NAME}!\pThe {B_OPPONENT_MON1_NAME} here have noticed you.\p");
 static const u8 sText_LegendaryPkmnAppeared[] = _("You encountered a wild {B_OPPONENT_MON1_NAME}!\p");
 static const u8 sText_WildPkmnAppearedPause[] = _("You encountered a wild {B_OPPONENT_MON1_NAME}!{PAUSE 127}");
 static const u8 sText_TwoWildPkmnAppeared[] = _("Oh! A wild {B_OPPONENT_MON1_NAME} and {B_OPPONENT_MON2_NAME} appeared!\p");
@@ -859,7 +864,7 @@ const u8 *const gBattleStringsTable[STRINGID_COUNT] =
     [STRINGID_PKMNGIGANTAMAXED]                     = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} grew huge into its Gigantamax form!"),
     [STRINGID_TIMETODYNAMAX]                        = COMPOUND_STRING("Time to Dynamax!"),
     [STRINGID_TIMETOGIGANTAMAX]                     = COMPOUND_STRING("Time to Gigantamax!"),
-    [STRINGID_QUESTIONFORFEITBATTLE]                = COMPOUND_STRING("Would you like to give up on this battle and quit now? Quitting the battle is the same as losing the battle."),
+    [STRINGID_QUESTIONFORFEITBATTLE]                = COMPOUND_STRING("Forfeit? You'll hand over half your money and walk away."), // FireRed Isekai
     [STRINGID_POWERCONSTRUCTPRESENCEOFMANY]         = COMPOUND_STRING("You sense the presence of many!"),
     [STRINGID_POWERCONSTRUCTTRANSFORM]              = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} transformed into its Complete Forme!"),
     [STRINGID_ABILITYSHIELDPROTECTS]                = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX}'s Ability is protected by the effects of its {B_LAST_ITEM}!"),
@@ -906,6 +911,12 @@ const u8 *const gBattleStringsTable[STRINGID_COUNT] =
     [STRINGID_BELCHCANTUSE]                         = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} hasn't eaten any held Berries, so it can't possibly belch!\p"),
     [STRINGID_ISEKAI_PSYDUCKNOTREADY]               = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} is holding its head.\nIt's not ready."),
     [STRINGID_ISEKAI_SLOWPOKETHINKING]              = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} is still thinking about the last thing you said."),
+    [STRINGID_ISEKAI_BALLBOUNCED]                   = COMPOUND_STRING("It bounces off. {B_OPPONENT_MON1_NAME} was very clear about its boundaries."),
+    [STRINGID_ISEKAI_NOFORFEIT_LEADER]              = COMPOUND_STRING("No forfeits here. You better come ready.\p"),
+    [STRINGID_ISEKAI_NOFORFEIT_ROCKET]              = COMPOUND_STRING("TEAM ROCKET is blocking the exit.\p"),
+    [STRINGID_ISEKAI_NOFORFEIT_OAK]                 = COMPOUND_STRING("OAK is watching. You can't walk away from this one.\p"),
+    [STRINGID_ISEKAI_NOFORFEIT_PEAK]                = COMPOUND_STRING("You climbed all the way up here. There's no walking away.\p"),
+    [STRINGID_ISEKAI_MANKEYIGNORES]                 = COMPOUND_STRING("{B_ATK_NAME_WITH_PREFIX} is ignoring you. It wants its own trainer back."),
 };
 
 const u16 gTrainerUsedItemStringIds[] =
@@ -1326,6 +1337,16 @@ const u16 gIsekaiLoanerQuirkStringIds[] =
 {
     STRINGID_ISEKAI_PSYDUCKNOTREADY,
     STRINGID_ISEKAI_SLOWPOKETHINKING,
+    STRINGID_ISEKAI_MANKEYIGNORES,
+};
+
+// FireRed Isekai: why this battle can't be forfeited (IsekaiForfeitForbidden's result - 1)
+const u16 gIsekaiNoForfeitStringIds[] =
+{
+    STRINGID_ISEKAI_NOFORFEIT_LEADER,
+    STRINGID_ISEKAI_NOFORFEIT_ROCKET,
+    STRINGID_ISEKAI_NOFORFEIT_OAK,
+    STRINGID_ISEKAI_NOFORFEIT_PEAK,
 };
 
 const u16 gInobedientStringIds[] =
@@ -2523,6 +2544,12 @@ void BufferStringBattle(enum StringID stringID, enum BattlerId battler)
                 stringPtr = sText_TwoWildPkmnAppeared;
             else if (gBattleTypeFlags & BATTLE_TYPE_CATCH_TUTORIAL)
                 stringPtr = sText_WildPkmnAppearedPause;
+            else if (IS_FRLG && gIsekaiWildUnwilling && IsekaiWildIsOverCaught())
+                stringPtr = sText_IsekaiWildOverCaught;
+            else if (IS_FRLG && gIsekaiWildUnwilling)
+                stringPtr = sText_IsekaiWildUnwilling;
+            else if (IS_FRLG)
+                stringPtr = sText_IsekaiWildCurious;
             else
                 stringPtr = sText_WildPkmnAppeared;
         }

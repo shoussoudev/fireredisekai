@@ -1,4 +1,5 @@
 #include "global.h"
+#include "fireredisekai.h"
 #include "malloc.h"
 #include "battle.h"
 #include "battle_anim.h"
@@ -2256,6 +2257,8 @@ u8 GetMonAilment(struct Pokemon *mon)
         return ailment;
     if (ShouldPokemonShowActivePokerus(mon))
         return AILMENT_PKRS;
+    if (IS_FRLG && IsekaiIsBadlyInjured(mon))
+        return AILMENT_HURT; // FireRed Isekai
     return AILMENT_NONE;
 }
 

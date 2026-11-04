@@ -20,6 +20,23 @@ gSpecials::
 	def_special HealPlayerParty
 	def_special IsekaiTakeAllMoney
 	def_special IsekaiRememberLoaner
+	def_special IsekaiCheckResumeValid
+	def_special IsekaiPrepareResume
+	def_special IsekaiCreateResumeWildMon
+	def_special IsekaiResumeTrainerBattle
+	def_special IsekaiNextDeathMessage
+	def_special IsekaiNextInjuryMessage
+	def_special IsekaiGetWakeUpScene
+	def_special IsekaiGameOver
+	def_special IsekaiCollectHealedMons
+	def_special IsekaiWardStatus
+	def_special IsekaiCountInjuredInParty
+	def_special IsekaiWouldLeaveEmptyParty
+	def_special IsekaiLeaveInjuredAtCenter
+	def_special IsekaiGiveCenterLoaner
+	def_special IsekaiBufferGraveNames
+	def_special IsekaiBufferLives
+	def_special IsekaiAttackedWithNoTeam
 	def_special SetCableClubWarp
 	def_special DoCableClubWarp, waitstate=1
 	def_special ReturnFromLinkRoom, waitstate=1

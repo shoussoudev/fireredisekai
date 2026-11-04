@@ -1,4 +1,5 @@
 #include "global.h"
+#include "fireredisekai.h"
 #include "battle.h"
 #include "battle_hold_effects.h"
 #include "battle_message.h"
@@ -4054,7 +4055,7 @@ static void Cmd_getmoneyreward(void)
     }
     else
     {
-        if (B_WHITEOUT_MONEY <= GEN_3)
+        if (B_WHITEOUT_MONEY <= GEN_3 || (IS_FRLG && gBattleOutcome == B_OUTCOME_FORFEITED)) // FireRed Isekai: forfeit costs half
         {
             money = GetMoney(&gSaveBlock1Ptr->money) / 2;
         }
@@ -8248,6 +8249,13 @@ static void Cmd_handleballthrow(void)
         BtlController_EmitBallThrowAnim(gBattlerAttacker, B_COMM_TO_CONTROLLER, BALL_TRAINER_BLOCK);
         MarkBattlerForControllerExec(gBattlerAttacker);
         gBattlescriptCurrInstr = BattleScript_TrainerBallBlock;
+    }
+    else if (IS_FRLG && gIsekaiWildUnwilling && !(gBattleTypeFlags & BATTLE_TYPE_CATCH_TUTORIAL))
+    {
+        // FireRed Isekai: an unwilling wild Pokémon bats the ball away.
+        BtlController_EmitBallThrowAnim(gBattlerAttacker, B_COMM_TO_CONTROLLER, BALL_GHOST_DODGE);
+        MarkBattlerForControllerExec(gBattlerAttacker);
+        gBattlescriptCurrInstr = BattleScript_IsekaiBallBounced;
     }
     else if (gBattleTypeFlags & BATTLE_TYPE_CATCH_TUTORIAL)
     {

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "fireredisekai.h"
 #include "battle.h"
 #include "battle_anim.h"
 #include "battle_ai_main.h"
@@ -4052,6 +4053,13 @@ static void HandleTurnActionSelectionState(void)
                       && !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_RECORDED_LINK))
                       && gBattleResources->bufferB[battler][1] == B_ACTION_RUN)
                 {
+                    u32 isekaiReason = IsekaiForfeitForbidden(); // FireRed Isekai: say why
+                    if (isekaiReason)
+                    {
+                        gBattleCommunication[MULTISTRING_CHOOSER] = isekaiReason - 1;
+                        BattleScriptExecute(BattleScript_IsekaiNoForfeit);
+                    }
+                    else
                     BattleScriptExecute(BattleScript_PrintCantRunFromTrainer);
                     gBattleCommunication[battler] = STATE_BEFORE_ACTION_CHOSEN;
                 }
@@ -5316,6 +5324,7 @@ static void FreeResetData_ReturnToOvOrDoEvolutions(void)
 {
     if (!gPaletteFade.active)
     {
+        IsekaiOnBattleEnd(); // FireRed Isekai: injuries, deaths, lives, autosave
         memset(&gBattleMons, 0, sizeof(struct BattlePokemon) * MAX_BATTLERS_COUNT);
         gIsFishingEncounter = FALSE;
         gIsSurfingEncounter = FALSE;
@@ -5837,6 +5846,9 @@ bool32 CanPlayerForfeitNormalTrainerBattle(void)
         return FALSE;
 
     if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_INVALID)
+        return FALSE;
+
+    if (IsekaiForfeitForbidden()) // FireRed Isekai: gym leaders, the League, Giovanni, Red...
         return FALSE;
 
     return (gBattleTypeFlags & BATTLE_TYPE_TRAINER);

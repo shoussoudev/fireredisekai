@@ -7,6 +7,8 @@
 //   1 = Oak's lab, at the start of the loaner scene
 #define ISEKAI_START_NORMAL     0
 #define ISEKAI_START_OAKS_LAB   1
+//   2 = rules sandbox: Route 22 tall grass with Oak's PSYDUCK at Lv10 on 1 HP, after Blue's battle
+#define ISEKAI_START_RULES_TEST 2
 
 #ifndef ISEKAI_START_AT
 #define ISEKAI_START_AT ISEKAI_START_NORMAL

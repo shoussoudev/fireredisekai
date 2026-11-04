@@ -1,4 +1,5 @@
 #include "global.h"
+#include "fireredisekai.h"
 #include "data.h"
 #include "main.h"
 #include "battle.h"
@@ -410,6 +411,7 @@ static void DoStandardWildBattle(bool32 isDouble)
         VarSet(VAR_TEMP_E, 0);
         gBattleTypeFlags |= BATTLE_TYPE_PYRAMID;
     }
+    IsekaiOnWildBattleStart(); // FireRed Isekai
     CreateBattleStartTask(GetWildBattleTransition(), 0);
     IncrementGameStat(GAME_STAT_TOTAL_BATTLES);
     IncrementGameStat(GAME_STAT_WILD_BATTLES);
@@ -492,6 +494,7 @@ static void DoTrainerBattle(void)
     CreateNPCTrainerParty(&gParties[B_TRAINER_OPPONENT_A][0], TRAINER_BATTLE_PARAM.opponentA);
     if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS && !BATTLE_TWO_VS_ONE_OPPONENT)
         CreateNPCTrainerParty(&gParties[B_TRAINER_OPPONENT_B][0], TRAINER_BATTLE_PARAM.opponentB);
+    IsekaiOnTrainerBattleStart(); // FireRed Isekai: mark the battle, reset penalty, autosave
     CreateBattleStartTask(GetTrainerBattleTransition(), 0);
     IncrementGameStat(GAME_STAT_TOTAL_BATTLES);
     IncrementGameStat(GAME_STAT_TRAINER_BATTLES);
@@ -534,6 +537,7 @@ void BattleSetup_StartScriptedWildBattle(void)
     LockPlayerFieldControls();
     gMain.savedCallback = CB2_EndScriptedWildBattle;
     gBattleTypeFlags = 0;
+    IsekaiOnWildBattleStart(); // FireRed Isekai
     CreateBattleStartTask(GetWildBattleTransition(), 0);
     IncrementGameStat(GAME_STAT_TOTAL_BATTLES);
     IncrementGameStat(GAME_STAT_WILD_BATTLES);
@@ -1096,6 +1100,7 @@ void TrainerBattleLoadArgs(const u8 *data)
     InitTrainerBattleParameter();
     memcpy(gTrainerBattleParameter.data, data, sizeof(TrainerBattleParameter));
     sTrainerBattleEndScript = (u8*)data + sizeof(TrainerBattleParameter);
+    gIsekaiTrainerArgs = data; // FireRed Isekai: remembered so a reset can restart this battle
 }
 
 // loads trainer A parameter to trainer B. Used for second trainer in trainer_see.c
@@ -1272,6 +1277,19 @@ void ConfigureTrainerBattle(struct ScriptContext *ctx)
     BattleSetup_ConfigureTrainerBattle(&gTrainerBattleParameter, &trainerBattleScriptStack);
     ScriptContext_SetupContextFromStack(&trainerBattleScriptStack, ctx);
     ScriptContext_Enable();
+}
+
+// FireRed Isekai: after a reset, start the same trainer battle again from its script arguments.
+// Called from a special, so it replaces the running global script with the battle's own.
+void IsekaiRestartTrainerBattleFromArgs(const u8 *args)
+{
+    struct ScriptStack trainerBattleScriptStack;
+
+    InitTrainerBattleParameter();
+    InitScriptStack(&trainerBattleScriptStack);
+    TrainerBattleLoadArgs(args);
+    BattleSetup_ConfigureTrainerBattle(&gTrainerBattleParameter, &trainerBattleScriptStack);
+    ScriptContext_SetupGlobalContextFromStack(&trainerBattleScriptStack);
 }
 
 void ConfigureApproachingTrainerBattle(struct ApproachingTrainer *approachingTrainer)

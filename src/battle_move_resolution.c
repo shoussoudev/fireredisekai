@@ -277,7 +277,10 @@ static enum CancelerResult CancelerTruant(struct BattleCalcValues *cv)
         gBattleStruct->moveResultFlags[cv->battlerDef] |= MOVE_RESULT_MISSED;
         return CANCELER_RESULT_FAILURE;
     }
-    if (IsekaiLoanerLosesTurn(cv->battlerAtk))
+    bool32 isekaiGrumpy = IsekaiCenterLoanerIgnores(cv->battlerAtk);
+    if (isekaiGrumpy)
+        gBattleCommunication[MULTISTRING_CHOOSER] = 2; // the grumpy Center loaner
+    if (isekaiGrumpy || IsekaiLoanerLosesTurn(cv->battlerAtk))
     {
         // FireRed Isekai: Oak's loaner freezes (Psyduck) or lags (Slowpoke) until the Boulder Badge.
         CancelMultiTurnMoves(cv->battlerAtk);

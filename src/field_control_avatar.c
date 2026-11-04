@@ -1,4 +1,5 @@
 #include "global.h"
+#include "fireredisekai.h"
 #include "battle_setup.h"
 #include "bike.h"
 #include "coord_event_weather.h"
@@ -11,6 +12,7 @@
 #include "event_object_movement.h"
 #include "event_scripts.h"
 #include "fieldmap.h"
+#include "random.h"
 #include "field_control_avatar.h"
 #include "field_message_box.h"
 #include "field_move.h"
@@ -919,6 +921,17 @@ static bool8 CheckStandardWildEncounter(u16 metatileBehavior)
         sWildEncounterImmunitySteps++;
         sPrevMetatileBehavior = metatileBehavior;
         return FALSE;
+    }
+
+    // FireRed Isekai: no POKéMON left, and the grass notices.
+    if (IS_FRLG && CalculatePlayerPartyCount() == 0
+     && (MetatileBehavior_IsLandWildEncounter(metatileBehavior) || MetatileBehavior_IsWaterWildEncounter(metatileBehavior))
+     && (Random() % 8) == 0)
+    {
+        sWildEncounterImmunitySteps = 0;
+        sPrevMetatileBehavior = metatileBehavior;
+        ScriptContext_SetupScript(IsekaiEventScript_AttackedInGrass);
+        return TRUE;
     }
 
     if (StandardWildEncounter(metatileBehavior, sPrevMetatileBehavior) == TRUE)

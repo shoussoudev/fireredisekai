@@ -1,4 +1,5 @@
 #include "global.h"
+#include "fireredisekai.h"
 #include "malloc.h"
 #include "apprentice.h"
 #include "battle.h"
@@ -2952,6 +2953,9 @@ u8 GiveCapturedMonToPlayer(struct Pokemon *mon)
             break;
     }
 
+    if (IS_FRLG)
+        IsekaiOnMonCaught(GetMonData(mon, MON_DATA_SPECIES)); // FireRed Isekai: over-catching
+
     if (i >= PARTY_SIZE)
         return CopyMonToPC(mon);
 
@@ -3699,6 +3703,8 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, enum Item item, u8 partyIndex, 
                                 dataUnsigned = maxHP;
                             SetMonData(mon, MON_DATA_HP, &dataUnsigned);
                             retVal = FALSE;
+                            if (IS_FRLG && (effectFlags & (ITEM4_REVIVE >> 2)) && currentHP == 0)
+                                IsekaiOnReviveUsed(mon, item); // FireRed Isekai: revived = Badly Injured
                         }
                         effectFlags &= ~(ITEM4_REVIVE >> 2);
                         break;

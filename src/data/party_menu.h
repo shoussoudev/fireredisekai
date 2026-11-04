@@ -1141,6 +1141,12 @@ static const union AnimCmd sSpriteAnim_StatusFaint[] =
     ANIMCMD_END
 };
 
+static const union AnimCmd sSpriteAnim_StatusHurt[] = // FireRed Isekai: Badly Injured
+{
+    ANIMCMD_FRAME(32, 0),
+    ANIMCMD_END
+};
+
 static const union AnimCmd sSpriteAnim_StatusFrostbite[] =
 {
     ANIMCMD_FRAME(28, 0),
@@ -1156,12 +1162,13 @@ static const union AnimCmd *const sSpriteTemplate_StatusCondition[] =
     sSpriteAnim_StatusBurn,
     sSpriteAnim_StatusPokerus,
     sSpriteAnim_StatusFaint,
-    sSpriteAnim_StatusFrostbite
+    sSpriteAnim_StatusFrostbite,
+    sSpriteAnim_StatusHurt,
 };
 
 static const struct CompressedSpriteSheet sSpriteSheet_StatusIcons =
 {
-    gStatusGfx_Icons, 0x400, TAG_STATUS_ICONS
+    gStatusGfx_Icons, 0x480, TAG_STATUS_ICONS
 };
 
 static const struct SpritePalette sSpritePalette_StatusIcons =
