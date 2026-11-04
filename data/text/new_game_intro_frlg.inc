@@ -242,6 +242,29 @@ gOakSpeech_Text_HowMuchSleep::
 	.string "One more thing.\n"
 	.string "How much sleep did you get this week?$"
 
+gOakSpeech_Text_SleepMeansHard::
+	.string "In other words: HARD.\p"
+	.string "Two lives. Gym LEADERS bring full\n"
+	.string "teams and held items from BROCK on.\p"
+	.string "No EXP above the level cap, and no\n"
+	.string "free switch after a knockout.\p"
+	.string "Is that really how much you slept?$"
+
+gOakSpeech_Text_SleepMeansNormal::
+	.string "In other words: NORMAL.\p"
+	.string "Three lives. Fights start a little\n"
+	.string "above what you remember, and get\l"
+	.string "tougher as you go.\p"
+	.string "Much less EXP above the level cap.\p"
+	.string "Is that really how much you slept?$"
+
+gOakSpeech_Text_SleepMeansEasy::
+	.string "In other words: EASY.\p"
+	.string "Five lives. The teams you remember,\n"
+	.string "and no level caps.\p"
+	.string "Nobody will judge you.\n"
+	.string "Is that really how much you slept?$"
+
 gOakSpeech_Text_SleepPlenty::
 	.string "Good.\n"
 	.string "You'll need it.$"

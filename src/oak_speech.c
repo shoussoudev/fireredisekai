@@ -86,6 +86,8 @@ static void Task_OakSpeech_ClearGenderWindows(u8);
 static void Task_OakSpeech_AskSleep(u8);
 static void Task_OakSpeech_ShowSleepOptions(u8);
 static void Task_OakSpeech_HandleSleepInput(u8);
+static void Task_OakSpeech_ShowSleepConfirm(u8);
+static void Task_OakSpeech_HandleSleepConfirm(u8);
 static void Task_OakSpeech_SleepReactionDone(u8);
 static void Task_OakSpeech_ShowLookPicker(u8);
 static void Task_OakSpeech_MoveRivalDisplayNameOptions(u8);
@@ -790,6 +792,7 @@ void StartNewGameSceneFrlg(void)
 #define tTextboxWindowId            data[14]
 #define tDelta                      data[15]
 #define tLookChoice                 data[11]
+#define tSleepChoice                data[12]
 
 static void Task_NewGameScene(u8 taskId)
 {
@@ -1497,26 +1500,71 @@ static void Task_OakSpeech_ShowSleepOptions(u8 taskId)
 static void Task_OakSpeech_HandleSleepInput(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
-    const u8 *reaction;
+    const u8 *meaning;
     s8 input = Menu_ProcessInputNoWrap();
 
     if (input == MENU_NOTHING_CHOSEN || input == MENU_B_PRESSED)
         return;
 
     PlaySE(SE_SELECT);
-    gIsekaiChosenDifficulty = sSleepDifficulty[input] + 1;
+    tSleepChoice = input;
     ClearStdWindowAndFrameToTransparent(tMenuWindowId, TRUE);
     RemoveWindow(tMenuWindowId);
     tMenuWindowId = WIN_INTRO_TEXTBOX;
+    // Oak spells out what the answer means, then asks if you're sure.
     if (input == 0)
-        reaction = gOakSpeech_Text_SleepPlenty;
+        meaning = gOakSpeech_Text_SleepMeansHard;
     else if (input == 1)
-        reaction = gOakSpeech_Text_SleepSome;
+        meaning = gOakSpeech_Text_SleepMeansNormal;
     else
-        reaction = gOakSpeech_Text_SleepNewborn;
-    OakSpeechPrintMessage(reaction, sOakSpeechResources->textSpeed, FALSE);
-    tTimer = 40;
-    gTasks[taskId].func = Task_OakSpeech_SleepReactionDone;
+        meaning = gOakSpeech_Text_SleepMeansEasy;
+    OakSpeechPrintMessage(meaning, sOakSpeechResources->textSpeed, FALSE);
+    tTimer = 25;
+    gTasks[taskId].func = Task_OakSpeech_ShowSleepConfirm;
+}
+
+static void Task_OakSpeech_ShowSleepConfirm(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+
+    if (!IsTextPrinterActiveOnWindow(WIN_INTRO_TEXTBOX))
+    {
+        if (tTimer != 0)
+        {
+            tTimer--;
+            return;
+        }
+        CreateYesNoMenuAtPos(&sIntro_WindowTemplates[WIN_INTRO_YESNO], FONT_NORMAL, 0, 2, STD_WINDOW_BASE_TILE_NUM, 14, 0);
+        gTasks[taskId].func = Task_OakSpeech_HandleSleepConfirm;
+    }
+}
+
+static void Task_OakSpeech_HandleSleepConfirm(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    const u8 *reaction;
+
+    switch (Menu_ProcessInputNoWrapClearOnChoose())
+    {
+    case 0: // YES
+        PlaySE(SE_SELECT);
+        gIsekaiChosenDifficulty = sSleepDifficulty[tSleepChoice] + 1;
+        if (tSleepChoice == 0)
+            reaction = gOakSpeech_Text_SleepPlenty;
+        else if (tSleepChoice == 1)
+            reaction = gOakSpeech_Text_SleepSome;
+        else
+            reaction = gOakSpeech_Text_SleepNewborn;
+        OakSpeechPrintMessage(reaction, sOakSpeechResources->textSpeed, FALSE);
+        tTimer = 40;
+        gTasks[taskId].func = Task_OakSpeech_SleepReactionDone;
+        break;
+    case 1: // NO
+    case MENU_B_PRESSED:
+        PlaySE(SE_SELECT);
+        gTasks[taskId].func = Task_OakSpeech_AskSleep; // ask again
+        break;
+    }
 }
 
 static void Task_OakSpeech_SleepReactionDone(u8 taskId)
