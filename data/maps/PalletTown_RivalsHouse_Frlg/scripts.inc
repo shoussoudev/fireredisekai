@@ -164,21 +164,27 @@ PalletTown_RivalsHouse_EventScript_Picture::
 	msgbox PalletTown_RivalsHouse_Text_LovelyAndSweetClefairy, MSGBOX_SIGN
 	end
 
+@ FireRed Isekai: Daisy has never seen this man before.
 PalletTown_RivalsHouse_Text_HiBrothersAtLab::
-	.string "DAISY: Hi, {PLAYER}!\p"
-	.string "My brother, {RIVAL}, is out at\n"
-	.string "Grandpa's LAB.$"
+	.string "DAISY: Oh! Um… can I help you?\p"
+	.string "If you're looking for my brother,\n"
+	.string "{RIVAL}, he's at Grandpa's LAB.\p"
+	.string "And if you're selling something,\n"
+	.string "we're not interested.$"
 
 PalletTown_RivalsHouse_Text_HeardYouBattledRival::
-	.string "DAISY: {PLAYER}, I heard you had\n"
-	.string "a battle against {RIVAL}.\p"
-	.string "I wish I'd seen that!$"
+	.string "DAISY: Wait. You're the man from\n"
+	.string "the LAB?\p"
+	.string "{RIVAL} came home talking about\n"
+	.string "“some old guy with a rental.”\p"
+	.string "He hasn't stopped since.\n"
+	.string "I wish I'd seen it!$"
 
 PalletTown_RivalsHouse_Text_ErrandForGrandpaThisWillHelp::
-	.string "Grandpa asked you to run an\n"
-	.string "errand?\p"
+	.string "Grandpa sent a total stranger to\n"
+	.string "run his errands?\p"
 	.string "Gee, that's lazy of him.\n"
-	.string "Here, this will help you.$"
+	.string "Here. You look like you get lost.$"
 
 PalletTown_RivalsHouse_Text_ReceivedTownMapFromDaisy::
 	.string "{PLAYER} received a TOWN MAP\n"

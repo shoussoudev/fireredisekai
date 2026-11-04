@@ -98,6 +98,11 @@ void ClearSaveData(void);
 void Save_ResetSaveCounters(void);
 u8 HandleSavingData(u8 saveType);
 u8 TrySavingData(u8 saveType);
+// FireRed Isekai: background (one sector per frame) save
+void BackgroundSave_Begin(bool8 clearContinueWarpAfter);
+void BackgroundSave_Step(void);
+void BackgroundSave_Finish(void);
+bool8 BackgroundSave_IsActive(void);
 bool8 LinkFullSave_Init(void);
 bool8 LinkFullSave_WriteSector(void);
 bool8 LinkFullSave_ReplaceLastSector(void);

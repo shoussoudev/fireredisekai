@@ -45,6 +45,9 @@ IsekaiText_SawYouFlicker:
 @ ---------------------------------------------------------------------------
 IsekaiEventScript_AfterBattleNews::
 	lockall
+	special IsekaiNextProtectedNote
+	call_if_eq VAR_RESULT, 1, IsekaiEventScript_ProtectedNote_NoBadge
+	call_if_eq VAR_RESULT, 2, IsekaiEventScript_ProtectedNote_Badge
 IsekaiEventScript_AfterBattleNews_Deaths:
 	special IsekaiNextDeathMessage
 	goto_if_eq VAR_RESULT, FALSE, IsekaiEventScript_AfterBattleNews_Injuries
@@ -58,6 +61,29 @@ IsekaiEventScript_AfterBattleNews_Injuries:
 IsekaiEventScript_AfterBattleNews_Done:
 	releaseall
 	end
+
+IsekaiEventScript_ProtectedNote_NoBadge:
+	msgbox IsekaiText_ProtectedNote_NoBadge
+	return
+
+IsekaiEventScript_ProtectedNote_Badge:
+	msgbox IsekaiText_ProtectedNote_Badge
+	return
+
+IsekaiText_ProtectedNote_NoBadge:
+	.string "{STR_VAR_1} only fainted.\n"
+	.string "No lasting harm.\p"
+	.string "Young POKéMON bounce back. Anything\n"
+	.string "under level 10 does, for now.\p"
+	.string "That stops once you've earned your\n"
+	.string "first BADGE.$"
+
+IsekaiText_ProtectedNote_Badge:
+	.string "{STR_VAR_1} only fainted.\n"
+	.string "No lasting harm.\p"
+	.string "Whatever knocked it down was too\n"
+	.string "small to do real damage.\l"
+	.string "Anything level 10 or up will.$"
 
 IsekaiText_DidntGetBackUp:
 	.string "{STR_VAR_1} didn't get back up.\p"
@@ -82,8 +108,20 @@ IsekaiEventScript_WakeUp::
 	return
 
 IsekaiEventScript_WakeUp_WaitingRoom:
+	goto_if_set FLAG_BADGE01_GET, IsekaiEventScript_WakeUp_WaitingRoomBadge
 	msgbox IsekaiText_WakeUp_WaitingRoom
 	return
+IsekaiEventScript_WakeUp_WaitingRoomBadge:
+	msgbox IsekaiText_WakeUp_WaitingRoomBadge
+	return
+
+IsekaiText_WakeUp_WaitingRoomBadge:
+	.string "You come to on a bench in the\n"
+	.string "waiting room.\p"
+	.string "NURSE: They only fainted. Whatever\n"
+	.string "you ran into was too small to do\l"
+	.string "real damage.\p"
+	.string "Anything level 10 or up won't be.$"
 
 IsekaiEventScript_WakeUp_Ward:
 	fadescreen FADE_TO_BLACK
@@ -150,7 +188,10 @@ IsekaiText_WakeUp_WaitingRoom:
 	.string "waiting room.\p"
 	.string "NURSE: They only fainted. Nobody out\n"
 	.string "there was really trying to hurt you.\p"
-	.string "Not yet.$"
+	.string "Young POKéMON bounce back. Under\n"
+	.string "level 10, they always do.\p"
+	.string "That stops once you've earned your\n"
+	.string "first BADGE.$"
 
 IsekaiText_WakeUp_HowWild:
 	.string "With your team down, nothing stood\n"

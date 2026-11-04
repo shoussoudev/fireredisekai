@@ -1,4 +1,5 @@
 #include "global.h"
+#include "save.h"
 #include "crt0.h"
 #include "malloc.h"
 #include "link.h"
@@ -169,6 +170,7 @@ void AgbMainLoop(void)
 
         PlayTimeCounter_Update();
         MapMusicMain();
+        BackgroundSave_Step(); // FireRed Isekai: autosaves, one sector per frame
         WaitForVBlank();
     }
 }

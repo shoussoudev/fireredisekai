@@ -49,13 +49,21 @@ PalletTown_PlayersHouse_1F_EventScript_MomOakLookingForYouFemale::
 	msgbox PalletTown_PlayersHouse_1F_Text_AllGirlsLeaveOakLookingForYou
 	return
 
+@ FireRed Isekai: she's not healing a stranger's POKéMON (that may change with her romance)
 PalletTown_PlayersHouse_1F_EventScript_MomHeal::
-	msgbox PalletTown_PlayersHouse_1F_Text_YouShouldTakeQuickRest
+	msgbox PalletTown_PlayersHouse_1F_Text_IsekaiNotACenter
 	closemessage
-	call Common_EventScript_OutOfCenterPartyHeal
-	msgbox PalletTown_PlayersHouse_1F_Text_LookingGreatTakeCare
+	applymovement LOCALID_PLAYERS_HOUSE_1F_MOM, Common_Movement_FaceOriginalDirection
+	waitmovement 0
 	release
 	end
+
+PalletTown_PlayersHouse_1F_Text_IsekaiNotACenter::
+	.string "RED'S MOM: You again.\p"
+	.string "This is a house, not a\n"
+	.string "POKéMON CENTER.\p"
+	.string "VIRIDIAN CITY is that way.\n"
+	.string "North. Keep walking.$"
 
 @ Displays special text if interacted with from side or back (which are normally inaccessible)
 PalletTown_PlayersHouse_1F_EventScript_TV::

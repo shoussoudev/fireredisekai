@@ -37,6 +37,7 @@ gSpecials::
 	def_special IsekaiBufferGraveNames
 	def_special IsekaiBufferLives
 	def_special IsekaiAttackedWithNoTeam
+	def_special IsekaiNextProtectedNote
 	def_special SetCableClubWarp
 	def_special DoCableClubWarp, waitstate=1
 	def_special ReturnFromLinkRoom, waitstate=1

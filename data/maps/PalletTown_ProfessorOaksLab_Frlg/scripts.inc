@@ -1453,9 +1453,10 @@ PalletTown_ProfessorOaksLab_Text_OakCanReachNextTownWithMon::
 	.string "In one piece, ideally.$"
 
 PalletTown_ProfessorOaksLab_Text_OakBattleMonForItToGrow::
-	.string "OAK: {PLAYER}, raise your young\n"
-	.string "POKéMON by making it battle.\p"
-	.string "It has to battle for it to grow.$"
+	.string "OAK: Battle with it, by all means.\n"
+	.string "That's how it grows.\p"
+	.string "Just bring it back in one piece.\n"
+	.string "It's still mine.$"
 
 PalletTown_ProfessorOaksLab_Text_OakHaveSomethingForMe::
 	.string "OAK: Oh, {PLAYER}!\n"

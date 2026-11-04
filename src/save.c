@@ -3,6 +3,7 @@
 #include "gba/flash_internal.h"
 #include "fieldmap.h"
 #include "save.h"
+#include "save_location.h"
 #include "task.h"
 #include "decompress.h"
 #include "load_save.h"
@@ -710,10 +711,74 @@ static void UpdateSaveAddresses(void)
     }
 }
 
+// ---------------------------------------------------------------------------
+// FireRed Isekai: background save. Writes the save slot one sector per frame
+// (called from the main loop) so autosaves don't freeze the game. The new slot
+// only becomes valid once every sector is written, so a reset part-way through
+// simply falls back to the previous save.
+// ---------------------------------------------------------------------------
+static EWRAM_DATA bool8 sBgSaveActive = FALSE;
+static EWRAM_DATA u8 sBgSaveSector = 0;
+static EWRAM_DATA bool8 sBgSaveClearContinueWarp = FALSE;
+
+bool8 BackgroundSave_IsActive(void)
+{
+    return sBgSaveActive;
+}
+
+void BackgroundSave_Step(void)
+{
+    if (!sBgSaveActive)
+        return;
+    UpdateSaveAddresses(); // save blocks can move (battles, map loads)
+    gReadWriteSector = &gSaveDataBuffer;
+    HandleWriteSector(sBgSaveSector++, gRamSaveSectorLocations);
+    if (sBgSaveSector < NUM_SECTORS_PER_SLOT)
+        return;
+    if (gDamagedSaveSectors)
+    {
+        gLastWrittenSector = gLastKnownGoodSector;
+        gSaveCounter = gLastSaveCounter;
+        gSaveAttemptStatus = SAVE_STATUS_ERROR;
+    }
+    else
+    {
+        gSaveAttemptStatus = SAVE_STATUS_OK;
+    }
+    if (sBgSaveClearContinueWarp)
+        gSaveBlock2Ptr->specialSaveWarpFlags &= ~CONTINUE_GAME_WARP;
+    sBgSaveActive = FALSE;
+}
+
+void BackgroundSave_Finish(void)
+{
+    while (sBgSaveActive)
+        BackgroundSave_Step();
+}
+
+void BackgroundSave_Begin(bool8 clearContinueWarpAfter)
+{
+    BackgroundSave_Finish();
+    if (gFlashMemoryPresent != TRUE)
+        return;
+    UpdateSaveAddresses();
+    CopyPartyAndObjectsToSave();
+    gLastKnownGoodSector = gLastWrittenSector;
+    gLastSaveCounter = gSaveCounter;
+    gLastWrittenSector++;
+    gLastWrittenSector = gLastWrittenSector % NUM_SECTORS_PER_SLOT;
+    gSaveCounter++;
+    sBgSaveSector = 0;
+    sBgSaveClearContinueWarp = clearContinueWarpAfter;
+    sBgSaveActive = TRUE;
+}
+
 u8 HandleSavingData(u8 saveType)
 {
     u8 i;
     u32 *backupVar = gTrainerHillVBlankCounter;
+
+    BackgroundSave_Finish(); // FireRed Isekai: never interleave two saves
 
     gTrainerHillVBlankCounter = NULL;
     UpdateSaveAddresses();

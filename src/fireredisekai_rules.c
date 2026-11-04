@@ -44,6 +44,8 @@ STATIC_ASSERT(sizeof(struct BoxPokemon) == ISEKAI_BOXMON_SIZE, IsekaiBoxMonSize)
 EWRAM_DATA const u8 *gIsekaiTrainerArgs = NULL;       // set by TrainerBattleLoadArgs
 EWRAM_DATA static bool8 sResumingBattle = FALSE;       // this battle is a restart after a reset
 EWRAM_DATA static u8 sAliveAtStart = 0;                // party slots with HP > 0 when the battle began
+EWRAM_DATA static bool8 sPendingProtectedNote = FALSE;  // explain the level-10 rule (once)
+EWRAM_DATA static u8 sProtectedName[POKEMON_NAME_LENGTH + 1] = {0};
 EWRAM_DATA static u8 sPendingDeaths = 0;               // how many "didn't get back up" messages to show
 EWRAM_DATA static u8 sPendingDeathNames[PARTY_SIZE][POKEMON_NAME_LENGTH + 1] = {0};
 EWRAM_DATA static u8 sPendingInjuries = 0;             // how many "Badly Injured" messages to show
@@ -213,8 +215,35 @@ static u16 CurrentMapKey(void)
     return ((gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum) + 1;
 }
 
+// Autosaves run in the background (one flash sector per frame) so the player keeps moving.
+// Pass clearContinueWarp when the continue-game warp was set just for this save.
+static void Autosave(bool8 clearContinueWarp)
+{
+    if (gDifferentSaveFile == TRUE)
+    {
+        // First save over someone else's file: erase it properly, in one go.
+        TrySavingData(SAVE_OVERWRITE_DIFFERENT_FILE);
+        gDifferentSaveFile = FALSE;
+        if (clearContinueWarp)
+            gSaveBlock2Ptr->specialSaveWarpFlags &= ~CONTINUE_GAME_WARP;
+    }
+    else
+    {
+        BackgroundSave_Begin(clearContinueWarp);
+    }
+    sAutosavePending = FALSE;
+    sLastAutosaveMap = CurrentMapKey();
+}
+
 void IsekaiAutosave(void)
 {
+    Autosave(FALSE);
+}
+
+// Saves right now (for moments right before a reset or a whiteout warp).
+static void SaveNow(void)
+{
+    BackgroundSave_Finish();
     if (gDifferentSaveFile == TRUE)
     {
         TrySavingData(SAVE_OVERWRITE_DIFFERENT_FILE);
@@ -225,7 +254,6 @@ void IsekaiAutosave(void)
         TrySavingData(SAVE_NORMAL);
     }
     sAutosavePending = FALSE;
-    sLastAutosaveMap = CurrentMapKey();
 }
 
 void IsekaiRequestAutosave(void)
@@ -409,7 +437,15 @@ void IsekaiOnBattleEnd(void)
         if (GetMonData(mon, MON_DATA_HP) != 0 || !(sAliveAtStart & (1 << i)))
             continue;
         if (IsProtectedFaint(mon, oppLevel))
+        {
+            // The first time a faint doesn't count, say why (once per game).
+            if (!FlagGet(FLAG_ISEKAI_SEEN_PROTECTED) && !sPendingProtectedNote)
+            {
+                GetMonData(mon, MON_DATA_NICKNAME, sProtectedName);
+                sPendingProtectedNote = TRUE;
+            }
             continue;
+        }
         anyUnprotected = TRUE;
         if (IsekaiIsBadlyInjured(mon))
         {
@@ -459,8 +495,7 @@ void IsekaiOnBattleEnd(void)
             gSaveBlock2Ptr->specialSaveWarpFlags |= CONTINUE_GAME_WARP;
         }
     }
-    IsekaiAutosave();
-    gSaveBlock2Ptr->specialSaveWarpFlags &= ~CONTINUE_GAME_WARP;
+    Autosave(TRUE); // background; clears the continue warp once written
 }
 
 // Walking through grass with no Pokémon at all: it costs a life, and he wakes up in the ward.
@@ -471,7 +506,7 @@ void IsekaiAttackedWithNoTeam(void)
         sIsekai.lives--;
     gSaveBlock1Ptr->continueGameWarp = gSaveBlock1Ptr->lastHealLocation;
     gSaveBlock2Ptr->specialSaveWarpFlags |= CONTINUE_GAME_WARP;
-    IsekaiAutosave();
+    SaveNow();
     gSaveBlock2Ptr->specialSaveWarpFlags &= ~CONTINUE_GAME_WARP;
     SetMainCallback2(CB2_WhiteOut);
 }
@@ -520,6 +555,7 @@ void IsekaiGetWakeUpScene(void)
         gSpecialVar_Result = 1;
     gSpecialVar_0x8004 = sLastDefeat;
     sPendingInjuries = 0; // the nurse is about to talk about them anyway
+    sPendingProtectedNote = FALSE;
     ConvertIntToDecimalStringN(gStringVar1, sIsekai.lives, STR_CONV_MODE_LEFT_ALIGN, 1);
     StringCopy(gStringVar2, GetSpeciesName(sLastWildSpecies));
     sLastDefeat = ISEKAI_DEFEAT_NONE;
@@ -538,9 +574,23 @@ void IsekaiCheckResumeValid(void)
     }
 }
 
+// After the first protected faint: STR_VAR_1 = its name. VAR_RESULT: 0 none, 1 before the badge, 2 after.
+void IsekaiNextProtectedNote(void)
+{
+    gSpecialVar_Result = 0;
+    if (!sPendingProtectedNote)
+        return;
+    sPendingProtectedNote = FALSE;
+    FlagSet(FLAG_ISEKAI_SEEN_PROTECTED);
+    StringCopy(gStringVar1, sProtectedName);
+    StringGet_Nickname(gStringVar1);
+    gSpecialVar_Result = FlagGet(FLAG_BADGE01_GET) ? 2 : 1;
+}
+
 // The end. The save is wiped: there's no loading your way out of this one.
 void IsekaiGameOver(void)
 {
+    BackgroundSave_Finish();
     ClearSaveData();
     DoSoftReset();
 }
@@ -604,7 +654,7 @@ bool32 IsekaiFieldIdle(void)
         ScriptContext_SetupScript(IsekaiEventScript_GameOver);
         return TRUE;
     }
-    if (sPendingDeaths != 0 || sPendingInjuries != 0)
+    if (sPendingDeaths != 0 || sPendingInjuries != 0 || sPendingProtectedNote)
     {
         LockPlayerFieldControls();
         ScriptContext_SetupScript(IsekaiEventScript_AfterBattleNews);
