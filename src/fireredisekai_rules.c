@@ -256,6 +256,18 @@ static void SaveNow(void)
     sAutosavePending = FALSE;
 }
 
+// Called during a warp, while the screen is still black: entering a building saves here,
+// so the save (and any pause it causes) happens before the room fades in.
+void IsekaiAutosaveOnArrival(void)
+{
+    if (gMapHeader.mapType != MAP_TYPE_INDOOR || CurrentMapKey() == sLastAutosaveMap)
+        return;
+    if (sIsekai.battleType != ISEKAI_BATTLE_NONE)
+        return; // a reset battle is about to resume; don't overwrite that
+    SaveNow();
+    sLastAutosaveMap = CurrentMapKey();
+}
+
 void IsekaiRequestAutosave(void)
 {
     sAutosavePending = TRUE;
@@ -660,6 +672,8 @@ bool32 IsekaiFieldIdle(void)
         ScriptContext_SetupScript(IsekaiEventScript_AfterBattleNews);
         return TRUE;
     }
+    if (gMapHeader.mapType != MAP_TYPE_INDOOR)
+        sLastAutosaveMap = 0; // outside: the next building entered saves again
     // Autosave on entering any building (and when something asked for one).
     if (sAutosavePending
      || (gMapHeader.mapType == MAP_TYPE_INDOOR && CurrentMapKey() != sLastAutosaveMap))

@@ -43,6 +43,7 @@ void IsekaiOnReviveUsed(struct Pokemon *mon, u16 item);
 u8 IsekaiGraveCount(void);
 void IsekaiAutosave(void);
 void IsekaiRequestAutosave(void);
+void IsekaiAutosaveOnArrival(void);
 void IsekaiOnTrainerBattleStart(void);
 void IsekaiOnWildBattleStart(void);
 void IsekaiOnBattleEnd(void);

@@ -297,6 +297,8 @@ static void SetUpWarpExitTask(void)
 
 void FieldCB_DefaultWarpExit(void)
 {
+    if (IS_FRLG)
+        IsekaiAutosaveOnArrival(); // FireRed Isekai: building autosave, hidden while the screen is black
     Overworld_PlaySpecialMapMusic();
     WarpFadeInScreen();
     SetUpWarpExitTask();
