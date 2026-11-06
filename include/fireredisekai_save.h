@@ -30,6 +30,8 @@ struct IsekaiCatch
 
 struct IsekaiSaveData
 {
+    // --- Everything that changes often comes first: the first 116 bytes of SaveBlock3 ride
+    // in sector 0, which every save writes anyway. (v0.12: needs a NEW GAME.)
     // Human lives
     u8 lives;
     u8 livesShown:1;          // the nurse has explained the rule
@@ -40,19 +42,20 @@ struct IsekaiSaveData
     u8 battleType;            // ISEKAI_BATTLE_*
     u8 resetCount;            // how many times this battle was reset
     u32 trainerArgs;          // ROM address of the trainerbattle arguments
+    u32 loanerPersonality;
     u16 battleOpponent;       // trainer id, or wild species
     u8 wildLevel;
     u8 wildWilling;
-    // Center ward: Badly Injured Pokémon left to heal
-    u8 wardMons[ISEKAI_WARD_SLOTS][ISEKAI_BOXMON_SIZE];
     u8 wardBattlesLeft[ISEKAI_WARD_SLOTS];
-    u32 loanerPersonality;
-    // Graveyard
     u8 graveCount;
     u8 releasedCount;         // released on their home route (capped bonus)
-    struct IsekaiGrave graves[ISEKAI_GRAVES];
     // Over-catching
     struct IsekaiCatch catches[ISEKAI_CATCH_SLOTS];
+    // --- Big, rarely changing data after that.
+    // Center ward: Badly Injured Pokémon left to heal
+    u8 wardMons[ISEKAI_WARD_SLOTS][ISEKAI_BOXMON_SIZE];
+    // Graveyard
+    struct IsekaiGrave graves[ISEKAI_GRAVES];
 };
 
 #endif // GUARD_FIREREDISEKAI_SAVE_H

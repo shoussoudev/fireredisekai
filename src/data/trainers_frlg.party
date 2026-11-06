@@ -7059,6 +7059,141 @@ IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 - Bind
 - Rock Tomb
 
+=== TRAINER_RIVAL_ROUTE22_EARLY_SQUIRTLE ===
+Name: TERRY
+Class: Rival Early Frlg
+Pic: Rival Early Frlg
+Gender: Male
+Music: Serious
+Double Battle: No
+Difficulty: Hard
+AI: Check Bad Move / Try To Faint / Check Viability
+
+Pidgey
+Level: 8
+IVs: 20 HP / 20 Atk / 20 Def / 20 SpA / 20 SpD / 20 Spe
+- Tackle
+- Sand Attack
+- Gust
+
+Rattata
+Level: 8
+IVs: 20 HP / 20 Atk / 20 Def / 20 SpA / 20 SpD / 20 Spe
+- Tackle
+- Tail Whip
+- Quick Attack
+
+Eevee @ Oran Berry
+Level: 9
+IVs: 20 HP / 20 Atk / 20 Def / 20 SpA / 20 SpD / 20 Spe
+- Tackle
+- Tail Whip
+- Sand Attack
+- Quick Attack
+
+=== TRAINER_RIVAL_ROUTE22_EARLY_BULBASAUR ===
+Name: TERRY
+Class: Rival Early Frlg
+Pic: Rival Early Frlg
+Gender: Male
+Music: Serious
+Double Battle: No
+Difficulty: Hard
+AI: Check Bad Move / Try To Faint / Check Viability
+
+Pidgey
+Level: 8
+IVs: 20 HP / 20 Atk / 20 Def / 20 SpA / 20 SpD / 20 Spe
+- Tackle
+- Sand Attack
+- Gust
+
+Rattata
+Level: 8
+IVs: 20 HP / 20 Atk / 20 Def / 20 SpA / 20 SpD / 20 Spe
+- Tackle
+- Tail Whip
+- Quick Attack
+
+Eevee @ Oran Berry
+Level: 9
+IVs: 20 HP / 20 Atk / 20 Def / 20 SpA / 20 SpD / 20 Spe
+- Tackle
+- Tail Whip
+- Sand Attack
+- Quick Attack
+
+=== TRAINER_RIVAL_ROUTE22_EARLY_CHARMANDER ===
+Name: TERRY
+Class: Rival Early Frlg
+Pic: Rival Early Frlg
+Gender: Male
+Music: Serious
+Double Battle: No
+Difficulty: Hard
+AI: Check Bad Move / Try To Faint / Check Viability
+
+Pidgey
+Level: 8
+IVs: 20 HP / 20 Atk / 20 Def / 20 SpA / 20 SpD / 20 Spe
+- Tackle
+- Sand Attack
+- Gust
+
+Rattata
+Level: 8
+IVs: 20 HP / 20 Atk / 20 Def / 20 SpA / 20 SpD / 20 Spe
+- Tackle
+- Tail Whip
+- Quick Attack
+
+Eevee @ Oran Berry
+Level: 9
+IVs: 20 HP / 20 Atk / 20 Def / 20 SpA / 20 SpD / 20 Spe
+- Tackle
+- Tail Whip
+- Sand Attack
+- Quick Attack
+
+=== TRAINER_LEADER_BROCK ===
+Name: BROCK
+Class: Leader Frlg
+Pic: Leader Brock Frlg
+Gender: Male
+Music: Serious
+Double Battle: No
+Difficulty: Hard
+AI: Check Bad Move / Try To Faint / Check Viability
+
+Geodude @ Oran Berry
+Level: 11
+IVs: 25 HP / 25 Atk / 25 Def / 25 SpA / 25 SpD / 25 Spe
+- Rock Throw
+- Defense Curl
+- Tackle
+
+Nosepass
+Level: 11
+IVs: 25 HP / 25 Atk / 25 Def / 25 SpA / 25 SpD / 25 Spe
+- Rock Throw
+- Harden
+- Thunder Wave
+
+Rhyhorn
+Level: 11
+IVs: 25 HP / 25 Atk / 25 Def / 25 SpA / 25 SpD / 25 Spe
+- Horn Attack
+- Tail Whip
+- Stomp
+
+Onix @ Sitrus Berry
+Level: 13
+IVs: 25 HP / 25 Atk / 25 Def / 25 SpA / 25 SpD / 25 Spe
+- Rock Tomb
+- Bind
+- Harden
+- Screech
+
 === TRAINER_LEADER_MISTY ===
 Name: MISTY
 Class: Leader Frlg

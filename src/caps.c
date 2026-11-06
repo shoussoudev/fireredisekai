@@ -5,23 +5,37 @@
 #include "pokemon.h"
 
 
+// FireRed Isekai: the sleep question picks the cap. EASY none, NORMAL soft, HARD hard.
+u32 IsekaiExpCapType(void)
+{
+    switch (VarGet(VAR_ISEKAI_DIFFICULTY))
+    {
+    case DIFFICULTY_HARD:   return EXP_CAP_HARD;
+    case DIFFICULTY_NORMAL: return EXP_CAP_SOFT;
+    default:                return EXP_CAP_NONE;
+    }
+}
+
 u32 GetCurrentLevelCap(void)
 {
     static const u32 sLevelCapFlagMap[][2] =
     {
-        {FLAG_BADGE01_GET, 15},
-        {FLAG_BADGE02_GET, 19},
+        // FireRed Isekai: each gym leader's ace.
+        {FLAG_BADGE01_GET, 14},
+        {FLAG_BADGE02_GET, 21},
         {FLAG_BADGE03_GET, 24},
         {FLAG_BADGE04_GET, 29},
-        {FLAG_BADGE05_GET, 31},
-        {FLAG_BADGE06_GET, 33},
-        {FLAG_BADGE07_GET, 42},
-        {FLAG_BADGE08_GET, 46},
-        {FLAG_IS_CHAMPION, 58},
+        {FLAG_BADGE05_GET, 43},
+        {FLAG_BADGE06_GET, 43},
+        {FLAG_BADGE07_GET, 47},
+        {FLAG_BADGE08_GET, 50},
+        {FLAG_IS_CHAMPION, 63},
     };
 
     u32 i;
 
+    if (IsekaiExpCapType() == EXP_CAP_NONE) // FireRed Isekai: no caps on EASY
+        return MAX_LEVEL;
     if (B_LEVEL_CAP_TYPE == LEVEL_CAP_FLAG_LIST)
     {
         for (i = 0; i < ARRAY_COUNT(sLevelCapFlagMap); i++)
@@ -46,7 +60,7 @@ u32 GetSoftLevelCapExpValue(u32 level, u32 expValue)
     u32 levelDifference;
     u32 currentLevelCap = GetCurrentLevelCap();
 
-    if (B_EXP_CAP_TYPE == EXP_CAP_NONE)
+    if (IsekaiExpCapType() == EXP_CAP_NONE)
         return expValue;
 
     if (level < currentLevelCap)
@@ -64,11 +78,11 @@ u32 GetSoftLevelCapExpValue(u32 level, u32 expValue)
             return expValue;
         }
     }
-    else if (B_EXP_CAP_TYPE == EXP_CAP_HARD)
+    else if (IsekaiExpCapType() == EXP_CAP_HARD)
     {
         return 0;
     }
-    else if (B_EXP_CAP_TYPE == EXP_CAP_SOFT)
+    else if (IsekaiExpCapType() == EXP_CAP_SOFT)
     {
         levelDifference = level - currentLevelCap;
         if (levelDifference > ARRAY_COUNT(sExpScalingDown) - 1)

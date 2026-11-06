@@ -3526,7 +3526,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, enum Item item, u8 partyIndex, 
                     enum Species species = GetMonData(mon, MON_DATA_SPECIES);
                     dataUnsigned = sExpCandyExperienceTable[param - 1] + GetMonData(mon, MON_DATA_EXP);
 
-                    if (B_RARE_CANDY_CAP && B_EXP_CAP_TYPE == EXP_CAP_HARD)
+                    if (B_RARE_CANDY_CAP && IsekaiExpCapType() == EXP_CAP_HARD)
                     {
                         u32 currentLevelCap = GetCurrentLevelCap();
                         if (dataUnsigned > gExperienceTables[gSpeciesInfo[species].growthRate][currentLevelCap])

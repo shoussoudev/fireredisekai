@@ -490,16 +490,43 @@ static bool32 IsSpecialFoe(void)
     return FALSE;
 }
 
+// Difficulty: trainers are a little tougher on NORMAL, tougher again on HARD (on top of the
+// hand-made HARD teams in trainers_frlg.party). Not the lab fight, not KEVIN (fixed).
+static u8 DifficultyLevelBoost(void)
+{
+    if (IsekaiForfeitForbidden() == ISEKAI_NOFORFEIT_OAK
+     || TRAINER_BATTLE_PARAM.opponentA == TRAINER_ISEKAI_KEVIN)
+        return 0;
+    switch (VarGet(VAR_ISEKAI_DIFFICULTY))
+    {
+    case DIFFICULTY_HARD:   return 2;
+    case DIFFICULTY_NORMAL: return 1;
+    default:                return 0;
+    }
+}
+
+static void BoostOpponents(u8 boost)
+{
+    u8 i;
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        BoostMonLevel(&gParties[B_TRAINER_OPPONENT_A][i], boost);
+        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
+            BoostMonLevel(&gParties[B_TRAINER_OPPONENT_B][i], boost);
+    }
+}
+
+STATIC_ASSERT(offsetof(struct IsekaiSaveData, wardMons) <= SAVE_BLOCK_3_CHUNK_SIZE, IsekaiHotFieldsInSectorZero);
+
 // Called by DoTrainerBattle once the opponent's party exists.
 void IsekaiOnTrainerBattleStart(void)
 {
-    u8 i;
-
     if (!IsekaiRulesApply())
         return;
     RecordAliveAtStart();
     if (!IsSpecialFoe() || gIsekaiTrainerArgs == NULL)
     {
+        BoostOpponents(DifficultyLevelBoost());
         // Ordinary trainer: no save at the start, no reset penalty.
         sIsekai.battleType = ISEKAI_BATTLE_NONE;
         sResumingBattle = FALSE;
@@ -511,12 +538,7 @@ void IsekaiOnTrainerBattleStart(void)
     sIsekai.battleType = ISEKAI_BATTLE_TRAINER;
     sIsekai.trainerArgs = (u32)gIsekaiTrainerArgs;
     sIsekai.battleOpponent = TRAINER_BATTLE_PARAM.opponentA;
-    for (i = 0; i < PARTY_SIZE; i++)
-    {
-        BoostMonLevel(&gParties[B_TRAINER_OPPONENT_A][i], sIsekai.resetCount * 3);
-        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
-            BoostMonLevel(&gParties[B_TRAINER_OPPONENT_B][i], sIsekai.resetCount * 3);
-    }
+    BoostOpponents(DifficultyLevelBoost() + sIsekai.resetCount * 3);
     // Saved once the battle transition has gone black (IsekaiOnBattleInit), so the pause is hidden.
     sBattleStartSavePending = TRUE;
 }
