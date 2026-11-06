@@ -15,6 +15,9 @@
 #include "fireredisekai.h"
 #include "item.h"
 #include "main.h"
+#include "metatile_behavior.h"
+#include "money.h"
+#include "constants/map_groups.h"
 #include "menu.h"
 #include "text_window.h"
 #include "window.h"
@@ -61,6 +64,8 @@ EWRAM_DATA static bool8 sAutosavePending = FALSE;
 EWRAM_DATA static bool8 sZoneSavePending = FALSE;
 EWRAM_DATA static bool8 sArrivalSavePending = FALSE;  // entered a save building; save once it has faded in
 EWRAM_DATA static bool8 sBattleStartSavePending = FALSE;
+EWRAM_DATA static u8 sPendingCall = 0;               // Oak's phone call to play: 1 first catch, 2 overdue
+EWRAM_DATA static bool8 sPendingWantedReminder = FALSE;
 EWRAM_DATA static u16 sLastAutosaveMap = 0;            // (group << 8 | num) + 1 of the last autosave; 0 = none yet
 EWRAM_DATA bool8 gIsekaiWildUnwilling = FALSE;         // this wild Pokémon won't accept a ball
 
@@ -101,6 +106,9 @@ void IsekaiNewGameInit(void)
 {
     memset(&sIsekai, 0, sizeof(sIsekai));
     sIsekai.lives = IsekaiMaxLives();
+    if (VarGet(VAR_ISEKAI_LOAN_STATE) == 0)
+        FlagSet(FLAG_HIDE_ISEKAI_SHADY_MAN);  // appears once the loan starts
+    FlagSet(FLAG_HIDE_ISEKAI_LAB_JENNY);  // appears if the loaner is overdue
     FlagSet(FLAG_SYS_B_DASH); // running from the very start
     if (GetCurrentDifficultyLevel() == DIFFICULTY_HARD)
         gSaveBlock2Ptr->optionsBattleStyle = OPTIONS_BATTLE_STYLE_SET; // no free switch after a KO
@@ -261,14 +269,96 @@ static bool32 IsSaveBuilding(void)
 // save; leaving one means coming back saves again.
 void IsekaiOnMapWarp(void)
 {
-    return; // v0.10.5: buildings no longer autosave (manual SAVE is back)
-    if (!IsSaveBuilding())
-    {
-        sLastAutosaveMap = 0;
-        sArrivalSavePending = FALSE;
+    // While wanted, Centers and Marts now and then remind him (posters by the door).
+    // (Buildings no longer autosave since v0.10.5; manual SAVE is back.)
+    sPendingWantedReminder = FALSE;
+    if (FlagGet(FLAG_ISEKAI_WANTED) && IsSaveBuilding()
+     && gSaveBlock1Ptr->location.mapGroup != MAP_GROUP(MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB)
+     && (Random() % 2) == 0)
+        sPendingWantedReminder = TRUE;
+}
+
+// ---------------------------------------------------------------------------
+// Oak's loan (v0.11): the first catch starts a 1,000-step clock.
+// ---------------------------------------------------------------------------
+#define ISEKAI_LOAN_DEADLINE 1000
+
+void IsekaiOnFirstCatch(void)
+{
+    if (VarGet(VAR_ISEKAI_LOAN_STATE) != 2)
         return;
+    VarSet(VAR_ISEKAI_LOAN_STATE, 3);
+    VarSet(VAR_ISEKAI_LOAN_STEPS, 0);
+    sPendingCall = 1;
+}
+
+bool32 IsekaiOnStep(u16 metatileBehavior)
+{
+    if (VarGet(VAR_ISEKAI_LOAN_STATE) == 3)
+    {
+        u16 steps = VarGet(VAR_ISEKAI_LOAN_STEPS) + 1;
+        VarSet(VAR_ISEKAI_LOAN_STEPS, steps);
+        if (steps >= ISEKAI_LOAN_DEADLINE)
+        {
+            VarSet(VAR_ISEKAI_LOAN_STATE, 4);
+            FlagSet(FLAG_ISEKAI_WANTED);
+            FlagClear(FLAG_HIDE_ISEKAI_LAB_JENNY);
+            sPendingCall = 2;
+        }
     }
-    sArrivalSavePending = (CurrentMapKey() != sLastAutosaveMap);
+    // The first step into tall grass on Route 1.
+    if (!FlagGet(FLAG_ISEKAI_SEEN_FIRST_GRASS)
+     && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_ROUTE1)
+     && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_ROUTE1)
+     && MetatileBehavior_IsTallGrass(metatileBehavior))
+    {
+        FlagSet(FLAG_ISEKAI_SEEN_FIRST_GRASS);
+        ScriptContext_SetupScript(IsekaiEventScript_FirstGrass);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// VAR_RESULT = TRUE if Oak's loaner is in the party.
+void IsekaiLoanerInParty(void)
+{
+    u8 i;
+    gSpecialVar_Result = FALSE;
+    for (i = 0; i < PARTY_SIZE; i++)
+        if (GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES) != SPECIES_NONE
+         && IsekaiIsLoaner(&gParties[B_TRAINER_PLAYER][i]))
+            gSpecialVar_Result = TRUE;
+}
+
+// VAR_RESULT = TRUE if the party has a POKéMON other than the loaner.
+void IsekaiHasOwnMon(void)
+{
+    u8 i;
+    gSpecialVar_Result = FALSE;
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        struct Pokemon *mon = &gParties[B_TRAINER_PLAYER][i];
+        if (GetMonData(mon, MON_DATA_SPECIES) != SPECIES_NONE && !GetMonData(mon, MON_DATA_IS_EGG) && !IsekaiIsLoaner(mon))
+            gSpecialVar_Result = TRUE;
+    }
+}
+
+// Honest return: Oak keeps ₽500 and refunds the rest. STR_VAR_1 = the refund.
+void IsekaiRefundDeposit(void)
+{
+    u32 deposit = VarGet(VAR_ISEKAI_LOAN_DEPOSIT);
+    u32 refund = deposit > 500 ? deposit - 500 : 0;
+    AddMoney(&gSaveBlock1Ptr->money, refund);
+    ConvertIntToDecimalStringN(gStringVar1, refund, STR_CONV_MODE_LEFT_ALIGN, 6);
+}
+
+// Jenny's fine: up to ₽1000, whatever he has. STR_VAR_1 = the amount.
+void IsekaiPayFine(void)
+{
+    u32 money = GetMoney(&gSaveBlock1Ptr->money);
+    u32 fine = money < 1000 ? money : 1000;
+    RemoveMoney(&gSaveBlock1Ptr->money, fine);
+    ConvertIntToDecimalStringN(gStringVar1, fine, STR_CONV_MODE_LEFT_ALIGN, 6);
 }
 
 // A small "Saving..." box in the bottom-right corner, shown while a field autosave runs.
@@ -369,7 +459,7 @@ static void RecordAliveAtStart(void)
 // scenes are built: the staring Viridian Forest kid, KEVIN, AMEDEE).
 static const u16 sIsekaiSpecialTrainers[] =
 {
-    TRAINER_NONE,
+    TRAINER_ISEKAI_KEVIN,
 };
 
 static bool32 IsSpecialFoe(void)
@@ -781,6 +871,22 @@ bool32 IsekaiFieldIdle(void)
         ScriptContext_SetupScript(IsekaiEventScript_AfterBattleNews);
         return TRUE;
     }
+    if (sPendingCall != 0)
+    {
+        gSpecialVar_0x8004 = sPendingCall;
+        sPendingCall = 0;
+        LockPlayerFieldControls();
+        ScriptContext_SetupScript(IsekaiEventScript_OakCall);
+        return TRUE;
+    }
+    if (sPendingWantedReminder)
+    {
+        sPendingWantedReminder = FALSE;
+        gSpecialVar_0x8004 = Random() % 3;
+        LockPlayerFieldControls();
+        ScriptContext_SetupScript(IsekaiEventScript_WantedReminder);
+        return TRUE;
+    }
     // (v0.10.5: no building or zone autosaves; players save from the START menu.
     // Something can still ask for a field autosave, which shows a small "Saving..." box.)
     if (sAutosavePending && !(gMain.heldKeys & DPAD_ANY))
@@ -806,7 +912,10 @@ u32 IsekaiForfeitForbidden(void)
     u8 trainerClass;
     if (!IS_FRLG || !(gBattleTypeFlags & BATTLE_TYPE_TRAINER))
         return 0;
-    if (TRAINER_BATTLE_PARAM.earlyRival)
+    if (TRAINER_BATTLE_PARAM.earlyRival
+     && GetTrainerClassFromId(TRAINER_BATTLE_PARAM.opponentA) == TRAINER_CLASS_RIVAL_EARLY_FRLG
+     && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB)
+     && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB))
         return ISEKAI_NOFORFEIT_OAK; // Oak is watching
     // Red and the hidden trainers (Chapter 3) will return ISEKAI_NOFORFEIT_PEAK.
     trainerClass = GetTrainerClassFromId(TRAINER_BATTLE_PARAM.opponentA);

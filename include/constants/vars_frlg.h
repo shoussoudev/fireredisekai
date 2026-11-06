@@ -169,7 +169,9 @@
 #define VAR_0x4091                 0x4091
 #define VAR_ISEKAI_LOANER_PID_HI           VAR_0x4091 // FireRed Isekai: loaner's personality, high half
 #define VAR_0x4092                 0x4092
+#define VAR_ISEKAI_LOAN_STATE              VAR_0x4092 // FireRed Isekai: loan: 0 none, 1 lent, 2 balls given, 3 caught (clock), 4 overdue (wanted), 5 returned, 6 turned in late
 #define VAR_0x4093                 0x4093
+#define VAR_ISEKAI_LOAN_STEPS              VAR_0x4093 // FireRed Isekai: steps since the first catch (the 1,000-step clock)
 #define VAR_0x4094                 0x4094
 #define VAR_0x4095                 0x4095
 #define VAR_0x4096                 0x4096

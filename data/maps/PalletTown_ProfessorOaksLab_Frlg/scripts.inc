@@ -566,6 +566,8 @@ PalletTown_ProfessorOaksLab_EventScript_ProfOak::
 	lock
 	faceplayer
 	goto_if_set SHOWED_OAK_COMPLETE_DEX, PalletTown_ProfessorOaksLab_EventScript_OakJustShownCompleteDex
+	goto_if_ge VAR_ISEKAI_LOAN_STATE, 5, PalletTown_ProfessorOaksLab_EventScript_IsekaiOakAfterLoan
+	goto_if_ge VAR_ISEKAI_LOAN_STATE, 1, PalletTown_ProfessorOaksLab_EventScript_IsekaiOakLoan
 	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 9, PalletTown_ProfessorOaksLab_EventScript_RatePokedex
 	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 8, PalletTown_ProfessorOaksLab_EventScript_MonsAroundWorldWait
 	goto_if_set FLAG_SYS_GAME_CLEAR, PalletTown_ProfessorOaksLab_EventScript_TryStartNationalDexScene
@@ -1447,10 +1449,19 @@ PalletTown_ProfessorOaksLab_Text_ReceivedMonFromOak::
 	.string "from PROF. OAK!$"
 
 PalletTown_ProfessorOaksLab_Text_OakCanReachNextTownWithMon::
-	.string "OAK: Go to ROUTE 1 and catch a\n"
-	.string "POKéMON that wants to come with you.\p"
-	.string "Then bring mine back.\n"
-	.string "In one piece, ideally.$"
+	.string "OAK: POKé BALLS? Not yet.\n"
+	.string "VIRIDIAN first.\p"
+	.string "Head north through ROUTE 1.\n"
+	.string "And keep my POKéMON in one piece.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiPhone::
+	.string "OAK: And take this.\n"
+	.string "So I can reach you.\p"
+	.string "It's cheap. Don't lose it.\n"
+	.string "It's also mine.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiGotPhone::
+	.string "{PLAYER} received a cheap phone.$"
 
 PalletTown_ProfessorOaksLab_Text_OakBattleMonForItToGrow::
 	.string "OAK: Battle with it, by all means.\n"
@@ -1687,12 +1698,19 @@ PalletTown_ProfessorOaksLab_EventScript_IsekaiDeposit::
 	msgbox PalletTown_ProfessorOaksLab_Text_HandedOverDeposit
 	textcolor NPC_TEXT_COLOR_MALE
 	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiRemindsMeOfSomeone
-	msgbox PalletTown_ProfessorOaksLab_Text_BallsAreExtra
-	giveitem ITEM_POKE_BALL, 5
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiPhone
+	textcolor NPC_TEXT_COLOR_NEUTRAL
+	playfanfare MUS_RG_OBTAIN_KEY_ITEM
+	message PalletTown_ProfessorOaksLab_Text_IsekaiGotPhone
+	waitmessage
+	waitfanfare
 	textcolor NPC_TEXT_COLOR_MALE
+	setflag FLAG_ISEKAI_HAS_PHONE
 	msgbox PalletTown_ProfessorOaksLab_Text_OakCanReachNextTownWithMon
 	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiPewterHint
 	setflag FLAG_ISEKAI_HAS_LOANER
+	setvar VAR_ISEKAI_LOAN_STATE, 1
+	clearflag FLAG_HIDE_ISEKAI_SHADY_MAN
 	setvar VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 3
 	call_if_set FLAG_OPENED_START_MENU, PalletTown_ProfessorOaksLab_EventScript_ReadyEndSignLadyScene
 	release
@@ -1818,3 +1836,296 @@ PalletTown_ProfessorOaksLab_Text_IsekaiPewterHint::
 	.string "MUSEUM who collects that sort of\l"
 	.string "thing. DR. PEBBLE.\p"
 	.string "…I'd keep your expectations low.$"
+
+
+@ ---------------------------------------------------------------------------
+@ FireRed Isekai (v0.11): the loan, the parcel, and bringing the loaner back
+@ ---------------------------------------------------------------------------
+PalletTown_ProfessorOaksLab_EventScript_IsekaiOakLoan::
+	goto_if_set FLAG_ISEKAI_LOANER_DIED, PalletTown_ProfessorOaksLab_EventScript_IsekaiLoanerDied
+	switch VAR_ISEKAI_LOAN_STATE
+	case 1, PalletTown_ProfessorOaksLab_EventScript_IsekaiBeforeParcel
+	case 2, PalletTown_ProfessorOaksLab_EventScript_IsekaiNoCatchYet
+	case 3, PalletTown_ProfessorOaksLab_EventScript_IsekaiReturnOnTime
+	case 4, PalletTown_ProfessorOaksLab_EventScript_IsekaiReturnLate
+	release
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiOakAfterLoan::
+	goto_if_set FLAG_ISEKAI_OAK_COLD, PalletTown_ProfessorOaksLab_EventScript_IsekaiOakCold
+	goto PalletTown_ProfessorOaksLab_EventScript_RatePokedexOrTryGiveBalls
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiOakCold::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiOakCold
+	release
+	end
+
+@ State 1: lent, no POKé BALLS yet. The parcel swaps for five on credit.
+PalletTown_ProfessorOaksLab_EventScript_IsekaiBeforeParcel::
+	checkitem ITEM_OAKS_PARCEL
+	goto_if_eq VAR_RESULT, TRUE, PalletTown_ProfessorOaksLab_EventScript_IsekaiParcel
+	msgbox PalletTown_ProfessorOaksLab_Text_OakCanReachNextTownWithMon
+	release
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiParcel::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiParcelThanks
+	textcolor NPC_TEXT_COLOR_NEUTRAL
+	playfanfare MUS_OBTAIN_TMHM
+	message PalletTown_ProfessorOaksLab_Text_DeliveredOaksParcel
+	waitmessage
+	waitfanfare
+	call EventScript_RestorePrevTextColor
+	removeitem ITEM_OAKS_PARCEL
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiBallsOnCredit
+	giveitem ITEM_POKE_BALL, 5
+	textcolor NPC_TEXT_COLOR_MALE
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiBringMineBack
+	setvar VAR_ISEKAI_LOAN_STATE, 2
+	setvar VAR_MAP_SCENE_VIRIDIAN_CITY_MART, 2
+	setvar VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 1
+	setvar VAR_MAP_SCENE_PALLET_TOWN_RIVALS_HOUSE, 1
+	setvar VAR_MAP_SCENE_ROUTE22, 1
+	release
+	end
+
+@ State 2: has POKé BALLS, hasn't caught anything yet. Three more, once.
+PalletTown_ProfessorOaksLab_EventScript_IsekaiNoCatchYet::
+	special IsekaiHasOwnMon
+	goto_if_eq VAR_RESULT, TRUE, PalletTown_ProfessorOaksLab_EventScript_IsekaiReturnOnTime
+	checkitem ITEM_POKE_BALL
+	goto_if_eq VAR_RESULT, TRUE, PalletTown_ProfessorOaksLab_EventScript_IsekaiStillHaveBalls
+	goto_if_set FLAG_ISEKAI_EXTRA_BALLS, PalletTown_ProfessorOaksLab_EventScript_IsekaiNoMoreBalls
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiThreeMore
+	giveitem ITEM_POKE_BALL, 3
+	setflag FLAG_ISEKAI_EXTRA_BALLS
+	release
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiStillHaveBalls::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiBringMineBack
+	release
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiNoMoreBalls::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiNotSendingYouEmptyHanded
+	release
+	end
+
+@ State 3: caught something, within the 1,000 steps.
+PalletTown_ProfessorOaksLab_EventScript_IsekaiReturnOnTime::
+	special IsekaiLoanerInParty
+	goto_if_eq VAR_RESULT, FALSE, PalletTown_ProfessorOaksLab_EventScript_IsekaiWhereIsIt
+	bufferspeciesname STR_VAR_2, VAR_ISEKAI_LOANER_SPECIES
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiHandBack, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, PalletTown_ProfessorOaksLab_EventScript_IsekaiNotYet
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiYouBroughtItBack
+	special IsekaiRefundDeposit
+	textcolor NPC_TEXT_COLOR_NEUTRAL
+	playse SE_SHOP
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiRefund
+	textcolor NPC_TEXT_COLOR_MALE
+	call PalletTown_ProfessorOaksLab_EventScript_IsekaiGivePokedex
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiRecordThem
+	setvar VAR_ISEKAI_LOAN_STATE, 5
+	setflag FLAG_HIDE_ISEKAI_SHADY_MAN
+	release
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiNotYet::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiNotYet
+	release
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiWhereIsIt::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiWhereIsIt
+	release
+	end
+
+@ State 4: overdue. JENNY is waiting.
+PalletTown_ProfessorOaksLab_EventScript_IsekaiJenny::
+	lock
+	faceplayer
+	goto_if_ne VAR_ISEKAI_LOAN_STATE, 4, PalletTown_ProfessorOaksLab_EventScript_IsekaiJennyIdle
+	goto PalletTown_ProfessorOaksLab_EventScript_IsekaiReturnLate
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiJennyIdle::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiJennyIdle
+	release
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiReturnLate::
+	special IsekaiLoanerInParty
+	goto_if_eq VAR_RESULT, FALSE, PalletTown_ProfessorOaksLab_EventScript_IsekaiLateNoLoaner
+	textcolor NPC_TEXT_COLOR_FEMALE
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiJenny1
+	special IsekaiPayFine
+	textcolor NPC_TEXT_COLOR_NEUTRAL
+	playse SE_SHOP
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiPaidFine
+	textcolor NPC_TEXT_COLOR_FEMALE
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiJenny2
+	closemessage
+	fadescreen FADE_TO_BLACK
+	removeobject LOCALID_OAKS_LAB_JENNY
+	setflag FLAG_HIDE_ISEKAI_LAB_JENNY
+	fadescreen FADE_FROM_BLACK
+	textcolor NPC_TEXT_COLOR_MALE
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiTookYourTime
+	call PalletTown_ProfessorOaksLab_EventScript_IsekaiGivePokedex
+	clearflag FLAG_ISEKAI_WANTED
+	setflag FLAG_ISEKAI_TURNED_IN
+	setflag FLAG_ISEKAI_OAK_COLD
+	setflag FLAG_ISEKAI_BLUE_SOUR
+	setflag FLAG_HIDE_ISEKAI_SHADY_MAN
+	setvar VAR_ISEKAI_LOAN_STATE, 6
+	release
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiLateNoLoaner::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiLateNoLoaner
+	release
+	end
+
+@ The loaner died. Oak doesn't shout.
+PalletTown_ProfessorOaksLab_EventScript_IsekaiLoanerDied::
+	goto_if_ge VAR_ISEKAI_LOAN_STATE, 5, PalletTown_ProfessorOaksLab_EventScript_IsekaiOakCold
+	checkitem ITEM_OAKS_PARCEL
+	call_if_eq VAR_RESULT, TRUE, PalletTown_ProfessorOaksLab_EventScript_IsekaiDiedTakeParcel
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiLoanerDied
+	call PalletTown_ProfessorOaksLab_EventScript_IsekaiGivePokedex
+	setflag FLAG_ISEKAI_OAK_COLD
+	setflag FLAG_ISEKAI_BLUE_SOUR
+	clearflag FLAG_ISEKAI_WANTED
+	setflag FLAG_HIDE_ISEKAI_LAB_JENNY
+	setflag FLAG_HIDE_ISEKAI_SHADY_MAN
+	setvar VAR_ISEKAI_LOAN_STATE, 5
+	release
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiDiedTakeParcel::
+	removeitem ITEM_OAKS_PARCEL
+	giveitem ITEM_POKE_BALL, 5
+	setvar VAR_MAP_SCENE_VIRIDIAN_CITY_MART, 2
+	setvar VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 1
+	setvar VAR_MAP_SCENE_PALLET_TOWN_RIVALS_HOUSE, 1
+	setvar VAR_MAP_SCENE_ROUTE22, 1
+	return
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiGivePokedex::
+	removeobject LOCALID_POKEDEX_1
+	removeobject LOCALID_POKEDEX_2
+	setflag FLAG_HIDE_POKEDEX
+	textcolor NPC_TEXT_COLOR_NEUTRAL
+	playfanfare MUS_RG_OBTAIN_KEY_ITEM
+	message PalletTown_ProfessorOaksLab_Text_ReceivedPokedexFromOak
+	waitmessage
+	waitfanfare
+	call EventScript_RestorePrevTextColor
+	setflag FLAG_SYS_POKEDEX_GET
+	special SetUnlockedPokedexFlags
+	setvar VAR_MAP_SCENE_POKEMON_CENTER_TEALA, 1
+	setvar VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 6
+	textcolor NPC_TEXT_COLOR_MALE
+	return
+
+PalletTown_ProfessorOaksLab_Text_IsekaiParcelThanks::
+	.string "OAK: Ah, my parcel! From the\n"
+	.string "VIRIDIAN MART?$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiBallsOnCredit::
+	.string "OAK: Good. You can follow simple\n"
+	.string "instructions. That's a start.\p"
+	.string "Here. Five POKé BALLS.\n"
+	.string "On credit.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiBringMineBack::
+	.string "OAK: Catch one that wants to come\n"
+	.string "with you.\p"
+	.string "And the moment you do, you bring\n"
+	.string "mine back.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiThreeMore::
+	.string "OAK: Nothing? Not a single one?\p"
+	.string "…Three more. That's it.\n"
+	.string "I'm a professor, not a shop.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiNotSendingYouEmptyHanded::
+	.string "OAK: Still nothing.\p"
+	.string "…Keep it, for now. I'm not sending\n"
+	.string "you out there empty-handed.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiHandBack::
+	.string "OAK: You caught one. Good.\p"
+	.string "He holds out his hand.\p"
+	.string "OAK: My {STR_VAR_2}, please.\n"
+	.string "Will you give it back?$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiNotYet::
+	.string "OAK: …I see.\p"
+	.string "Don't make me pick up that phone.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiWhereIsIt::
+	.string "OAK: And where is my POKéMON?\p"
+	.string "Bring it here. With you.\n"
+	.string "In your party.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiYouBroughtItBack::
+	.string "OAK: You brought it back.\p"
+	.string "Most people don't, you know.\p"
+	.string "…It keeps looking at you.\p"
+	.string "Keep it. It's never followed anyone\n"
+	.string "around like that before.\p"
+	.string "I'll keep ¥500 of your deposit\n"
+	.string "for its upkeep.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiRefund::
+	.string "{PLAYER} got ¥{STR_VAR_1} back.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiRecordThem::
+	.string "OAK: Use the POKéDEX to record what\n"
+	.string "you see out there.\p"
+	.string "I asked you to record them.\n"
+	.string "Not take them all.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiJennyIdle::
+	.string "JENNY: Just here for a chat with\n"
+	.string "the professor.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiJenny1::
+	.string "JENNY: So you're the one on my\n"
+	.string "posters.\p"
+	.string "Shorter than the drawing.\p"
+	.string "The professor isn't pressing\n"
+	.string "charges.\p"
+	.string "You'll pay a fine.\n"
+	.string "And the deposit's gone. All of it.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiPaidFine::
+	.string "{PLAYER} paid a fine of ¥{STR_VAR_1}.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiJenny2::
+	.string "JENNY: The posters come down today.\p"
+	.string "Don't make me print new ones.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiTookYourTime::
+	.string "OAK: You took your time.\p"
+	.string "…Keep it. It's chosen you anyway.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiLateNoLoaner::
+	.string "JENNY: You came to turn yourself in\n"
+	.string "without the POKéMON?\p"
+	.string "Go and get it. I'll wait.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiLoanerDied::
+	.string "OAK: …\p"
+	.string "I heard.\p"
+	.string "I'll take care of the burial myself.\p"
+	.string "…Take the POKéDEX. Record them.\n"
+	.string "Every single one.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiOakCold::
+	.string "OAK: Hm. Still here?\p"
+	.string "The POKéDEX won't fill itself.$"

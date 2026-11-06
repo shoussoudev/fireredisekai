@@ -4488,11 +4488,12 @@ IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 - Tackle
 - Sand Attack
 
-Squirtle
+Eevee
 Level: 9
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 - Tackle
 - Tail Whip
+- Sand Attack
 
 === TRAINER_RIVAL_ROUTE22_EARLY_BULBASAUR ===
 Name: TERRY
@@ -4509,11 +4510,12 @@ IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 - Tackle
 - Sand Attack
 
-Bulbasaur
+Eevee
 Level: 9
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 - Tackle
-- Growl
+- Tail Whip
+- Sand Attack
 
 === TRAINER_RIVAL_ROUTE22_EARLY_CHARMANDER ===
 Name: TERRY
@@ -4530,11 +4532,12 @@ IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 - Tackle
 - Sand Attack
 
-Charmander
+Eevee
 Level: 9
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
-- Scratch
-- Growl
+- Tackle
+- Tail Whip
+- Sand Attack
 
 === TRAINER_RIVAL_CERULEAN_SQUIRTLE ===
 Name: TERRY
@@ -13787,3 +13790,20 @@ IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 Muk
 Level: 39
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
+
+=== TRAINER_ISEKAI_KEVIN ===
+Name: KEVIN
+Class: Cooltrainer Frlg
+Pic: Cooltrainer M Frlg
+Gender: Male
+Music: Cool
+Double Battle: No
+AI: Check Bad Move / Try To Faint / Check Viability
+
+Charmander
+Level: 55
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+- Flamethrower
+- Slash
+- Dragon Claw
+- Fire Fang

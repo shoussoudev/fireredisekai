@@ -27,8 +27,19 @@ Route1_EventScript_AlreadyGotPotion::
 	end
 
 Route1_EventScript_Boy::
+	goto_if_set FLAG_ISEKAI_LIMPING, Route1_EventScript_IsekaiBoyLimp
 	msgbox Route1_Text_CanJumpFromLedges, MSGBOX_NPC
 	end
+
+@ FireRed Isekai: he climbed out of a window this morning.
+Route1_EventScript_IsekaiBoyLimp::
+	msgbox Route1_Text_IsekaiLimping, MSGBOX_NPC
+	end
+
+Route1_Text_IsekaiLimping::
+	.string "Are you… limping?\n"
+	.string "Through the grass?\p"
+	.string "Bold.$"
 
 Route1_EventScript_RouteSign::
 	msgbox Route1_Text_RouteSign, MSGBOX_SIGN

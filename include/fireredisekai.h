@@ -44,6 +44,8 @@ u8 IsekaiGraveCount(void);
 void IsekaiAutosave(void);
 void IsekaiRequestAutosave(void);
 void IsekaiOnMapWarp(void);
+bool32 IsekaiOnStep(u16 metatileBehavior);
+void IsekaiOnFirstCatch(void);
 void IsekaiOnBattleInit(void);
 void IsekaiOnTrainerBattleStart(void);
 void IsekaiOnWildBattleStart(void);

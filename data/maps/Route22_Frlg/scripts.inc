@@ -30,6 +30,7 @@ Route22_EventScript_EarlyRival::
 	call_if_eq VAR_TEMP_1, 2, Route22_EventScript_EarlyRivalApproachBottom
 	delay 6
 	msgbox Route22_Text_EarlyRivalIntro
+	call_if_set FLAG_ISEKAI_BLUE_SOUR, Route22_EventScript_IsekaiRivalSour
 	call_if_eq VAR_STARTER_MON, 2, Route22_EventScript_EarlyRivalSquirtle
 	call_if_eq VAR_STARTER_MON, 1, Route22_EventScript_EarlyRivalBulbasaur
 	call_if_eq VAR_STARTER_MON, 0, Route22_EventScript_EarlyRivalCharmander
@@ -233,28 +234,37 @@ Route22_EventScript_LeagueGateSign::
 	msgbox Route22_Text_LeagueGateSign, MSGBOX_SIGN
 	end
 
+Route22_EventScript_IsekaiRivalSour::
+	msgbox Route22_Text_IsekaiRivalSour
+	return
+
+Route22_Text_IsekaiRivalSour::
+	.string "{RIVAL}: Gramps had to call the\n"
+	.string "POLICE on you. The POLICE.\p"
+	.string "He's never called the police on\n"
+	.string "anyone. Not even me.$"
+
 Route22_Text_EarlyRivalIntro::
-	.string "{RIVAL}: Hey! {PLAYER}!\p"
+	.string "{RIVAL}: Hey! Old man!\p"
 	.string "You're off to the POKéMON LEAGUE?\n"
-	.string "Forget about it!\p"
-	.string "You probably don't have any\n"
-	.string "BADGES, do you?\p"
-	.string "The guard won't let you through\n"
-	.string "without them.\p"
-	.string "By the way, did your POKéMON get\n"
-	.string "any stronger?$"
+	.string "At your age?\p"
+	.string "You don't have any BADGES. The\n"
+	.string "guard won't even let you through.\p"
+	.string "They'd ask for your ID and think\n"
+	.string "you're somebody's dad.\p"
+	.string "So? Did that rental get any\n"
+	.string "stronger?$"
 
 Route22_Text_EarlyRivalDefeat::
 	.string "Awww!\n"
-	.string "You just lucked out!$"
+	.string "Lucky. Old man luck.$"
 
 Route22_Text_EarlyRivalPostBattle::
 	.string "I heard the POKéMON LEAGUE is\n"
 	.string "crawling with tough TRAINERS.\p"
-	.string "I have to figure out how to get\n"
-	.string "past them.\p"
-	.string "You should quit dawdling and get a\n"
-	.string "move on!$"
+	.string "They'll eat you alive, grandpa.\p"
+	.string "Me? I'll be fine.\n"
+	.string "Smell you later!$"
 
 @ Translated in RB as "{RIVAL}: What? Why do I have 2 POKéMON? You should catch some more too!"
 Route22_Text_RivalShouldCatchSomeMons::

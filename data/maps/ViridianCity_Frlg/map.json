@@ -161,6 +161,36 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "ViridianCity_EventScript_ItemPotion",
       "flag": "FLAG_HIDE_VIRIDIAN_CITY_POTION"
+    },
+    {
+      "type": "object",
+      "graphics_id": "OBJ_EVENT_GFX_BIKER",
+      "x": 39,
+      "y": 20,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_FACE_LEFT",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "ViridianCity_EventScript_IsekaiShadyMan",
+      "flag": "FLAG_HIDE_ISEKAI_SHADY_MAN",
+      "local_id": "LOCALID_VIRIDIAN_SHADY_MAN"
+    },
+    {
+      "type": "object",
+      "graphics_id": "OBJ_EVENT_GFX_COOLTRAINER_M",
+      "x": 31,
+      "y": 24,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "ViridianCity_EventScript_IsekaiKevin",
+      "flag": "0",
+      "local_id": "LOCALID_VIRIDIAN_KEVIN"
     }
   ],
   "warp_events": [

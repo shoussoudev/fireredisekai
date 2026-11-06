@@ -760,6 +760,8 @@ static bool8 TryStartStepCountScript(u16 metatileBehavior)
 
     if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_FORCED_MOVE) && !MetatileBehavior_IsForcedMovementTile(metatileBehavior))
     {
+        if (IS_FRLG && IsekaiOnStep(metatileBehavior)) // FireRed Isekai: loan clock, first grass
+            return TRUE;
     #if OW_POISON_DAMAGE < GEN_5
         if (UpdatePoisonStepCounter() == TRUE)
         {

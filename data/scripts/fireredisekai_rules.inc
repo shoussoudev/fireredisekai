@@ -411,3 +411,87 @@ IsekaiEventScript_Saving::
 	special IsekaiDoFieldAutosave
 	releaseall
 	end
+
+@ ---------------------------------------------------------------------------
+@ Route 1: the first step into tall grass.
+@ ---------------------------------------------------------------------------
+IsekaiEventScript_FirstGrass::
+	lockall
+	msgbox IsekaiText_FirstGrass
+	releaseall
+	end
+
+IsekaiText_FirstGrass:
+	.string "It's just one step.\p"
+	.string "…It's never just one step.$"
+
+@ ---------------------------------------------------------------------------
+@ Oak's phone calls about the loan. VAR_0x8004: 1 first catch, 2 overdue.
+@ ---------------------------------------------------------------------------
+IsekaiEventScript_OakCall::
+	lockall
+	playse SE_POKENAV_CALL
+	waitse
+	playse SE_POKENAV_CALL
+	msgbox IsekaiText_PhoneRings
+	textcolor NPC_TEXT_COLOR_MALE
+	goto_if_eq VAR_0x8004, 2, IsekaiEventScript_OakCall_Overdue
+	msgbox IsekaiText_OakCall_Caught
+	releaseall
+	end
+IsekaiEventScript_OakCall_Overdue:
+	msgbox IsekaiText_OakCall_Overdue
+	releaseall
+	end
+
+IsekaiText_PhoneRings:
+	.string "The cheap phone OAK gave you\n"
+	.string "is ringing.$"
+
+IsekaiText_OakCall_Caught:
+	.string "OAK: I hear you caught something.\n"
+	.string "Good.\p"
+	.string "Now bring my POKéMON back.\p"
+	.string "…\p"
+	.string "…You ARE bringing it back,\n"
+	.string "aren't you?$"
+
+IsekaiText_OakCall_Overdue:
+	.string "OAK: That's it.\p"
+	.string "I've called JENNY.$"
+
+@ ---------------------------------------------------------------------------
+@ While wanted: Centers and Marts gently remind him. VAR_0x8004 picks a line.
+@ ---------------------------------------------------------------------------
+IsekaiEventScript_WantedReminder::
+	lockall
+	switch VAR_0x8004
+	case 0, IsekaiEventScript_Wanted_Poster
+	case 1, IsekaiEventScript_Wanted_Clerk
+	msgbox IsekaiText_Wanted_Whisper
+	releaseall
+	end
+IsekaiEventScript_Wanted_Poster:
+	msgbox IsekaiText_Wanted_Poster
+	releaseall
+	end
+IsekaiEventScript_Wanted_Clerk:
+	msgbox IsekaiText_Wanted_Clerk
+	releaseall
+	end
+
+IsekaiText_Wanted_Poster:
+	.string "A poster by the door:\p"
+	.string "WANTED: tall, tired-looking man.\n"
+	.string "Last seen with PROF. OAK's POKéMON.\p"
+	.string "…The drawing is generous.$"
+
+IsekaiText_Wanted_Clerk:
+	.string "Someone behind the counter looks at\n"
+	.string "you, then at the poster by the door,\l"
+	.string "then back at you.$"
+
+IsekaiText_Wanted_Whisper:
+	.string "“…that thief from PALLET…”\p"
+	.string "The whispering stops when you\n"
+	.string "turn around.$"

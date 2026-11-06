@@ -19,6 +19,19 @@
 #define FLAG_ISEKAI_LOANER_DIED      FLAG_0x024 // Oak's loaner died
 #define FLAG_ISEKAI_SEEN_WARD        FLAG_0x025 // the nurse has explained the lives rule
 #define FLAG_ISEKAI_SEEN_PROTECTED   FLAG_0x026 // the level-10 rule has been explained after a faint
+// (more FireRed Isekai flags reuse 0x0AF-0x0BA, unused in FRLG and by the shared C code)
+#define FLAG_ISEKAI_HAS_PHONE        FLAG_0x0AF // Oak lent a cheap phone
+#define FLAG_ISEKAI_WANTED           FLAG_0x0B0 // wanted posters are up
+#define FLAG_ISEKAI_TURNED_IN        FLAG_0x0B1 // returned the loaner late (Jenny scene)
+#define FLAG_ISEKAI_OAK_COLD         FLAG_0x0B2 // Oak never fully warms up
+#define FLAG_ISEKAI_BLUE_SOUR        FLAG_0x0B3 // Blue is sour about the police
+#define FLAG_ISEKAI_EXTRA_BALLS      FLAG_0x0B4 // Oak gave the three extra Poke Balls
+#define FLAG_ISEKAI_SEEN_FIRST_GRASS FLAG_0x0B5 // "It's never just one step"
+#define FLAG_HIDE_ISEKAI_SHADY_MAN   FLAG_0x0B6 // the "Who's gonna know?" man near the Viridian Mart
+#define FLAG_HIDE_ISEKAI_LAB_JENNY   FLAG_0x0B7 // Officer Jenny waiting in the lab
+#define FLAG_ISEKAI_KEVIN_DONE       FLAG_0x0B8 // fought Kevin
+#define FLAG_ISEKAI_WARD_NURSE_MET   FLAG_0x0B9 // met the ward nurse
+#define FLAG_ISEKAI_CALL_PENDING     FLAG_0x0BA // (unused)
 
 // Hide/show flags
 #define FLAG_HIDE_BULBASAUR_BALL                           0x028

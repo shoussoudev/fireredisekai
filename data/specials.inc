@@ -40,6 +40,10 @@ gSpecials::
 	def_special IsekaiNextProtectedNote
 	def_special IsekaiDoFieldAutosave
 	def_special IsekaiShowSavingBox
+	def_special IsekaiLoanerInParty
+	def_special IsekaiHasOwnMon
+	def_special IsekaiRefundDeposit
+	def_special IsekaiPayFine
 	def_special SetCableClubWarp
 	def_special DoCableClubWarp, waitstate=1
 	def_special ReturnFromLinkRoom, waitstate=1

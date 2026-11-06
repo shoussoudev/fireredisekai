@@ -139,6 +139,35 @@ static void ClearFrontierRecord(void)
 
 static void WarpToTruck(void)
 {
+#if ISEKAI_START_AT == ISEKAI_START_VIRIDIAN
+    // Developer checkpoint: just arrived in Viridian with the loaner, holding Oak's Parcel.
+    VarSet(VAR_ISEKAI_INTRO, 4);
+    VarSet(VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 4);
+    VarSet(VAR_MAP_SCENE_PALLET_TOWN_OAK, 1);
+    VarSet(VAR_MAP_SCENE_PALLET_TOWN_PLAYERS_HOUSE_2F, 1);
+    VarSet(VAR_MAP_SCENE_VIRIDIAN_CITY_MART, 1);
+    VarSet(VAR_STARTER_MON, 0);
+    FlagSet(FLAG_SYS_POKEMON_GET);
+    FlagSet(FLAG_ISEKAI_HAS_LOANER);
+    FlagSet(FLAG_ISEKAI_HAS_PHONE);
+    FlagSet(FLAG_BEAT_RIVAL_IN_OAKS_LAB);
+    FlagClear(FLAG_HIDE_OAK_IN_HIS_LAB);
+    FlagSet(FLAG_HIDE_OAK_IN_PALLET_TOWN);
+    FlagSet(FLAG_HIDE_RIVAL_IN_LAB);
+    FlagSet(FLAG_HIDE_BULBASAUR_BALL);
+    VarSet(VAR_ISEKAI_LOAN_STATE, 1);
+    VarSet(VAR_ISEKAI_LOAN_DEPOSIT, 3000);
+    SetMoney(&gSaveBlock1Ptr->money, 0);
+    ScriptGiveMon(SPECIES_PSYDUCK, 7, ITEM_NONE);
+    VarSet(VAR_ISEKAI_LOANER_SPECIES, SPECIES_PSYDUCK);
+    IsekaiRememberLoaner();
+    AddBagItem(ITEM_OAKS_PARCEL, 1);
+    AddBagItem(ITEM_POTION, 2);
+    SetLastHealLocationWarp(HEAL_LOCATION_VIRIDIAN_CITY);
+    SetWarpDestination(MAP_GROUP(MAP_VIRIDIAN_CITY), MAP_NUM(MAP_VIRIDIAN_CITY), WARP_ID_NONE, 36, 20);
+    WarpIntoMap();
+    return;
+#endif
 #if ISEKAI_START_AT == ISEKAI_START_RULES_TEST
     // Developer checkpoint: the core rules sandbox. Route 22 tall grass (next to Viridian), Oak's PSYDUCK at Lv10
     // (so its faints count) on 1 HP, a few healing items, Viridian as the last heal spot.
@@ -281,6 +310,12 @@ void NewGameInitData(void)
     if (gIsekaiChosenDifficulty != 0)
         SetCurrentDifficultyLevel(gIsekaiChosenDifficulty - 1);
     IsekaiNewGameInit(); // lives, running shoes
+#if ISEKAI_START_AT == ISEKAI_START_VIRIDIAN
+    // (after the map flags were reset) Oak is back in his lab, Blue has left.
+    FlagClear(FLAG_HIDE_OAK_IN_HIS_LAB);
+    FlagSet(FLAG_HIDE_RIVAL_IN_LAB);
+    FlagSet(FLAG_HIDE_BULBASAUR_BALL);
+#endif
 #endif
     ResetItemFlags();
     ResetDexNav();

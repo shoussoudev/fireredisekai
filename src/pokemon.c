@@ -2954,7 +2954,10 @@ u8 GiveCapturedMonToPlayer(struct Pokemon *mon)
     }
 
     if (IS_FRLG)
+    {
         IsekaiOnMonCaught(GetMonData(mon, MON_DATA_SPECIES)); // FireRed Isekai: over-catching
+        IsekaiOnFirstCatch();                                 // and Oak's 1,000-step clock
+    }
 
     if (i >= PARTY_SIZE)
         return CopyMonToPC(mon);
