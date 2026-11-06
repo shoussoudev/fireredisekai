@@ -19,7 +19,13 @@ IsekaiEventScript_ResumeBattle_NoHint:
 	end
 
 IsekaiEventScript_ResumeTrainer:
+	goto_if_eq VAR_0x8006, TRUE, IsekaiEventScript_ResumeRival
 	msgbox IsekaiText_SawYouFlicker
+	special IsekaiResumeTrainerBattle
+	end
+
+IsekaiEventScript_ResumeRival:
+	msgbox IsekaiText_RivalSawYouFlicker
 	special IsekaiResumeTrainerBattle
 	end
 
@@ -35,6 +41,12 @@ IsekaiText_TryToReload:
 IsekaiText_WildOffended:
 	.string "The wild {STR_VAR_1} is still here.\n"
 	.string "It looks personally offended.$"
+
+IsekaiText_RivalSawYouFlicker:
+	.string "{RIVAL}: Whoa. Did you just…\n"
+	.string "flicker?\p"
+	.string "Gramps! He flickered!\n"
+	.string "Doesn't matter. Round two!$"
 
 IsekaiText_SawYouFlicker:
 	.string "“Going somewhere?\n"

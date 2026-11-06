@@ -339,8 +339,7 @@ static void BuildNormalStartMenu(void)
         AddStartMenuAction(MENU_ACTION_POKENAV);
 
     AddStartMenuAction(MENU_ACTION_PLAYER);
-    if (!IS_FRLG) // FireRed Isekai: no manual save, only autosaves
-        AddStartMenuAction(MENU_ACTION_SAVE);
+    AddStartMenuAction(MENU_ACTION_SAVE); // FireRed Isekai: back, alongside autosaves for important moments
     AddStartMenuAction(MENU_ACTION_OPTION);
     AddStartMenuAction(MENU_ACTION_EXIT);
 }

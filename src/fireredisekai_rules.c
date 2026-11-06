@@ -60,7 +60,6 @@ EWRAM_DATA static u16 sLastWildSpecies = SPECIES_NONE;
 EWRAM_DATA static bool8 sAutosavePending = FALSE;
 EWRAM_DATA static bool8 sZoneSavePending = FALSE;
 EWRAM_DATA static bool8 sArrivalSavePending = FALSE;  // entered a save building; save once it has faded in
-EWRAM_DATA static u8 sLastZone = 0;               // region map section, for zone-change saves
 EWRAM_DATA static bool8 sBattleStartSavePending = FALSE;
 EWRAM_DATA static u16 sLastAutosaveMap = 0;            // (group << 8 | num) + 1 of the last autosave; 0 = none yet
 EWRAM_DATA bool8 gIsekaiWildUnwilling = FALSE;         // this wild Pokémon won't accept a ball
@@ -262,6 +261,7 @@ static bool32 IsSaveBuilding(void)
 // save; leaving one means coming back saves again.
 void IsekaiOnMapWarp(void)
 {
+    return; // v0.10.5: buildings no longer autosave (manual SAVE is back)
     if (!IsSaveBuilding())
     {
         sLastAutosaveMap = 0;
@@ -363,6 +363,43 @@ static void RecordAliveAtStart(void)
     }
 }
 
+// Special foes: autosaved at the start and end of the battle, and the only ones who
+// carry the reset penalty (and notice it). Gym leaders, BLUE, GIOVANNI, the ELITE FOUR
+// and the CHAMPION by class; a few hand-picked tough trainers by id (added as their
+// scenes are built: the staring Viridian Forest kid, KEVIN, AMEDEE).
+static const u16 sIsekaiSpecialTrainers[] =
+{
+    TRAINER_NONE,
+};
+
+static bool32 IsSpecialFoe(void)
+{
+    u32 i;
+    u16 id = TRAINER_BATTLE_PARAM.opponentA;
+
+    if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER))
+        return FALSE;
+    switch (GetTrainerClassFromId(id))
+    {
+    case TRAINER_CLASS_LEADER_FRLG:
+    case TRAINER_CLASS_ELITE_FOUR_FRLG:
+    case TRAINER_CLASS_CHAMPION_FRLG:
+    case TRAINER_CLASS_RIVAL_EARLY_FRLG:
+    case TRAINER_CLASS_RIVAL_LATE_FRLG:
+    case TRAINER_CLASS_BOSS_FRLG:
+    case TRAINER_CLASS_LEADER:
+    case TRAINER_CLASS_ELITE_FOUR:
+    case TRAINER_CLASS_CHAMPION:
+        return TRUE;
+    default:
+        break;
+    }
+    for (i = 0; i < ARRAY_COUNT(sIsekaiSpecialTrainers); i++)
+        if (sIsekaiSpecialTrainers[i] != TRAINER_NONE && sIsekaiSpecialTrainers[i] == id)
+            return TRUE;
+    return FALSE;
+}
+
 // Called by DoTrainerBattle once the opponent's party exists.
 void IsekaiOnTrainerBattleStart(void)
 {
@@ -370,6 +407,14 @@ void IsekaiOnTrainerBattleStart(void)
 
     if (!IsekaiRulesApply())
         return;
+    RecordAliveAtStart();
+    if (!IsSpecialFoe() || gIsekaiTrainerArgs == NULL)
+    {
+        // Ordinary trainer: no save at the start, no reset penalty.
+        sIsekai.battleType = ISEKAI_BATTLE_NONE;
+        sResumingBattle = FALSE;
+        return;
+    }
     if (!sResumingBattle)
         sIsekai.resetCount = 0;
     sResumingBattle = FALSE;
@@ -382,9 +427,8 @@ void IsekaiOnTrainerBattleStart(void)
         if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
             BoostMonLevel(&gParties[B_TRAINER_OPPONENT_B][i], sIsekai.resetCount * 3);
     }
-    RecordAliveAtStart();
     // Saved once the battle transition has gone black (IsekaiOnBattleInit), so the pause is hidden.
-    sBattleStartSavePending = (gIsekaiTrainerArgs != NULL);
+    sBattleStartSavePending = TRUE;
 }
 
 // Called as the battle screen sets up, while it's still black.
@@ -430,6 +474,11 @@ static const u8 sText_TryToReload[] = _("You try to reload.\nNothing happens.\pT
 void IsekaiPrepareResume(void)
 {
     gSpecialVar_0x8004 = sIsekai.battleType;
+    {
+        u8 cls = GetTrainerClassFromId(sIsekai.battleOpponent);
+        gSpecialVar_0x8006 = (sIsekai.battleType == ISEKAI_BATTLE_TRAINER
+                           && (cls == TRAINER_CLASS_RIVAL_EARLY_FRLG || cls == TRAINER_CLASS_RIVAL_LATE_FRLG));
+    }
     gSpecialVar_0x8005 = !sIsekai.resetMsgShown;
     sIsekai.resetMsgShown = TRUE;
     if (sIsekai.resetCount < 30)
@@ -477,6 +526,7 @@ void IsekaiOnBattleEnd(void)
     u8 i, oppLevel;
     bool32 anyUnprotected = FALSE;
     bool32 forfeited = (gBattleOutcome == B_OUTCOME_FORFEITED);
+    bool32 special = IsSpecialFoe();
 
     if (!IsekaiRulesApply())
         return;
@@ -548,6 +598,12 @@ void IsekaiOnBattleEnd(void)
                 sIsekai.lives--;
         }
     }
+
+    // Save only when something important happened (a death, a new injury, a lost life),
+    // or after a special foe. Otherwise the last save stands.
+    if (!special && sPendingDeaths == 0 && sPendingInjuries == 0
+     && (sLastDefeat == ISEKAI_DEFEAT_NONE || sLastDefeat == ISEKAI_DEFEAT_PROTECTED))
+        return;
 
     // Whiteouts heal and warp to a Center; write that outcome so a reset can't dodge it.
     if (PlayerLost() || forfeited || CalculatePlayerPartyCount() == 0)
@@ -725,17 +781,9 @@ bool32 IsekaiFieldIdle(void)
         ScriptContext_SetupScript(IsekaiEventScript_AfterBattleNews);
         return TRUE;
     }
-    if (gMapHeader.mapType != MAP_TYPE_INDOOR)
-        sLastAutosaveMap = 0; // outside: the next building entered saves again
-    // Moving into a new zone outdoors (a town onto a route...): save once the player stops.
-    if (gMapHeader.mapType != MAP_TYPE_INDOOR && gMapHeader.regionMapSectionId != sLastZone)
-    {
-        if (sLastZone != 0)
-            sZoneSavePending = TRUE;
-        sLastZone = gMapHeader.regionMapSectionId;
-    }
-    // Building and zone saves show a small "Saving..." box, so the pause has a reason.
-    if (sArrivalSavePending || ((sAutosavePending || sZoneSavePending) && !(gMain.heldKeys & DPAD_ANY)))
+    // (v0.10.5: no building or zone autosaves; players save from the START menu.
+    // Something can still ask for a field autosave, which shows a small "Saving..." box.)
+    if (sAutosavePending && !(gMain.heldKeys & DPAD_ANY))
     {
         sArrivalSavePending = FALSE;
         sZoneSavePending = FALSE;
