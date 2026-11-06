@@ -20,6 +20,7 @@
 #include "roamer.h"
 #include "safari_zone.h"
 #include "script.h"
+#include "string_util.h"
 #include "tv.h"
 #include "wild_encounter.h"
 #include "battle_debug.h"
@@ -173,6 +174,7 @@ static void FeebasSeedRng(u16 seed)
 
 // NUM_LAND_MONS_ENCOUNTER_SLOTS
 static bool32 IsekaiTooRare(enum Species species);
+static u32 IsekaiCordonPerk(const struct WildPokemon *wildPokemon, u32 index, u32 lo, u32 hi);
 
 u32 ChooseWildMonIndex_Land(void)
 {
@@ -550,6 +552,7 @@ bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, enum WildPok
         do
             wildMonIndex = ChooseWildMonIndex_Land();
         while (IsekaiTooRare(wildMonInfo->wildPokemon[wildMonIndex].species));
+        wildMonIndex = IsekaiCordonPerk(wildMonInfo->wildPokemon, wildMonIndex, 0, NUM_LAND_MONS_ENCOUNTER_SLOTS - 1);
         break;
     case WILD_AREA_WATER:
         if (TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildMonInfo->wildPokemon, TYPE_STEEL, ABILITY_MAGNET_PULL, &wildMonIndex, NUM_WATER_MONS_ENCOUNTER_SLOTS))
@@ -586,10 +589,57 @@ bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, enum WildPok
     return TRUE;
 }
 
+// FireRed Isekai: the creator's perk. A player named CORDON meets the other-generation
+// picks far more often (1 encounter in 3 where they live), and the rare ones aren't rare.
+static const u8 sIsekaiCordonUpper[] = _("CORDON");
+static const u8 sIsekaiCordonMixed[] = _("Cordon");
+
+static bool32 IsekaiIsCordon(void)
+{
+    return StringCompare(gSaveBlock2Ptr->playerName, sIsekaiCordonUpper) == 0
+        || StringCompare(gSaveBlock2Ptr->playerName, sIsekaiCordonMixed) == 0;
+}
+
+static bool32 IsekaiIsPerkSpecies(enum Species species)
+{
+    switch (species)
+    {
+    case SPECIES_LOTAD:
+    case SPECIES_SEEDOT:
+    case SPECIES_WHISMUR:
+    case SPECIES_MAKUHITA:
+    case SPECIES_SHIELDON:
+    case SPECIES_RIOLU:
+    case SPECIES_CROAGUNK:
+    case SPECIES_FEEBAS:
+    case SPECIES_SUDOWOODO:
+    case SPECIES_HOUNDOUR:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+// Slots lo..hi of the table. Returns the (maybe swapped) slot index.
+static u32 IsekaiCordonPerk(const struct WildPokemon *wildPokemon, u32 index, u32 lo, u32 hi)
+{
+    u8 slots[12];
+    u32 i, n = 0;
+
+    if (!IsekaiIsCordon() || IsekaiIsPerkSpecies(wildPokemon[index].species) || (Random() % 3) != 0)
+        return index;
+    for (i = lo; i <= hi && n < ARRAY_COUNT(slots); i++)
+        if (IsekaiIsPerkSpecies(wildPokemon[i].species))
+            slots[n++] = i;
+    return n ? slots[Random() % n] : index;
+}
+
 // FireRed Isekai: a few species should feel rare. When one comes up, it only stays
 // 1 time in N; otherwise the slot is rolled again.
 static bool32 IsekaiTooRare(enum Species species)
 {
+    if (IsekaiIsCordon())
+        return FALSE;
     switch (species)
     {
     case SPECIES_RIOLU:  return (Random() % 4) != 0;   // 1% slot -> ~1 in 400 Route 2 encounters
@@ -607,6 +657,12 @@ static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 
     do
         wildMonIndex = ChooseWildMonIndex_Fishing(rod);
     while (IsekaiTooRare(wildMonInfo->wildPokemon[wildMonIndex].species));
+    if (rod == OLD_ROD)
+        wildMonIndex = IsekaiCordonPerk(wildMonInfo->wildPokemon, wildMonIndex, 0, 1);
+    else if (rod == GOOD_ROD)
+        wildMonIndex = IsekaiCordonPerk(wildMonInfo->wildPokemon, wildMonIndex, 2, 4);
+    else
+        wildMonIndex = IsekaiCordonPerk(wildMonInfo->wildPokemon, wildMonIndex, 5, 9);
     wildMonSpecies = wildMonInfo->wildPokemon[wildMonIndex].species;
     level = ChooseWildMonLevel(wildMonInfo->wildPokemon, wildMonIndex, WILD_AREA_FISHING);
 
