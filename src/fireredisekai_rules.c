@@ -15,6 +15,9 @@
 #include "fireredisekai.h"
 #include "item.h"
 #include "main.h"
+#include "menu.h"
+#include "text_window.h"
+#include "window.h"
 #include "overworld.h"
 #include "party_menu.h"
 #include "pokemon.h"
@@ -56,7 +59,7 @@ EWRAM_DATA static u8 sLastDefeat = ISEKAI_DEFEAT_NONE; // how the last whiteout 
 EWRAM_DATA static u16 sLastWildSpecies = SPECIES_NONE;
 EWRAM_DATA static bool8 sAutosavePending = FALSE;
 EWRAM_DATA static bool8 sZoneSavePending = FALSE;
-EWRAM_DATA static bool8 sArrivalSavePending = FALSE;  // entered a save building; save before fade-in
+EWRAM_DATA static bool8 sArrivalSavePending = FALSE;  // entered a save building; save once it has faded in
 EWRAM_DATA static u8 sLastZone = 0;               // region map section, for zone-change saves
 EWRAM_DATA static bool8 sBattleStartSavePending = FALSE;
 EWRAM_DATA static u16 sLastAutosaveMap = 0;            // (group << 8 | num) + 1 of the last autosave; 0 = none yet
@@ -237,6 +240,7 @@ static void SaveNow(void)
         QuickSaveGame();
     }
     sAutosavePending = FALSE;
+    sZoneSavePending = FALSE; // this save already covers a zone change
 }
 
 void IsekaiAutosave(void)
@@ -267,16 +271,48 @@ void IsekaiOnMapWarp(void)
     sArrivalSavePending = (CurrentMapKey() != sLastAutosaveMap);
 }
 
-// Called as the new map is about to fade in (still black): do the queued building save.
-void IsekaiAutosaveOnArrival(void)
+// A small "Saving..." box in the bottom-right corner, shown while a field autosave runs.
+static const struct WindowTemplate sSavingWindowTemplate =
 {
-    if (!sArrivalSavePending)
+    .bg = 0,
+    .tilemapLeft = 21,     // bottom-right corner, clear of the map name popup
+    .tilemapTop = 17,
+    .width = 8,
+    .height = 2,
+    .paletteNum = 15,
+    .baseBlock = 0x170,    // free tiles between the map popup (0x107-) and the textbox (0x194-)
+};
+static const u8 sText_Saving[] = _("Saving…");
+EWRAM_DATA static u8 sSavingWindowId = 0;
+EWRAM_DATA static bool8 sSavingBoxShown = FALSE;
+
+void IsekaiShowSavingBox(void)
+{
+    sSavingWindowId = AddWindow(&sSavingWindowTemplate);
+    if (sSavingWindowId == WINDOW_NONE)
         return;
-    sArrivalSavePending = FALSE;
-    if (sIsekai.battleType != ISEKAI_BATTLE_NONE)
-        return; // a reset battle is about to resume; don't overwrite that
-    SaveNow();
-    sLastAutosaveMap = CurrentMapKey();
+    sSavingBoxShown = TRUE;
+    DrawStdWindowFrame(sSavingWindowId, FALSE);
+    FillWindowPixelBuffer(sSavingWindowId, PIXEL_FILL(1));
+    AddTextPrinterParameterized(sSavingWindowId, FONT_NORMAL, sText_Saving, 0, 1, TEXT_SKIP_DRAW, NULL);
+    CopyWindowToVram(sSavingWindowId, COPYWIN_FULL);
+}
+
+// Called by the "Saving..." field script, a couple of frames after the box is shown.
+void IsekaiDoFieldAutosave(void)
+{
+    if (sIsekai.battleType == ISEKAI_BATTLE_NONE) // (a reset battle about to resume isn't overwritten)
+    {
+        SaveNow();
+        if (IsSaveBuilding())
+            sLastAutosaveMap = CurrentMapKey();
+    }
+    if (sSavingBoxShown)
+    {
+        ClearStdWindowAndFrame(sSavingWindowId, TRUE);
+        RemoveWindow(sSavingWindowId);
+        sSavingBoxShown = FALSE;
+    }
 }
 
 void IsekaiRequestAutosave(void)
@@ -698,12 +734,15 @@ bool32 IsekaiFieldIdle(void)
             sZoneSavePending = TRUE;
         sLastZone = gMapHeader.regionMapSectionId;
     }
-    if (sArrivalSavePending)
-        IsekaiAutosaveOnArrival(); // arrived by a warp type without a black-screen hook
-    if ((sAutosavePending || sZoneSavePending) && !(gMain.heldKeys & DPAD_ANY))
+    // Building and zone saves show a small "Saving..." box, so the pause has a reason.
+    if (sArrivalSavePending || ((sAutosavePending || sZoneSavePending) && !(gMain.heldKeys & DPAD_ANY)))
     {
+        sArrivalSavePending = FALSE;
         sZoneSavePending = FALSE;
-        IsekaiAutosave();
+        sAutosavePending = FALSE;
+        LockPlayerFieldControls();
+        ScriptContext_SetupScript(IsekaiEventScript_Saving);
+        return TRUE;
     }
     return FALSE;
 }

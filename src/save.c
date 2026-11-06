@@ -778,6 +778,7 @@ static bool32 FlashSectorMatches(u16 sector)
 }
 
 EWRAM_DATA u8 gIsekaiLastSaveSectors = 0; // how many sectors the last quick save wrote (for testing)
+EWRAM_DATA u16 gIsekaiSaveSectorMask = 0;  // which sector ids quick saves have written (for testing)
 
 u8 QuickSaveGame(void)
 {
@@ -814,6 +815,7 @@ u8 QuickSaveGame(void)
     gLastKnownGoodSector = gLastWrittenSector;
     gLastSaveCounter = gSaveCounter;
     gIsekaiLastSaveSectors = 0;
+    gIsekaiSaveSectorMask = 0;
     for (i = 1; i <= NUM_SECTORS_PER_SLOT; i++)
     {
         id = i % NUM_SECTORS_PER_SLOT; // sectors 1..13, then 0 last
@@ -822,6 +824,7 @@ u8 QuickSaveGame(void)
         {
             TryWriteSector(slotBase + phys[id], gReadWriteSector->data);
             gIsekaiLastSaveSectors++;
+            gIsekaiSaveSectorMask |= 1 << id;
         }
     }
 

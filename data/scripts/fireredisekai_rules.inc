@@ -388,3 +388,14 @@ IsekaiText_AttackedInGrass:
 	.string "Something in the grass lunges at you.\p"
 	.string "There's no POKéMON left to stand\n"
 	.string "between you and it.$"
+
+@ ---------------------------------------------------------------------------
+@ Autosave with a small "Saving..." box (entering important buildings, new zones).
+@ ---------------------------------------------------------------------------
+IsekaiEventScript_Saving::
+	lockall
+	special IsekaiShowSavingBox
+	delay 2
+	special IsekaiDoFieldAutosave
+	releaseall
+	end
