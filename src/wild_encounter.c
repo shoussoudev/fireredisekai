@@ -172,6 +172,8 @@ static void FeebasSeedRng(u16 seed)
 }
 
 // NUM_LAND_MONS_ENCOUNTER_SLOTS
+static bool32 IsekaiTooRare(enum Species species);
+
 u32 ChooseWildMonIndex_Land(void)
 {
     u8 wildMonIndex = 0;
@@ -545,7 +547,9 @@ bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, enum WildPok
         if (OW_STORM_DRAIN >= GEN_8 && TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildMonInfo->wildPokemon, TYPE_WATER, ABILITY_STORM_DRAIN, &wildMonIndex, NUM_LAND_MONS_ENCOUNTER_SLOTS))
             break;
 
-        wildMonIndex = ChooseWildMonIndex_Land();
+        do
+            wildMonIndex = ChooseWildMonIndex_Land();
+        while (IsekaiTooRare(wildMonInfo->wildPokemon[wildMonIndex].species));
         break;
     case WILD_AREA_WATER:
         if (TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildMonInfo->wildPokemon, TYPE_STEEL, ABILITY_MAGNET_PULL, &wildMonIndex, NUM_WATER_MONS_ENCOUNTER_SLOTS))
@@ -582,11 +586,29 @@ bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, enum WildPok
     return TRUE;
 }
 
+// FireRed Isekai: a few species should feel rare. When one comes up, it only stays
+// 1 time in N; otherwise the slot is rolled again.
+static bool32 IsekaiTooRare(enum Species species)
+{
+    switch (species)
+    {
+    case SPECIES_RIOLU:  return (Random() % 4) != 0;   // 1% slot -> ~1 in 400 Route 2 encounters
+    case SPECIES_FEEBAS: return (Random() % 40) != 0;  // 20% Good Rod slot -> ~1 in 200 bites
+    default:             return FALSE;
+    }
+}
+
 static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 rod)
 {
-    u8 wildMonIndex = ChooseWildMonIndex_Fishing(rod);
-    enum Species wildMonSpecies = wildMonInfo->wildPokemon[wildMonIndex].species;
-    u8 level = ChooseWildMonLevel(wildMonInfo->wildPokemon, wildMonIndex, WILD_AREA_FISHING);
+    u8 wildMonIndex;
+    enum Species wildMonSpecies;
+    u8 level;
+
+    do
+        wildMonIndex = ChooseWildMonIndex_Fishing(rod);
+    while (IsekaiTooRare(wildMonInfo->wildPokemon[wildMonIndex].species));
+    wildMonSpecies = wildMonInfo->wildPokemon[wildMonIndex].species;
+    level = ChooseWildMonLevel(wildMonInfo->wildPokemon, wildMonIndex, WILD_AREA_FISHING);
 
     UpdateChainFishingStreak();
     CreateWildMon(wildMonSpecies, level);
