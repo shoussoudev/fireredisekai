@@ -933,6 +933,8 @@ static void LoadMapFromWarp(bool32 a1)
     bool8 isIndoors;
 
     LoadCurrentMapData();
+    if (IS_FRLG)
+        IsekaiOnMapWarp(); // FireRed Isekai: note whether this building should autosave
     if (!(sObjectEventLoadFlag & SKIP_OBJECT_EVENT_LOAD))
     {
         if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR)

@@ -160,8 +160,11 @@ static u8 WriteSaveSectorOrSlot(u16 sectorId, const struct SaveSectorLocation *l
         gSaveCounter++;
         status = SAVE_STATUS_OK;
 
-        for (i = 0; i < NUM_SECTORS_PER_SLOT; i++)
+        // FireRed Isekai: sector 0 is written last; the loader only trusts a slot
+        // whose other sectors are no newer than sector 0, so a cut-off save is ignored.
+        for (i = 1; i < NUM_SECTORS_PER_SLOT; i++)
             HandleWriteSector(i, locations);
+        HandleWriteSector(0, locations);
 
         if (gDamagedSaveSectors)
         {
@@ -525,6 +528,7 @@ static u8 GetSaveValidStatus(const struct SaveSectorLocation *locations)
     u32 saveSlot1Counter = 0;
     u32 saveSlot2Counter = 0;
     u32 validSectorFlags = 0;
+    u32 maxCounter = 0;
     bool8 signatureValid = FALSE;
     u8 saveSlot1Status;
     u8 saveSlot2Status;
@@ -539,11 +543,19 @@ static u8 GetSaveValidStatus(const struct SaveSectorLocation *locations)
             checksum = CalculateChecksum(gReadWriteSector->data, locations[gReadWriteSector->id].size);
             if (gReadWriteSector->checksum == checksum)
             {
-                saveSlot1Counter = gReadWriteSector->counter;
+                // FireRed Isekai: sector 0 holds the slot's counter (it's written last)
+                if (gReadWriteSector->id == 0)
+                    saveSlot1Counter = gReadWriteSector->counter;
+                if (gReadWriteSector->counter > maxCounter)
+                    maxCounter = gReadWriteSector->counter;
                 validSectorFlags |= 1 << gReadWriteSector->id;
             }
         }
     }
+    // A sector newer than sector 0 means a save was cut off part-way: don't trust this slot.
+    if (maxCounter > saveSlot1Counter)
+        validSectorFlags &= ~1;
+    maxCounter = 0;
 
     if (signatureValid)
     {
@@ -571,11 +583,19 @@ static u8 GetSaveValidStatus(const struct SaveSectorLocation *locations)
             checksum = CalculateChecksum(gReadWriteSector->data, locations[gReadWriteSector->id].size);
             if (gReadWriteSector->checksum == checksum)
             {
-                saveSlot2Counter = gReadWriteSector->counter;
+                // FireRed Isekai: sector 0 holds the slot's counter (it's written last)
+                if (gReadWriteSector->id == 0)
+                    saveSlot2Counter = gReadWriteSector->counter;
+                if (gReadWriteSector->counter > maxCounter)
+                    maxCounter = gReadWriteSector->counter;
                 validSectorFlags |= 1 << gReadWriteSector->id;
             }
         }
     }
+    // A sector newer than sector 0 means a save was cut off part-way: don't trust this slot.
+    if (maxCounter > saveSlot2Counter)
+        validSectorFlags &= ~1;
+    maxCounter = 0;
 
     if (signatureValid)
     {
@@ -709,6 +729,112 @@ static void UpdateSaveAddresses(void)
         gRamSaveSectorLocations[i].data = (void *)(gPokemonStoragePtr) + sSaveSlotLayout[i].offset;
         gRamSaveSectorLocations[i].size = sSaveSlotLayout[i].size;
     }
+}
+
+// ---------------------------------------------------------------------------
+// FireRed Isekai: quick ("delta") save. Writes the new save into the other slot like a
+// normal save, but skips every sector whose contents are already identical there
+// (usually the PC boxes, and most of the rest). Sector 0 is written last and commits
+// the slot. Saving on flash costs time per byte written, so this is much faster.
+// ---------------------------------------------------------------------------
+#define SECTOR_FOOTER_OFFSET (SECTOR_DATA_SIZE + SAVE_BLOCK_3_CHUNK_SIZE)
+
+static void BuildSaveSector(u16 id, u32 counter)
+{
+    u16 i;
+    u8 *data = gRamSaveSectorLocations[id].data;
+    u16 size = gRamSaveSectorLocations[id].size;
+
+    for (i = 0; i < SECTOR_SIZE; i++)
+        ((u8 *)gReadWriteSector)[i] = 0;
+    gReadWriteSector->id = id;
+    gReadWriteSector->signature = SECTOR_SIGNATURE;
+    gReadWriteSector->counter = counter;
+    for (i = 0; i < size; i++)
+        gReadWriteSector->data[i] = data[i];
+    CopyFromSaveBlock3(id, gReadWriteSector);
+    gReadWriteSector->checksum = CalculateChecksum(data, size);
+}
+
+// Does the flash sector already hold exactly this data (ignoring the save counter)?
+static bool32 FlashSectorMatches(u16 sector)
+{
+    u8 buf[256];
+    u16 off, i;
+    const u8 *want = (const u8 *)gReadWriteSector;
+
+    for (off = 0; off < SECTOR_SIZE; off += sizeof(buf))
+    {
+        ReadFlash(sector, off, buf, sizeof(buf));
+        for (i = 0; i < sizeof(buf); i++)
+        {
+            if (off + i >= offsetof(struct SaveSector, counter))
+                return TRUE; // the counter is the last field
+            if (buf[i] != want[off + i])
+                return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+EWRAM_DATA u8 gIsekaiLastSaveSectors = 0; // how many sectors the last quick save wrote (for testing)
+
+u8 QuickSaveGame(void)
+{
+    u16 slotBase, i, id;
+    s8 phys[NUM_SECTORS_PER_SLOT];
+    u32 newCounter;
+    struct { u16 id; u16 checksum; u32 signature; u32 counter; } footer;
+
+    BackgroundSave_Finish();
+    if (gFlashMemoryPresent != TRUE)
+        return SAVE_STATUS_ERROR;
+
+    UpdateSaveAddresses();
+    CopyPartyAndObjectsToSave();
+    gReadWriteSector = &gSaveDataBuffer;
+    newCounter = gSaveCounter + 1;
+    slotBase = NUM_SECTORS_PER_SLOT * (newCounter % NUM_SAVE_SLOTS);
+
+    // Where does each sector live in the target slot?
+    for (i = 0; i < NUM_SECTORS_PER_SLOT; i++)
+        phys[i] = -1;
+    for (i = 0; i < NUM_SECTORS_PER_SLOT; i++)
+    {
+        ReadFlash(slotBase + i, SECTOR_FOOTER_OFFSET, (u8 *)&footer, sizeof(footer));
+        if (footer.signature == SECTOR_SIGNATURE && footer.id < NUM_SECTORS_PER_SLOT && phys[footer.id] < 0)
+            phys[footer.id] = i;
+    }
+    for (i = 0; i < NUM_SECTORS_PER_SLOT; i++)
+    {
+        if (phys[i] < 0)
+            return TrySavingData(SAVE_NORMAL); // target slot incomplete: do a full save
+    }
+
+    gLastKnownGoodSector = gLastWrittenSector;
+    gLastSaveCounter = gSaveCounter;
+    gIsekaiLastSaveSectors = 0;
+    for (i = 1; i <= NUM_SECTORS_PER_SLOT; i++)
+    {
+        id = i % NUM_SECTORS_PER_SLOT; // sectors 1..13, then 0 last
+        BuildSaveSector(id, newCounter);
+        if (id == 0 || !FlashSectorMatches(slotBase + phys[id]))
+        {
+            TryWriteSector(slotBase + phys[id], gReadWriteSector->data);
+            gIsekaiLastSaveSectors++;
+        }
+    }
+
+    if (gDamagedSaveSectors)
+    {
+        gSaveAttemptStatus = SAVE_STATUS_ERROR;
+        DoSaveFailedScreen(SAVE_NORMAL);
+        return SAVE_STATUS_ERROR;
+    }
+    gSaveCounter = newCounter;
+    gLastWrittenSector = phys[0];
+    gSaveAttemptStatus = SAVE_STATUS_OK;
+    return SAVE_STATUS_OK;
 }
 
 // ---------------------------------------------------------------------------

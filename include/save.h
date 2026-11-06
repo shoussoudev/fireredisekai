@@ -98,6 +98,8 @@ void ClearSaveData(void);
 void Save_ResetSaveCounters(void);
 u8 HandleSavingData(u8 saveType);
 u8 TrySavingData(u8 saveType);
+// FireRed Isekai: quick save (skips sectors already identical in the target slot)
+u8 QuickSaveGame(void);
 // FireRed Isekai: background (one sector per frame) save
 void BackgroundSave_Begin(bool8 clearContinueWarpAfter);
 void BackgroundSave_Step(void);

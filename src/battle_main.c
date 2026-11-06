@@ -474,6 +474,7 @@ void CB2_InitBattle(void)
 {
     if (!(gBattleTypeFlags & BATTLE_TYPE_RECORDED))
         MoveSaveBlocks_ResetHeap();
+    IsekaiOnBattleInit(); // FireRed Isekai: trainer battles save here, while the screen is black
     AllocateBattleResources();
     AllocateBattleSpritesData();
     AllocateMonSpritesGfx();

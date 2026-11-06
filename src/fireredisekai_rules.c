@@ -38,6 +38,8 @@
 
 STATIC_ASSERT(sizeof(struct BoxPokemon) == ISEKAI_BOXMON_SIZE, IsekaiBoxMonSize);
 
+#include "data/fireredisekai_save_maps.h"
+
 #define sIsekai (gSaveBlock3Ptr->isekai)
 
 // Not saved: things that only matter until the next autosave or field message.
@@ -53,6 +55,10 @@ EWRAM_DATA static u8 sPendingInjuryNames[PARTY_SIZE][POKEMON_NAME_LENGTH + 1] = 
 EWRAM_DATA static u8 sLastDefeat = ISEKAI_DEFEAT_NONE; // how the last whiteout happened
 EWRAM_DATA static u16 sLastWildSpecies = SPECIES_NONE;
 EWRAM_DATA static bool8 sAutosavePending = FALSE;
+EWRAM_DATA static bool8 sZoneSavePending = FALSE;
+EWRAM_DATA static bool8 sArrivalSavePending = FALSE;  // entered a save building; save before fade-in
+EWRAM_DATA static u8 sLastZone = 0;               // region map section, for zone-change saves
+EWRAM_DATA static bool8 sBattleStartSavePending = FALSE;
 EWRAM_DATA static u16 sLastAutosaveMap = 0;            // (group << 8 | num) + 1 of the last autosave; 0 = none yet
 EWRAM_DATA bool8 gIsekaiWildUnwilling = FALSE;         // this wild Pokémon won't accept a ball
 
@@ -215,53 +221,58 @@ static u16 CurrentMapKey(void)
     return ((gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum) + 1;
 }
 
-// Autosaves run in the background (one flash sector per frame) so the player keeps moving.
-// Pass clearContinueWarp when the continue-game warp was set just for this save.
-static void Autosave(bool8 clearContinueWarp)
-{
-    if (gDifferentSaveFile == TRUE)
-    {
-        // First save over someone else's file: erase it properly, in one go.
-        TrySavingData(SAVE_OVERWRITE_DIFFERENT_FILE);
-        gDifferentSaveFile = FALSE;
-        if (clearContinueWarp)
-            gSaveBlock2Ptr->specialSaveWarpFlags &= ~CONTINUE_GAME_WARP;
-    }
-    else
-    {
-        BackgroundSave_Begin(clearContinueWarp);
-    }
-    sAutosavePending = FALSE;
-    sLastAutosaveMap = CurrentMapKey();
-}
-
-void IsekaiAutosave(void)
-{
-    Autosave(FALSE);
-}
-
-// Saves right now (for moments right before a reset or a whiteout warp).
+// All autosaves are quick saves (only the parts of the save that changed are written)
+// and happen at moments the player is already waiting: black screens, transitions, stops.
 static void SaveNow(void)
 {
     BackgroundSave_Finish();
     if (gDifferentSaveFile == TRUE)
     {
+        // First save over someone else's file: erase it properly, in one go.
         TrySavingData(SAVE_OVERWRITE_DIFFERENT_FILE);
         gDifferentSaveFile = FALSE;
     }
     else
     {
-        TrySavingData(SAVE_NORMAL);
+        QuickSaveGame();
     }
     sAutosavePending = FALSE;
 }
 
-// Called during a warp, while the screen is still black: entering a building saves here,
-// so the save (and any pause it causes) happens before the room fades in.
+void IsekaiAutosave(void)
+{
+    SaveNow();
+}
+
+static bool32 IsSaveBuilding(void)
+{
+    u16 map = (gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum;
+    u32 i;
+    for (i = 0; i < ARRAY_COUNT(sIsekaiSaveMaps); i++)
+        if (sIsekaiSaveMaps[i] == map)
+            return TRUE;
+    return FALSE;
+}
+
+// Every warp: entering an important building (Center, gym, Mart, story place) queues a
+// save; leaving one means coming back saves again.
+void IsekaiOnMapWarp(void)
+{
+    if (!IsSaveBuilding())
+    {
+        sLastAutosaveMap = 0;
+        sArrivalSavePending = FALSE;
+        return;
+    }
+    sArrivalSavePending = (CurrentMapKey() != sLastAutosaveMap);
+}
+
+// Called as the new map is about to fade in (still black): do the queued building save.
 void IsekaiAutosaveOnArrival(void)
 {
-    if (gMapHeader.mapType != MAP_TYPE_INDOOR || CurrentMapKey() == sLastAutosaveMap)
+    if (!sArrivalSavePending)
         return;
+    sArrivalSavePending = FALSE;
     if (sIsekai.battleType != ISEKAI_BATTLE_NONE)
         return; // a reset battle is about to resume; don't overwrite that
     SaveNow();
@@ -336,8 +347,17 @@ void IsekaiOnTrainerBattleStart(void)
             BoostMonLevel(&gParties[B_TRAINER_OPPONENT_B][i], sIsekai.resetCount * 3);
     }
     RecordAliveAtStart();
-    if (gIsekaiTrainerArgs != NULL)
-        IsekaiAutosave();
+    // Saved once the battle transition has gone black (IsekaiOnBattleInit), so the pause is hidden.
+    sBattleStartSavePending = (gIsekaiTrainerArgs != NULL);
+}
+
+// Called as the battle screen sets up, while it's still black.
+void IsekaiOnBattleInit(void)
+{
+    if (!sBattleStartSavePending)
+        return;
+    sBattleStartSavePending = FALSE;
+    SaveNow();
 }
 
 // Called when a wild battle starts (grass, water, scripted).
@@ -358,14 +378,10 @@ void IsekaiOnWildBattleStart(void)
     }
     sResumingBattle = FALSE;
     sLastWildSpecies = GetMonData(wild, MON_DATA_SPECIES);
-    sIsekai.battleType = ISEKAI_BATTLE_WILD;
-    sIsekai.trainerArgs = 0;
-    sIsekai.battleOpponent = sLastWildSpecies;
-    if (sIsekai.resetCount == 0)
-        sIsekai.wildLevel = GetMonData(wild, MON_DATA_LEVEL);
-    sIsekai.wildWilling = !gIsekaiWildUnwilling;
+    // Wild battles aren't saved at the start: resetting during one just reloads the last
+    // save (only trainer battles carry the reset penalty). The end of the battle is saved.
+    sIsekai.battleType = ISEKAI_BATTLE_NONE;
     RecordAliveAtStart();
-    IsekaiAutosave();
 }
 
 // ---------------------------------------------------------------------------
@@ -507,7 +523,8 @@ void IsekaiOnBattleEnd(void)
             gSaveBlock2Ptr->specialSaveWarpFlags |= CONTINUE_GAME_WARP;
         }
     }
-    Autosave(TRUE); // background; clears the continue warp once written
+    SaveNow(); // the screen is black here
+    gSaveBlock2Ptr->specialSaveWarpFlags &= ~CONTINUE_GAME_WARP;
 }
 
 // Walking through grass with no Pokémon at all: it costs a life, and he wakes up in the ward.
@@ -674,10 +691,20 @@ bool32 IsekaiFieldIdle(void)
     }
     if (gMapHeader.mapType != MAP_TYPE_INDOOR)
         sLastAutosaveMap = 0; // outside: the next building entered saves again
-    // Autosave on entering any building (and when something asked for one).
-    if (sAutosavePending
-     || (gMapHeader.mapType == MAP_TYPE_INDOOR && CurrentMapKey() != sLastAutosaveMap))
+    // Moving into a new zone outdoors (a town onto a route...): save once the player stops.
+    if (gMapHeader.mapType != MAP_TYPE_INDOOR && gMapHeader.regionMapSectionId != sLastZone)
+    {
+        if (sLastZone != 0)
+            sZoneSavePending = TRUE;
+        sLastZone = gMapHeader.regionMapSectionId;
+    }
+    if (sArrivalSavePending)
+        IsekaiAutosaveOnArrival(); // arrived by a warp type without a black-screen hook
+    if ((sAutosavePending || sZoneSavePending) && !(gMain.heldKeys & DPAD_ANY))
+    {
+        sZoneSavePending = FALSE;
         IsekaiAutosave();
+    }
     return FALSE;
 }
 

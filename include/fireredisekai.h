@@ -44,6 +44,8 @@ u8 IsekaiGraveCount(void);
 void IsekaiAutosave(void);
 void IsekaiRequestAutosave(void);
 void IsekaiAutosaveOnArrival(void);
+void IsekaiOnMapWarp(void);
+void IsekaiOnBattleInit(void);
 void IsekaiOnTrainerBattleStart(void);
 void IsekaiOnWildBattleStart(void);
 void IsekaiOnBattleEnd(void);
