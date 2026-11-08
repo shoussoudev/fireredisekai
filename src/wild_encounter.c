@@ -642,7 +642,7 @@ static bool32 IsekaiTooRare(enum Species species)
         return FALSE;
     switch (species)
     {
-    case SPECIES_RIOLU:  return (Random() % 4) != 0;   // 1% slot -> ~1 in 400 Route 2 encounters
+    case SPECIES_RIOLU:  return (Random() % 2) != 0;   // 1% slot -> ~1 in 200 Route 2 encounters
     case SPECIES_FEEBAS: return (Random() % 40) != 0;  // 20% Good Rod slot -> ~1 in 200 bites
     default:             return FALSE;
     }
