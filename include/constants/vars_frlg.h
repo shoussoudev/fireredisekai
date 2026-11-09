@@ -173,6 +173,7 @@
 #define VAR_0x4093                 0x4093
 #define VAR_ISEKAI_LOAN_STEPS              VAR_0x4093 // FireRed Isekai: steps since the first catch (the 1,000-step clock)
 #define VAR_0x4094                 0x4094
+#define VAR_ISEKAI_FINE_DEBT               VAR_0x4094 // FireRed Isekai: fine still owed to the police (taken from winnings)
 #define VAR_0x4095                 0x4095
 #define VAR_0x4096                 0x4096
 #define VAR_0x4097                 0x4097

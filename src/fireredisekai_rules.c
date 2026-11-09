@@ -353,12 +353,36 @@ void IsekaiRefundDeposit(void)
 }
 
 // Jenny's fine: up to ₽1000, whatever he has. STR_VAR_1 = the amount.
+// The late-return fine is ¥1000. Whatever he can't pay now comes out of his
+// battle winnings later. VAR_RESULT: 0 paid in full, 1 paid part, 2 broke.
+#define ISEKAI_FINE 1000
 void IsekaiPayFine(void)
 {
     u32 money = GetMoney(&gSaveBlock1Ptr->money);
-    u32 fine = money < 1000 ? money : 1000;
-    RemoveMoney(&gSaveBlock1Ptr->money, fine);
-    ConvertIntToDecimalStringN(gStringVar1, fine, STR_CONV_MODE_LEFT_ALIGN, 6);
+    u32 paid = money < ISEKAI_FINE ? money : ISEKAI_FINE;
+    u32 debt = ISEKAI_FINE - paid;
+
+    RemoveMoney(&gSaveBlock1Ptr->money, paid);
+    VarSet(VAR_ISEKAI_FINE_DEBT, debt);
+    ConvertIntToDecimalStringN(gStringVar1, paid, STR_CONV_MODE_LEFT_ALIGN, 6);
+    ConvertIntToDecimalStringN(gStringVar2, debt, STR_CONV_MODE_LEFT_ALIGN, 6);
+    gSpecialVar_Result = debt == 0 ? 0 : (paid != 0 ? 1 : 2);
+}
+
+// After a battle: the police take what's owed from his winnings.
+EWRAM_DATA static u16 sPendingDebtTaken = 0;
+static void CollectFineDebt(void)
+{
+    u32 debt = VarGet(VAR_ISEKAI_FINE_DEBT);
+    u32 money = GetMoney(&gSaveBlock1Ptr->money);
+    u32 take;
+
+    if (debt == 0 || money == 0)
+        return;
+    take = money < debt ? money : debt;
+    RemoveMoney(&gSaveBlock1Ptr->money, take);
+    VarSet(VAR_ISEKAI_FINE_DEBT, debt - take);
+    sPendingDebtTaken += take;
 }
 
 // A small "Saving..." box in the bottom-right corner, shown while a field autosave runs.
@@ -645,6 +669,8 @@ void IsekaiOnBattleEnd(void)
 
     sIsekai.battleType = ISEKAI_BATTLE_NONE;
     sIsekai.resetCount = 0;
+    if (gBattleOutcome == B_OUTCOME_WON)
+        CollectFineDebt();
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER || gBattleOutcome == B_OUTCOME_WON
      || gBattleOutcome == B_OUTCOME_CAUGHT || gBattleOutcome == B_OUTCOME_LOST)
         IsekaiWardBattleFought();
@@ -899,6 +925,16 @@ bool32 IsekaiFieldIdle(void)
         sPendingCall = 0;
         LockPlayerFieldControls();
         ScriptContext_SetupScript(IsekaiEventScript_OakCall);
+        return TRUE;
+    }
+    if (sPendingDebtTaken != 0)
+    {
+        ConvertIntToDecimalStringN(gStringVar1, sPendingDebtTaken, STR_CONV_MODE_LEFT_ALIGN, 6);
+        ConvertIntToDecimalStringN(gStringVar2, VarGet(VAR_ISEKAI_FINE_DEBT), STR_CONV_MODE_LEFT_ALIGN, 6);
+        gSpecialVar_0x8004 = VarGet(VAR_ISEKAI_FINE_DEBT) == 0;
+        sPendingDebtTaken = 0;
+        LockPlayerFieldControls();
+        ScriptContext_SetupScript(IsekaiEventScript_FineFromWinnings);
         return TRUE;
     }
     if (sPendingWantedReminder)

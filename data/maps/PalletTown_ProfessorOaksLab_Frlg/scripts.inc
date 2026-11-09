@@ -1962,10 +1962,10 @@ PalletTown_ProfessorOaksLab_EventScript_IsekaiReturnLate::
 	textcolor NPC_TEXT_COLOR_FEMALE
 	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiJenny1
 	special IsekaiPayFine
-	textcolor NPC_TEXT_COLOR_NEUTRAL
-	playse SE_SHOP
-	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiPaidFine
+	call_if_ne VAR_RESULT, 2, PalletTown_ProfessorOaksLab_EventScript_IsekaiFinePaid
 	textcolor NPC_TEXT_COLOR_FEMALE
+	call_if_eq VAR_RESULT, 1, PalletTown_ProfessorOaksLab_EventScript_IsekaiFinePart
+	call_if_eq VAR_RESULT, 2, PalletTown_ProfessorOaksLab_EventScript_IsekaiFineBroke
 	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiJenny2
 	closemessage
 	fadescreen FADE_TO_BLACK
@@ -2089,6 +2089,31 @@ PalletTown_ProfessorOaksLab_Text_IsekaiRecordThem::
 	.string "you see out there.\p"
 	.string "I asked you to record them.\n"
 	.string "Not take them all.$"
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiFinePaid::
+	textcolor NPC_TEXT_COLOR_NEUTRAL
+	playse SE_SHOP
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiPaidFine
+	return
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiFinePart::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiFinePart
+	return
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiFineBroke::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiFineBroke
+	return
+
+PalletTown_ProfessorOaksLab_Text_IsekaiFinePart::
+	.string "JENNY: That's not ¥1000.\p"
+	.string "The other ¥{STR_VAR_2} comes out of\n"
+	.string "your battle winnings.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiFineBroke::
+	.string "JENNY: …Your wallet's empty.\p"
+	.string "Fine. Then the whole ¥1000 comes\n"
+	.string "out of your battle winnings.\p"
+	.string "Every last one.$"
 
 PalletTown_ProfessorOaksLab_Text_IsekaiJennyIdle::
 	.string "JENNY: Just here for a chat with\n"

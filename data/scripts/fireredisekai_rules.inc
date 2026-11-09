@@ -495,3 +495,31 @@ IsekaiText_Wanted_Whisper:
 	.string "“…that thief from PALLET…”\p"
 	.string "The whispering stops when you\n"
 	.string "turn around.$"
+
+@ The late-return fine, taken from battle winnings until it's paid.
+IsekaiEventScript_FineFromWinnings::
+	lockall
+	msgbox IsekaiText_FineFromWinnings
+	call_if_eq VAR_0x8004, TRUE, IsekaiEventScript_FinePaidOff
+	call_if_eq VAR_0x8004, FALSE, IsekaiEventScript_FineStillOwed
+	releaseall
+	end
+
+IsekaiEventScript_FinePaidOff:
+	msgbox IsekaiText_FinePaidOff
+	return
+
+IsekaiEventScript_FineStillOwed:
+	msgbox IsekaiText_FineStillOwed
+	return
+
+IsekaiText_FineFromWinnings:
+	.string "¥{STR_VAR_1} of your winnings went\n"
+	.string "straight to the police.$"
+
+IsekaiText_FinePaidOff:
+	.string "The fine is paid off.\n"
+	.string "JENNY will be thrilled.$"
+
+IsekaiText_FineStillOwed:
+	.string "Still owed: ¥{STR_VAR_2}.$"

@@ -387,13 +387,24 @@ ViridianCity_Text_IsekaiShadyManWanted::
 ViridianCity_EventScript_IsekaiKevin::
 	lock
 	faceplayer
-	goto_if_set FLAG_ISEKAI_KEVIN_DONE, ViridianCity_EventScript_IsekaiKevinAfter
+	goto_if_set FLAG_ISEKAI_KEVIN_BEATEN, ViridianCity_EventScript_IsekaiKevinAfter
+	goto_if_set FLAG_ISEKAI_KEVIN_DONE, ViridianCity_EventScript_IsekaiKevinAgain
 	msgbox ViridianCity_Text_IsekaiKevinIntro
+	setflag FLAG_ISEKAI_KEVIN_DONE
+	msgbox ViridianCity_Text_IsekaiKevinWantToSee, MSGBOX_YESNO
+	goto ViridianCity_EventScript_IsekaiKevinAsk
+ViridianCity_EventScript_IsekaiKevinAgain:
+	msgbox ViridianCity_Text_IsekaiKevinAgain, MSGBOX_YESNO
+@ He asks four times before he lets CHARMANDER out.
+ViridianCity_EventScript_IsekaiKevinAsk:
+	goto_if_eq VAR_RESULT, NO, ViridianCity_EventScript_IsekaiKevinNo
 	msgbox ViridianCity_Text_IsekaiKevinSure, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, ViridianCity_EventScript_IsekaiKevinNo
 	msgbox ViridianCity_Text_IsekaiKevinSureSure, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, ViridianCity_EventScript_IsekaiKevinNo
-	setflag FLAG_ISEKAI_KEVIN_DONE
+	msgbox ViridianCity_Text_IsekaiKevinLastChance, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, ViridianCity_EventScript_IsekaiKevinNo
+	msgbox ViridianCity_Text_IsekaiKevinOkay
 	closemessage
 	trainerbattle_earlyrival TRAINER_ISEKAI_KEVIN, 0, ViridianCity_Text_IsekaiKevinDefeat, ViridianCity_Text_IsekaiKevinCallsItOff
 	specialvar VAR_RESULT, GetBattleOutcome
@@ -403,6 +414,7 @@ ViridianCity_EventScript_IsekaiKevin::
 	end
 
 ViridianCity_EventScript_IsekaiKevinLost::
+	setflag FLAG_ISEKAI_KEVIN_BEATEN
 	msgbox ViridianCity_Text_IsekaiKevinWon
 	release
 	end
@@ -426,13 +438,27 @@ ViridianCity_Text_IsekaiKevinIntro::
 	.string "He's still in there.\n"
 	.string "He never stopped training.$"
 
+ViridianCity_Text_IsekaiKevinWantToSee::
+	.string "KEVIN: …Want to see?$"
+
+ViridianCity_Text_IsekaiKevinAgain::
+	.string "KEVIN: Again?\n"
+	.string "…He did like that.$"
+
 ViridianCity_Text_IsekaiKevinSure::
-	.string "KEVIN: …Want to see?\p"
-	.string "Are you sure?\n"
+	.string "KEVIN: Are you sure?\n"
 	.string "He's really strong.$"
 
 ViridianCity_Text_IsekaiKevinSureSure::
 	.string "KEVIN: Are you SURE sure?$"
+
+ViridianCity_Text_IsekaiKevinLastChance::
+	.string "KEVIN: Last chance.\n"
+	.string "I'm not paying for the CENTER.$"
+
+ViridianCity_Text_IsekaiKevinOkay::
+	.string "KEVIN: …Okay.\n"
+	.string "Come on out, buddy.$"
 
 ViridianCity_Text_IsekaiKevinNo::
 	.string "KEVIN: Yeah. Smart.$"
