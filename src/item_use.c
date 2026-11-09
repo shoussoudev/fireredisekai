@@ -1580,4 +1580,27 @@ void ItemUseOutOfBattle_TownMap(u8 taskId)
     }
 }
 
+// FireRed Isekai: Oak's parcel can be opened.
+static void ItemUseOnFieldCB_Parcel(u8 taskId)
+{
+    LockPlayerFieldControls();
+    ScriptContext_SetupScript(IsekaiEventScript_OpenParcel);
+    DestroyTask(taskId);
+}
+
+void ItemUseOutOfBattle_Parcel(u8 taskId)
+{
+    if (!gTasks[taskId].tUsingRegisteredKeyItem)
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_Parcel;
+        gFieldCallback = FieldCB_UseItemOnField;
+        gBagMenu->newScreenCallback = CB2_ReturnToField;
+        Task_FadeAndCloseBagMenu(taskId);
+    }
+    else
+    {
+        gTasks[taskId].func = ItemUseOnFieldCB_Parcel;
+    }
+}
+
 #undef tUsingRegisteredKeyItem

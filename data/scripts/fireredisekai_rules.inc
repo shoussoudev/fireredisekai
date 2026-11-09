@@ -523,3 +523,35 @@ IsekaiText_FinePaidOff:
 
 IsekaiText_FineStillOwed:
 	.string "Still owed: ¥{STR_VAR_2}.$"
+
+@ Oak's parcel, opened from the bag. Oak will notice.
+IsekaiEventScript_OpenParcel::
+	lockall
+	goto_if_set FLAG_ISEKAI_PARCEL_OPENED, IsekaiEventScript_ParcelAlreadyOpen
+	msgbox IsekaiText_OpenParcel, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, IsekaiEventScript_ParcelDone
+	setflag FLAG_ISEKAI_PARCEL_OPENED
+	msgbox IsekaiText_ParcelInside
+IsekaiEventScript_ParcelDone:
+	releaseall
+	end
+
+IsekaiEventScript_ParcelAlreadyOpen:
+	msgbox IsekaiText_ParcelAlreadyOpen
+	releaseall
+	end
+
+IsekaiText_OpenParcel:
+	.string "It's addressed to PROF. OAK.\n"
+	.string "Open it anyway?$"
+
+IsekaiText_ParcelInside:
+	.string "{PLAYER} picks at the tape…\p"
+	.string "Five POKé BALLS, packed in straw.\n"
+	.string "That's all.\p"
+	.string "He tapes it back up.\n"
+	.string "It looks… mostly fine.$"
+
+IsekaiText_ParcelAlreadyOpen:
+	.string "The tape is a mess already.\n"
+	.string "Best not to make it worse.$"

@@ -1871,17 +1871,15 @@ PalletTown_ProfessorOaksLab_EventScript_IsekaiBeforeParcel::
 
 PalletTown_ProfessorOaksLab_EventScript_IsekaiParcel::
 	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiParcelThanks
-	textcolor NPC_TEXT_COLOR_NEUTRAL
-	playfanfare MUS_OBTAIN_TMHM
-	message PalletTown_ProfessorOaksLab_Text_DeliveredOaksParcel
-	waitmessage
-	waitfanfare
-	call EventScript_RestorePrevTextColor
-	removeitem ITEM_OAKS_PARCEL
+	call PalletTown_ProfessorOaksLab_EventScript_IsekaiHandOverParcel
+	goto_if_set FLAG_ISEKAI_PARCEL_OPENED, PalletTown_ProfessorOaksLab_EventScript_IsekaiParcelOpened
+PalletTown_ProfessorOaksLab_EventScript_IsekaiBallsOnCredit:
 	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiBallsOnCredit
+PalletTown_ProfessorOaksLab_EventScript_IsekaiGiveBalls:
 	giveitem ITEM_POKE_BALL, 5
 	textcolor NPC_TEXT_COLOR_MALE
 	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiBringMineBack
+PalletTown_ProfessorOaksLab_EventScript_IsekaiParcelState:
 	setvar VAR_ISEKAI_LOAN_STATE, 2
 	setvar VAR_MAP_SCENE_VIRIDIAN_CITY_MART, 2
 	setvar VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 1
@@ -1889,6 +1887,29 @@ PalletTown_ProfessorOaksLab_EventScript_IsekaiParcel::
 	setvar VAR_MAP_SCENE_ROUTE22, 1
 	release
 	end
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiHandOverParcel::
+	textcolor NPC_TEXT_COLOR_NEUTRAL
+	playfanfare MUS_OBTAIN_TMHM
+	message PalletTown_ProfessorOaksLab_Text_DeliveredOaksParcel
+	waitmessage
+	waitfanfare
+	call EventScript_RestorePrevTextColor
+	removeitem ITEM_OAKS_PARCEL
+	return
+
+@ He opened it. Oak asks; honesty keeps the credit (and nothing extra later).
+PalletTown_ProfessorOaksLab_EventScript_IsekaiParcelOpened::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiDidYouOpenThis, MSGBOX_YESNO
+	setflag FLAG_ISEKAI_EXTRA_BALLS
+	goto_if_eq VAR_RESULT, NO, PalletTown_ProfessorOaksLab_EventScript_IsekaiParcelLied
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiParcelHonest
+	goto PalletTown_ProfessorOaksLab_EventScript_IsekaiGiveBalls
+
+PalletTown_ProfessorOaksLab_EventScript_IsekaiParcelLied::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiParcelLied
+	setflag FLAG_ISEKAI_OAK_COLD
+	goto PalletTown_ProfessorOaksLab_EventScript_IsekaiParcelState
 
 @ State 2: has POKé BALLS, hasn't caught anything yet. Three more, once.
 PalletTown_ProfessorOaksLab_EventScript_IsekaiNoCatchYet::
@@ -2034,6 +2055,29 @@ PalletTown_ProfessorOaksLab_EventScript_IsekaiGivePokedex::
 PalletTown_ProfessorOaksLab_Text_IsekaiParcelThanks::
 	.string "OAK: Ah, my parcel! From the\n"
 	.string "VIRIDIAN MART?$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiDidYouOpenThis::
+	.string "OAK: …\p"
+	.string "This tape is on upside down.\p"
+	.string "Did you open my parcel?$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiParcelHonest::
+	.string "OAK: Hm. At least you're honest.\p"
+	.string "Reading other people's post is\n"
+	.string "a poor habit, though.\p"
+	.string "Just this once.\p"
+	.string "You've seen them already.\n"
+	.string "Five POKé BALLS. On credit.$"
+
+PalletTown_ProfessorOaksLab_Text_IsekaiParcelLied::
+	.string "OAK: I see.\p"
+	.string "Then a very tidy thief opened it,\n"
+	.string "looked at five POKé BALLS,\l"
+	.string "and taped it back up. Badly.\p"
+	.string "I'll keep my POKé BALLS, then.\n"
+	.string "The MART sells them.\p"
+	.string "And my POKéMON still comes back\n"
+	.string "the moment you catch one.$"
 
 PalletTown_ProfessorOaksLab_Text_IsekaiBallsOnCredit::
 	.string "OAK: Good. You can follow simple\n"

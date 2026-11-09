@@ -31,6 +31,7 @@
 #define FLAG_HIDE_ISEKAI_LAB_JENNY   FLAG_0x0B7 // Officer Jenny waiting in the lab
 #define FLAG_ISEKAI_KEVIN_DONE       FLAG_0x0B8 // fought Kevin
 #define FLAG_ISEKAI_WARD_NURSE_MET   FLAG_0x0B9 // met the ward nurse
+#define FLAG_ISEKAI_PARCEL_OPENED    FLAG_0x0BB // opened Oak's parcel on the way
 #define FLAG_ISEKAI_KEVIN_BEATEN     FLAG_0x0BA // beat KEVIN (FLAG_ISEKAI_KEVIN_DONE = met him)
 
 // Hide/show flags
