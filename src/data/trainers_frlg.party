@@ -13942,3 +13942,27 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Slash
 - Dragon Claw
 - Fire Fang
+
+=== TRAINER_ISEKAI_SHARK_GOON ===
+Name: TONY
+Class: Cue Ball Frlg
+Pic: Cue Ball Frlg
+Gender: Male
+Music: Serious
+Double Battle: No
+AI: Check Bad Move / Try To Faint
+
+Machop
+Level: 13
+IVs: 15 HP / 15 Atk / 15 Def / 15 SpA / 15 SpD / 15 Spe
+- Low Kick
+- Leer
+- Focus Energy
+
+Mankey
+Level: 14
+IVs: 15 HP / 15 Atk / 15 Def / 15 SpA / 15 SpD / 15 Spe
+- Scratch
+- Low Kick
+- Fury Swipes
+- Leer

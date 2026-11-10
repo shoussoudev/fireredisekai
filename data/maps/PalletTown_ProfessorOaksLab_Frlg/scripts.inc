@@ -566,6 +566,7 @@ PalletTown_ProfessorOaksLab_EventScript_ProfOak::
 	lock
 	faceplayer
 	goto_if_set SHOWED_OAK_COMPLETE_DEX, PalletTown_ProfessorOaksLab_EventScript_OakJustShownCompleteDex
+	goto_if_eq VAR_ISEKAI_LOAN_STATE, 7, PalletTown_ProfessorOaksLab_EventScript_IsekaiOakTooLate
 	goto_if_ge VAR_ISEKAI_LOAN_STATE, 5, PalletTown_ProfessorOaksLab_EventScript_IsekaiOakAfterLoan
 	goto_if_ge VAR_ISEKAI_LOAN_STATE, 1, PalletTown_ProfessorOaksLab_EventScript_IsekaiOakLoan
 	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 9, PalletTown_ProfessorOaksLab_EventScript_RatePokedex
@@ -1850,6 +1851,16 @@ PalletTown_ProfessorOaksLab_EventScript_IsekaiOakLoan::
 	case 4, PalletTown_ProfessorOaksLab_EventScript_IsekaiReturnLate
 	release
 	end
+
+@ State 7: past the first badge without bringing it back. No way back.
+PalletTown_ProfessorOaksLab_EventScript_IsekaiOakTooLate::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiOakTooLate
+	release
+	end
+
+PalletTown_ProfessorOaksLab_Text_IsekaiOakTooLate::
+	.string "OAK: …\p"
+	.string "I have nothing to say to you.$"
 
 PalletTown_ProfessorOaksLab_EventScript_IsekaiOakAfterLoan::
 	goto_if_set FLAG_ISEKAI_OAK_COLD, PalletTown_ProfessorOaksLab_EventScript_IsekaiOakCold

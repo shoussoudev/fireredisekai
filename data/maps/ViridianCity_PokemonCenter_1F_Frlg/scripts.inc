@@ -85,3 +85,94 @@ ViridianCity_PokemonCenter_1F_Text_IsekaiWardNurseAgain::
 	.string "You can come through my door\n"
 	.string "{STR_VAR_1} more times. Let's keep it\l"
 	.string "that way.$"
+
+@ FireRed Isekai: SHARKEY, the loan shark. Right outside the nurse's counter.
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkey::
+	lock
+	faceplayer
+	special IsekaiSharkDebt
+	goto_if_ne VAR_RESULT, 0, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyOwed
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyPitch
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyWant, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyNo
+	special IsekaiSharkLend
+	playse SE_SHOP
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyLent
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyNo::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyNo
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyOwed::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyOwed, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyLater
+	special IsekaiSharkRepay
+	goto_if_eq VAR_RESULT, 0, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyBroke
+	playse SE_SHOP
+	goto_if_eq VAR_RESULT, 1, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyPart
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyPaid
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyPart::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyPart
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyBroke::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyBroke
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyLater::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyLater
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyPitch::
+	.string "SHARKEY: Short on cash, friend?\n"
+	.string "Everybody is, in a place like this.\p"
+	.string "I'll lend you ¥1000. Today.\n"
+	.string "No questions.\p"
+	.string "Pay me back whenever you like.\n"
+	.string "Plus a little something every\l"
+	.string "500 steps. Ten percent.\p"
+	.string "Friendly rates.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyWant::
+	.string "SHARKEY: So. ¥1000?$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyLent::
+	.string "{PLAYER} got ¥1000.\p"
+	.string "SHARKEY: Pleasure doing business.\n"
+	.string "I'll be right here. I'm always here.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyNo::
+	.string "SHARKEY: Suit yourself.\n"
+	.string "The offer doesn't expire.\l"
+	.string "Neither do I.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyOwed::
+	.string "SHARKEY: There he is!\n"
+	.string "You owe me ¥{STR_VAR_1}.\p"
+	.string "Paying today?$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyPaid::
+	.string "SHARKEY: Paid in full!\n"
+	.string "See? Easy.\p"
+	.string "Come back anytime. You will.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyPart::
+	.string "SHARKEY: ¥{STR_VAR_1}. It's a start.\n"
+	.string "Still ¥{STR_VAR_2} to go.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyBroke::
+	.string "SHARKEY: With what?\n"
+	.string "Your good looks?$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyLater::
+	.string "SHARKEY: No rush.\p"
+	.string "…Well. A little rush.$"

@@ -64,7 +64,7 @@ EWRAM_DATA static bool8 sAutosavePending = FALSE;
 EWRAM_DATA static bool8 sZoneSavePending = FALSE;
 EWRAM_DATA static bool8 sArrivalSavePending = FALSE;  // entered a save building; save once it has faded in
 EWRAM_DATA static bool8 sBattleStartSavePending = FALSE;
-EWRAM_DATA static u8 sPendingCall = 0;               // Oak's phone call to play: 1 first catch, 2 overdue
+EWRAM_DATA static u8 sPendingCall = 0;               // Oak's phone call to play: 1 first catch, 2 overdue, 3 too late
 EWRAM_DATA static bool8 sPendingWantedReminder = FALSE;
 EWRAM_DATA static u16 sLastAutosaveMap = 0;            // (group << 8 | num) + 1 of the last autosave; 0 = none yet
 EWRAM_DATA bool8 gIsekaiWildUnwilling = FALSE;         // this wild Pokémon won't accept a ball
@@ -127,6 +127,10 @@ void IsekaiSetBadlyInjured(struct Pokemon *mon, bool32 injured)
 {
     u8 value = injured ? 1 : 0;
     SetMonData(mon, MON_DATA_MARINE_RIBBON, &value);
+    if (injured)
+        SetMonData(mon, MON_DATA_SKY_RIBBON, &value);  // ever Badly Injured (Celebi's check); never cleared
+    else
+        SetMonData(mon, MON_DATA_LAND_RIBBON, &value); // healed: no longer a pre-existing condition
 }
 
 bool32 IsekaiBoxMonIsBadlyInjured(struct BoxPokemon *boxMon)
@@ -177,6 +181,7 @@ void IsekaiOnReviveUsed(struct Pokemon *mon, u16 item)
 
 static void BuryMon(struct Pokemon *mon)
 {
+    IsekaiCarePlanOnDeath();
     u8 slot = sIsekai.graveCount;
     u8 name[POKEMON_NAME_LENGTH + 1];
 
@@ -306,6 +311,8 @@ bool32 IsekaiOnStep(u16 metatileBehavior)
             sPendingCall = 2;
         }
     }
+    if (IsekaiMoneyOnStep(metatileBehavior))
+        return TRUE;
     // The first step into tall grass on Route 1.
     if (!FlagGet(FLAG_ISEKAI_SEEN_FIRST_GRASS)
      && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_ROUTE1)
@@ -671,6 +678,9 @@ void IsekaiOnBattleEnd(void)
     sIsekai.resetCount = 0;
     if (gBattleOutcome == B_OUTCOME_WON)
         CollectFineDebt();
+    if ((gBattleTypeFlags & BATTLE_TYPE_TRAINER) && TRAINER_BATTLE_PARAM.opponentA == TRAINER_ISEKAI_SHARK_GOON
+     && gBattleOutcome != B_OUTCOME_WON)
+        IsekaiSharkTakesAll();
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER || gBattleOutcome == B_OUTCOME_WON
      || gBattleOutcome == B_OUTCOME_CAUGHT || gBattleOutcome == B_OUTCOME_LOST)
         IsekaiWardBattleFought();
@@ -788,6 +798,13 @@ u8 IsekaiLives(void)
 // A badge gives a life back, up to the starting number.
 void IsekaiBadgeEarned(void)
 {
+    // Still hasn't brought Oak's POKéMON back by the first badge: too late now.
+    if (VarGet(VAR_ISEKAI_LOAN_STATE) == 4)
+    {
+        VarSet(VAR_ISEKAI_LOAN_STATE, 7);
+        FlagSet(FLAG_HIDE_ISEKAI_LAB_JENNY);
+        sPendingCall = 3;
+    }
     if (sIsekai.lives < IsekaiMaxLives())
         sIsekai.lives++;
 }
@@ -927,6 +944,8 @@ bool32 IsekaiFieldIdle(void)
         ScriptContext_SetupScript(IsekaiEventScript_OakCall);
         return TRUE;
     }
+    if (IsekaiMoneyFieldIdle())
+        return TRUE;
     if (sPendingDebtTaken != 0)
     {
         ConvertIntToDecimalStringN(gStringVar1, sPendingDebtTaken, STR_CONV_MODE_LEFT_ALIGN, 6);

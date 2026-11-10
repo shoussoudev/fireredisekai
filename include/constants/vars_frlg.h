@@ -176,15 +176,21 @@
 #define VAR_ISEKAI_FINE_DEBT               VAR_0x4094 // FireRed Isekai: fine still owed to the police (taken from winnings)
 #define VAR_0x4095                 0x4095
 #define VAR_0x4096                 0x4096
+#define VAR_ISEKAI_CARE_PLAN              VAR_0x4096 // FireRed Isekai: POKé CARE PLAN: low byte on/off, high byte badge+1 when declined
 #define VAR_0x4097                 0x4097
 #define VAR_0x4098                 0x4098
+#define VAR_ISEKAI_CARE_PAYMENTS          VAR_0x4098 // FireRed Isekai: premiums paid in a row
 #define VAR_0x4099                 0x4099
 #define VAR_0x409A                 0x409A
 #define VAR_0x409B                 0x409B
+#define VAR_ISEKAI_CARE_STEPS             VAR_0x409B // FireRed Isekai: steps toward the next premium
 #define VAR_0x409C                 0x409C
 #define VAR_0x409D                 0x409D
+#define VAR_ISEKAI_CARE_SURCHARGE         VAR_0x409D // FireRed Isekai: premium surcharge from deaths on the plan
 #define VAR_0x409E                 0x409E
+#define VAR_ISEKAI_SHARK_DEBT             VAR_0x409E // FireRed Isekai: what SHARKEY is owed
 #define VAR_0x409F                 0x409F
+#define VAR_ISEKAI_SHARK_STEPS            VAR_0x409F // FireRed Isekai: steps toward the next interest
 #define VAR_0x40A0                 0x40A0
 #define VAR_0x40A1                 0x40A1
 #define VAR_0x40A2                 0x40A2

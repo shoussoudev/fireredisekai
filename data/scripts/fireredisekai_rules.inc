@@ -288,11 +288,23 @@ IsekaiEventScript_CenterWard_StillResting:
 	goto_if_eq VAR_RESULT, 0, IsekaiEventScript_CenterWard_End
 	msgbox IsekaiText_WardOffer, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, IsekaiEventScript_CenterWard_Declined
+	special IsekaiWardQuote
+	goto_if_eq VAR_RESULT, 2, IsekaiEventScript_CenterWard_CantPay
+	goto_if_eq VAR_RESULT, 0, IsekaiEventScript_CenterWard_Paid
+	msgbox IsekaiText_WardFee, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, IsekaiEventScript_CenterWard_Declined
+	special IsekaiPayWard
+	playse SE_SHOP
+IsekaiEventScript_CenterWard_Paid:
 	special IsekaiWouldLeaveEmptyParty
 	goto_if_eq VAR_RESULT, TRUE, IsekaiEventScript_CenterWard_LastOne
 	special IsekaiLeaveInjuredAtCenter
 	msgbox IsekaiText_WardTaken
 IsekaiEventScript_CenterWard_End:
+	return
+
+IsekaiEventScript_CenterWard_CantPay:
+	msgbox IsekaiText_WardCantPay
 	return
 
 IsekaiEventScript_CenterWard_ShowResting:
@@ -317,6 +329,16 @@ IsekaiEventScript_CenterWard_LastOne:
 	waitfanfare
 	msgbox IsekaiText_WardTaken
 	return
+
+IsekaiText_WardFee:
+	.string "Ward care is ¥{STR_VAR_1}.\n"
+	.string "Is that all right?$"
+
+IsekaiText_WardCantPay:
+	.string "Ward care is ¥{STR_VAR_1}.\n"
+	.string "…You don't have it.\p"
+	.string "I'm sorry. Please be careful out\n"
+	.string "there.$"
 
 IsekaiText_WardHealed:
 	.string "Oh, and {STR_VAR_1} is all better!\n"
@@ -436,6 +458,7 @@ IsekaiEventScript_OakCall::
 	msgbox IsekaiText_PhoneRings
 	textcolor NPC_TEXT_COLOR_MALE
 	goto_if_eq VAR_0x8004, 2, IsekaiEventScript_OakCall_Overdue
+	goto_if_eq VAR_0x8004, 3, IsekaiEventScript_OakCall_TooLate
 	msgbox IsekaiText_OakCall_Caught
 	releaseall
 	end
@@ -443,6 +466,17 @@ IsekaiEventScript_OakCall_Overdue:
 	msgbox IsekaiText_OakCall_Overdue
 	releaseall
 	end
+
+IsekaiEventScript_OakCall_TooLate:
+	msgbox IsekaiText_OakCall_TooLate
+	releaseall
+	end
+
+IsekaiText_OakCall_TooLate:
+	.string "OAK: I hear you won a BADGE.\n"
+	.string "With MY POKéMON, no doubt.\p"
+	.string "Don't bother bringing it back now.\p"
+	.string "And don't bother coming to the lab.$"
 
 IsekaiText_PhoneRings:
 	.string "The cheap phone OAK gave you\n"
@@ -555,3 +589,41 @@ IsekaiText_ParcelInside:
 IsekaiText_ParcelAlreadyOpen:
 	.string "The tape is a mess already.\n"
 	.string "Best not to make it worse.$"
+
+@ ---------------------------------------------------------------------------
+@ FireRed Isekai: the POKé CARE PLAN lapses; SHARKEY's associate
+@ ---------------------------------------------------------------------------
+IsekaiEventScript_CarePlanLapsed::
+	lockall
+	msgbox IsekaiText_CarePlanLapsed
+	releaseall
+	end
+
+IsekaiText_CarePlanLapsed:
+	.string "The POKé CARE PLAN couldn't take\n"
+	.string "its ¥{STR_VAR_1} payment.\p"
+	.string "Your plan has ended.$"
+
+IsekaiEventScript_SharkGoon::
+	lockall
+	playse SE_PIN
+	msgbox IsekaiText_SharkGoon
+	closemessage
+	trainerbattle_no_intro TRAINER_ISEKAI_SHARK_GOON, IsekaiText_SharkGoonDefeat
+	cleartrainerflag TRAINER_ISEKAI_SHARK_GOON
+	msgbox IsekaiText_SharkGoonAfter
+	releaseall
+	end
+
+IsekaiText_SharkGoon:
+	.string "A man in a very nice suit steps\n"
+	.string "out of the grass.\p"
+	.string "TONY: SHARKEY says hi.\n"
+	.string "And he wants his money.$"
+
+IsekaiText_SharkGoonDefeat:
+	.string "TONY: …Okay. Okay.$"
+
+IsekaiText_SharkGoonAfter:
+	.string "TONY: You win this time.\n"
+	.string "But the interest doesn't stop.$"

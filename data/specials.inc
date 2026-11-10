@@ -44,6 +44,18 @@ gSpecials::
 	def_special IsekaiHasOwnMon
 	def_special IsekaiRefundDeposit
 	def_special IsekaiPayFine
+	def_special IsekaiHealQuote
+	def_special IsekaiPayHeal
+	def_special IsekaiHealOneQuote
+	def_special IsekaiHealOne
+	def_special IsekaiWardQuote
+	def_special IsekaiPayWard
+	def_special IsekaiCarePlanShouldOffer
+	def_special IsekaiCarePlanDecline
+	def_special IsekaiCarePlanSignUp
+	def_special IsekaiSharkDebt
+	def_special IsekaiSharkLend
+	def_special IsekaiSharkRepay
 	def_special SetCableClubWarp
 	def_special DoCableClubWarp, waitstate=1
 	def_special ReturnFromLinkRoom, waitstate=1
