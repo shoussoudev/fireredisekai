@@ -627,3 +627,81 @@ IsekaiText_SharkGoonDefeat:
 IsekaiText_SharkGoonAfter:
 	.string "TONY: You win this time.\n"
 	.string "But the interest doesn't stop.$"
+
+@ ---------------------------------------------------------------------------
+@ FireRed Isekai: SHARKEY part two. TONY's "interest", the warning call, the auction.
+@ ---------------------------------------------------------------------------
+IsekaiEventScript_TonyTakes::
+	lockall
+	special IsekaiTonyDone
+	msgbox IsekaiText_TonyArrives
+	special IsekaiSharkBuildList
+	goto_if_eq VAR_RESULT, 0, IsekaiEventScript_TonyNothing
+	goto_if_eq VAR_RESULT, 0xFF, IsekaiEventScript_TonyNothing
+	msgbox IsekaiText_TonyPick
+	dynmultistack 0, 0, TRUE, 6, FALSE, 0, DYN_MULTICHOICE_CB_NONE
+	copyvar VAR_0x8004, VAR_RESULT
+	setvar VAR_0x8005, 2
+	special IsekaiSharkTake
+	msgbox IsekaiText_TonyTook
+	releaseall
+	end
+
+IsekaiEventScript_TonyNothing:
+	msgbox IsekaiText_TonyNothing
+	releaseall
+	end
+
+IsekaiText_TonyArrives:
+	.string "A man in a very nice suit is\n"
+	.string "waiting for you.\p"
+	.string "TONY: SHARKEY still wants his money.\n"
+	.string "So. Interest.$"
+
+IsekaiText_TonyPick:
+	.string "TONY: Not the junk. One of the ones\n"
+	.string "that actually fight.\p"
+	.string "The rest? Worthless.\n"
+	.string "You pick.$"
+
+IsekaiText_TonyTook:
+	.string "TONY took {STR_VAR_1}.\p"
+	.string "TONY: Call it interest.\n"
+	.string "SHARKEY gives it back for ¥{STR_VAR_2}.\p"
+	.string "For now.$"
+
+IsekaiText_TonyNothing:
+	.string "TONY: …That's it?\n"
+	.string "Worthless. All of it.$"
+
+IsekaiEventScript_SharkCall::
+	lockall
+	playse SE_POKENAV_CALL
+	waitse
+	playse SE_POKENAV_CALL
+	msgbox IsekaiText_SharkPhone
+	goto_if_eq VAR_0x8004, 2, IsekaiEventScript_SharkCall_Sold
+	msgbox IsekaiText_SharkWarning
+	releaseall
+	end
+IsekaiEventScript_SharkCall_Sold:
+	msgbox IsekaiText_SharkSold
+	releaseall
+	end
+
+IsekaiText_SharkPhone:
+	.string "The cheap phone is ringing.\n"
+	.string "Unknown number.$"
+
+IsekaiText_SharkWarning:
+	.string "SHARKEY: How did I get this number?\n"
+	.string "I have everyone's number.\p"
+	.string "Your {STR_VAR_1}'s looking lonely.\p"
+	.string "1,000 more steps.\n"
+	.string "Then it goes to auction.$"
+
+IsekaiText_SharkSold:
+	.string "SHARKEY: Going once…\n"
+	.string "going twice…\p"
+	.string "Your {STR_VAR_1} found a new home.\n"
+	.string "Nothing personal.$"

@@ -8,11 +8,25 @@
 #define ISEKAI_GRAVES           30   // names kept for the Viridian graveyard and the credits
 #define ISEKAI_CATCH_SLOTS      8    // recent catches, for over-catching
 #define ISEKAI_GRAVE_NAME_LEN   12   // POKEMON_NAME_LENGTH
+#define ISEKAI_SHARK_SLOTS      3    // POKéMON SHARKEY is holding (collateral or "interest")
 
 // What kind of battle was "in progress" when the game was last saved
 #define ISEKAI_BATTLE_NONE      0
 #define ISEKAI_BATTLE_WILD      1
 #define ISEKAI_BATTLE_TRAINER   2
+
+// A POKéMON in SHARKEY's hands.
+#define ISEKAI_SHARK_NONE        0
+#define ISEKAI_SHARK_COLLATERAL  1   // back when the loan is repaid
+#define ISEKAI_SHARK_INTEREST    2   // TONY took it; back for a ransom
+struct IsekaiSharkHeld
+{
+    u8 mon[ISEKAI_BOXMON_SIZE];
+    u16 steps;     // since he took it (warning at 4000, auction at 5000)
+    u16 ransom;    // what it costs to buy back (interest only)
+    u8 kind;
+    u8 warned;
+};
 
 struct IsekaiGrave
 {
@@ -56,6 +70,11 @@ struct IsekaiSaveData
     u8 wardMons[ISEKAI_WARD_SLOTS][ISEKAI_BOXMON_SIZE];
     // Graveyard
     struct IsekaiGrave graves[ISEKAI_GRAVES];
+    // SHARKEY (v0.12.6)
+    struct IsekaiSharkHeld sharkHeld[ISEKAI_SHARK_SLOTS];
+    u8 soldMon[ISEKAI_BOXMON_SIZE];  // auctioned; a ROCKET grunt will have it
+    u8 soldWaiting;
+    u8 tonyPending;                  // lost to TONY: he takes "interest" when the field is calm
 };
 
 #endif // GUARD_FIREREDISEKAI_SAVE_H

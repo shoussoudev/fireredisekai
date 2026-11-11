@@ -90,14 +90,43 @@ ViridianCity_PokemonCenter_1F_Text_IsekaiWardNurseAgain::
 ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkey::
 	lock
 	faceplayer
-	special IsekaiSharkDebt
-	goto_if_ne VAR_RESULT, 0, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyOwed
+	special IsekaiSharkBuildCounter
+	goto_if_eq VAR_RESULT, TRUE, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyCounter
 	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyPitch
-	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyWant, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyNo
+	dynmultichoice 0, 0, FALSE, 3, 0, DYN_MULTICHOICE_CB_NONE, ViridianCity_PokemonCenter_1F_Text_IsekaiOpt1000, ViridianCity_PokemonCenter_1F_Text_IsekaiOpt3000, ViridianCity_PokemonCenter_1F_Text_IsekaiOptNo
+	goto_if_eq VAR_RESULT, 0, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyLend
+	goto_if_eq VAR_RESULT, 1, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyCollateral
+	goto ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyNo
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyLend::
 	special IsekaiSharkLend
 	playse SE_SHOP
 	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyLent
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyCollateral::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyCollateral
+	special IsekaiSharkBuildList
+	goto_if_eq VAR_RESULT, 0, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyNothingGood
+	goto_if_eq VAR_RESULT, 0xFF, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyFull
+	dynmultistack 0, 0, FALSE, 6, FALSE, 0, DYN_MULTICHOICE_CB_NONE
+	goto_if_ge VAR_RESULT, 6, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyNo
+	copyvar VAR_0x8004, VAR_RESULT
+	setvar VAR_0x8005, 1
+	special IsekaiSharkTake
+	playse SE_SHOP
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyCollateralTaken
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyNothingGood::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyNothingGood
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyFull::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyFull
 	release
 	end
 
@@ -106,7 +135,34 @@ ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyNo::
 	release
 	end
 
-ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyOwed::
+@ He owes, or SHARKEY holds one of his POKéMON.
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyCounter::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyWhatllItBe
+	setvar VAR_0x8006, 100
+	dynmultistack 0, 0, FALSE, 6, FALSE, VAR_0x8006, DYN_MULTICHOICE_CB_NONE
+	goto_if_eq VAR_RESULT, 100, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyPayDebt
+	goto_if_ge VAR_RESULT, 3, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyLater
+	copyvar VAR_0x8004, VAR_RESULT
+	special IsekaiSharkBuyBack
+	goto_if_eq VAR_RESULT, 0, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyIsCollateral
+	goto_if_eq VAR_RESULT, 2, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyCantAfford
+	playse SE_SHOP
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyBoughtBack
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyIsCollateral::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyIsCollateral
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyCantAfford::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyCantAfford
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyPayDebt::
+	special IsekaiSharkDebt
 	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyOwed, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyLater
 	special IsekaiSharkRepay
@@ -114,6 +170,10 @@ ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyOwed::
 	playse SE_SHOP
 	goto_if_eq VAR_RESULT, 1, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyPart
 	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyPaid
+	special IsekaiSharkReturnCollateral
+	goto_if_eq VAR_RESULT, FALSE, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyEnd
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyCollateralBack
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyEnd:
 	release
 	end
 
@@ -132,11 +192,63 @@ ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyLater::
 	release
 	end
 
+ViridianCity_PokemonCenter_1F_Text_IsekaiOpt1000:
+	.string "¥1000$"
+ViridianCity_PokemonCenter_1F_Text_IsekaiOpt3000:
+	.string "¥3000 (collateral)$"
+ViridianCity_PokemonCenter_1F_Text_IsekaiOptNo:
+	.string "No thanks$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyCollateral::
+	.string "SHARKEY: ¥3000. But I hold one of\n"
+	.string "your POKéMON till it's paid back.\p"
+	.string "Nothing personal.\n"
+	.string "Just paperwork.\p"
+	.string "And not any old POKéMON. Show me\n"
+	.string "the ones that do the work.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyCollateralTaken::
+	.string "{PLAYER} handed over {STR_VAR_1}\n"
+	.string "and got ¥3000.\p"
+	.string "SHARKEY: It'll be fed.\n"
+	.string "Mostly.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyNothingGood::
+	.string "SHARKEY: Those? They've never seen\n"
+	.string "a fight. Worthless.\p"
+	.string "Take the ¥1000 deal.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyFull::
+	.string "SHARKEY: My kennels are full.\n"
+	.string "Some of them are yours, actually.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyWhatllItBe::
+	.string "SHARKEY: There he is!\n"
+	.string "What'll it be?$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyIsCollateral::
+	.string "SHARKEY: {STR_VAR_1}'s collateral.\n"
+	.string "Pay off the loan and it's yours.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyCantAfford::
+	.string "SHARKEY: {STR_VAR_1}'s ¥{STR_VAR_2}.\n"
+	.string "Come back when you're serious.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyBoughtBack::
+	.string "{PLAYER} got {STR_VAR_1} back.\p"
+	.string "SHARKEY: See? Everybody wins.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyCollateralBack::
+	.string "SHARKEY: And here's your {STR_VAR_1}.\n"
+	.string "Not a scratch on it.$"
+
 ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyPitch::
 	.string "SHARKEY: Short on cash, friend?\n"
 	.string "Everybody is, in a place like this.\p"
 	.string "I'll lend you ¥1000. Today.\n"
 	.string "No questions.\p"
+	.string "Or ¥3000, if you leave me something\n"
+	.string "to hold on to.\p"
 	.string "Pay me back whenever you like.\n"
 	.string "Plus a little something every\l"
 	.string "500 steps. Ten percent.\p"

@@ -73,3 +73,37 @@ Route1_Text_RouteSign::
 	.string "ROUTE 1\n"
 	.string "PALLET TOWN - VIRIDIAN CITY$"
 
+
+@ FireRed Isekai: the POKéMON RANGER, counting PIDGEY.
+Route1_EventScript_IsekaiRanger::
+	lock
+	goto_if_set FLAG_ISEKAI_MET_RANGER, Route1_EventScript_IsekaiRangerAgain
+	msgbox Route1_Text_IsekaiRangerCount
+	faceplayer
+	msgbox Route1_Text_IsekaiRanger
+	setflag FLAG_ISEKAI_MET_RANGER
+	release
+	end
+
+Route1_EventScript_IsekaiRangerAgain::
+	msgbox Route1_Text_IsekaiRangerAgain
+	release
+	end
+
+Route1_Text_IsekaiRangerCount:
+	.string "RANGER: Shh. Forty-one.\n"
+	.string "…Forty-two.$"
+
+Route1_Text_IsekaiRanger:
+	.string "RANGER: PIDGEY. I count them every\n"
+	.string "spring.\p"
+	.string "Half as many as when the LEAGUE\n"
+	.string "opened.\p"
+	.string "Everyone wants to catch them all.\n"
+	.string "Nobody asks where “all” goes.\p"
+	.string "…Sorry. Good luck out there.\n"
+	.string "Catch what you need.$"
+
+Route1_Text_IsekaiRangerAgain:
+	.string "RANGER: …Forty-three.\n"
+	.string "Shh.$"

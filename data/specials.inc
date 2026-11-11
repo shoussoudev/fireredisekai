@@ -56,6 +56,12 @@ gSpecials::
 	def_special IsekaiSharkDebt
 	def_special IsekaiSharkLend
 	def_special IsekaiSharkRepay
+	def_special IsekaiSharkBuildList
+	def_special IsekaiSharkTake
+	def_special IsekaiSharkReturnCollateral
+	def_special IsekaiSharkBuildCounter
+	def_special IsekaiSharkBuyBack
+	def_special IsekaiTonyDone
 	def_special SetCableClubWarp
 	def_special DoCableClubWarp, waitstate=1
 	def_special ReturnFromLinkRoom, waitstate=1

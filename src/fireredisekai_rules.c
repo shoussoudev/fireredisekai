@@ -299,6 +299,9 @@ void IsekaiOnFirstCatch(void)
 
 bool32 IsekaiOnStep(u16 metatileBehavior)
 {
+    // DAISY's grooming cooldown (FireRed counts steps for it; the expansion doesn't).
+    if (VarGet(VAR_MASSAGE_COOLDOWN_STEP_COUNTER) < 500)
+        VarSet(VAR_MASSAGE_COOLDOWN_STEP_COUNTER, VarGet(VAR_MASSAGE_COOLDOWN_STEP_COUNTER) + 1);
     if (VarGet(VAR_ISEKAI_LOAN_STATE) == 3)
     {
         u16 steps = VarGet(VAR_ISEKAI_LOAN_STEPS) + 1;
@@ -555,6 +558,8 @@ void IsekaiOnTrainerBattleStart(void)
     if (!IsekaiRulesApply())
         return;
     RecordAliveAtStart();
+    if (GetTrainerClassFromId(TRAINER_BATTLE_PARAM.opponentA) == TRAINER_CLASS_TEAM_ROCKET_FRLG)
+        IsekaiMaybeGiveGruntSoldMon(); // the auctioned POKéMON, still wearing his nickname
     if (!IsSpecialFoe() || gIsekaiTrainerArgs == NULL)
     {
         BoostOpponents(DifficultyLevelBoost());
@@ -674,13 +679,17 @@ void IsekaiOnBattleEnd(void)
     if (!IsekaiRulesApply())
         return;
 
+    IsekaiCountFights();
     sIsekai.battleType = ISEKAI_BATTLE_NONE;
     sIsekai.resetCount = 0;
     if (gBattleOutcome == B_OUTCOME_WON)
         CollectFineDebt();
     if ((gBattleTypeFlags & BATTLE_TYPE_TRAINER) && TRAINER_BATTLE_PARAM.opponentA == TRAINER_ISEKAI_SHARK_GOON
      && gBattleOutcome != B_OUTCOME_WON)
+    {
         IsekaiSharkTakesAll();
+        IsekaiTonyWillTake();
+    }
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER || gBattleOutcome == B_OUTCOME_WON
      || gBattleOutcome == B_OUTCOME_CAUGHT || gBattleOutcome == B_OUTCOME_LOST)
         IsekaiWardBattleFought();
@@ -1293,6 +1302,13 @@ bool8 IsekaiRollWillingness(struct Pokemon *wild)
     if (!IS_FRLG)
         return TRUE;
     // Route 1 never soft-locks the opening, and scripted legendaries are their own story.
+    // ...except the very first PIDGEY there, which teaches that not everything wants to come along.
+    if (gMapHeader.regionMapSectionId == MAPSEC_ROUTE_1 && species == SPECIES_PIDGEY && !FlagGet(FLAG_ISEKAI_PIDGEY_REFUSED)
+     && CheckBagHasItem(ITEM_POKE_BALL, 1))
+    {
+        FlagSet(FLAG_ISEKAI_PIDGEY_REFUSED);
+        return FALSE;
+    }
     if (gMapHeader.regionMapSectionId == MAPSEC_ROUTE_1 || (gBattleTypeFlags & BATTLE_TYPE_LEGENDARY))
         return TRUE;
     if (IsOverCaught(species))

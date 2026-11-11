@@ -4411,6 +4411,15 @@ bool32 DoesMonMeetAdditionalConditions(struct Pokemon *mon, const struct Evoluti
     return TRUE;
 }
 
+// The item that triggers a trade evolution when used: its held-item condition, or a Linking Cord.
+static enum Item IsekaiTradeEvoItem(const struct EvolutionParam *params)
+{
+    for (; params != NULL && params->condition != CONDITIONS_END; params++)
+        if (params->condition == IF_HOLD_ITEM)
+            return params->arg1;
+    return ITEM_LINKING_CORD;
+}
+
 enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode mode, enum Item evolutionItem, struct Pokemon *tradePartner, bool32 *canStopEvo, enum EvoState evoState)
 {
     int i;
@@ -4497,15 +4506,22 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
             if (SanitizeSpeciesId(evolutions[i].targetSpecies) == SPECIES_NONE)
                 continue;
 
+            bool32 isekaiTradeItem = FALSE;
             switch (evolutions[i].method)
             {
             case EVO_ITEM:
                 if (evolutions[i].param == evolutionItem)
                     conditionsMet = TRUE;
                 break;
+            // FireRed Isekai: no trading. Trade evolutions happen by using the item instead:
+            // the held item they'd need (King's Rock, Metal Coat...), or a Linking Cord.
+            case EVO_TRADE:
+                if (IsekaiTradeEvoItem(evolutions[i].params) == evolutionItem && evolutionItem != ITEM_NONE)
+                    conditionsMet = isekaiTradeItem = TRUE;
+                break;
             }
 
-            if (conditionsMet && DoesMonMeetAdditionalConditions(mon, evolutions[i].params, NULL, PARTY_SIZE, canStopEvo, evoState))
+            if (conditionsMet && (isekaiTradeItem || DoesMonMeetAdditionalConditions(mon, evolutions[i].params, NULL, PARTY_SIZE, canStopEvo, evoState)))
             {
                 // All checks passed, so stop checking the rest of the evolutions.
                 // This is different from vanilla where the loop continues.

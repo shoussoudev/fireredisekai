@@ -33,6 +33,9 @@
 #define FLAG_ISEKAI_WARD_NURSE_MET   FLAG_0x0B9 // met the ward nurse
 #define FLAG_ISEKAI_PARCEL_OPENED    FLAG_0x0BB // opened Oak's parcel on the way
 #define FLAG_ISEKAI_NURSE_FREE_SAID  FLAG_0x0BC // the nurse explained free healing for new trainers
+#define FLAG_ISEKAI_PIDGEY_REFUSED   FLAG_0x0BD // the first Route 1 PIDGEY wouldn't be caught
+#define FLAG_ISEKAI_MET_RANGER       FLAG_0x0BE // heard the RANGER's count on Route 1
+#define FLAG_ISEKAI_DAISY_RATES      FLAG_0x0BF // DAISY offered to read friendship and groom
 #define FLAG_ISEKAI_KEVIN_BEATEN     FLAG_0x0BA // beat KEVIN (FLAG_ISEKAI_KEVIN_DONE = met him)
 
 // Hide/show flags

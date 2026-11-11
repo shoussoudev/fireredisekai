@@ -23,7 +23,9 @@ PalletTown_RivalsHouse_EventScript_Daisy::
 	faceplayer
 	famechecker FAMECHECKER_DAISY, FCPICKSTATE_COLORED, UpdatePickStateFromSpecialVar8005
 	goto_if_set FLAG_SYS_GAME_CLEAR, PalletTown_RivalsHouse_EventScript_GroomMon
-	goto_if_eq RECEIVED_TOWN_MAP, TRUE, PalletTown_RivalsHouse_EventScript_PleaseGiveMonsRest
+	@ FireRed Isekai: after the TOWN MAP, she reads how much his POKéMON like him, and grooms them
+	@ (so players can check friendship long before the post-game).
+	goto_if_eq RECEIVED_TOWN_MAP, TRUE, PalletTown_RivalsHouse_EventScript_IsekaiDaisyRates
 	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_RIVALS_HOUSE, 2, PalletTown_RivalsHouse_EventScript_ExplainTownMap
 	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_RIVALS_HOUSE, 1, PalletTown_RivalsHouse_EventScript_GiveTownMap
 	goto_if_ge VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 1, PalletTown_RivalsHouse_EventScript_HeardBattledRival
@@ -33,6 +35,21 @@ PalletTown_RivalsHouse_EventScript_Daisy::
 	waitmovement 0
 	release
 	end
+
+PalletTown_RivalsHouse_EventScript_IsekaiDaisyRates::
+	goto_if_set FLAG_ISEKAI_DAISY_RATES, PalletTown_RivalsHouse_EventScript_GroomMon
+	setflag FLAG_ISEKAI_DAISY_RATES
+	msgbox PalletTown_RivalsHouse_Text_IsekaiDaisyRates
+	goto PalletTown_RivalsHouse_EventScript_GroomMon
+
+PalletTown_RivalsHouse_Text_IsekaiDaisyRates::
+	.string "DAISY: Oh. It's you again.\p"
+	.string "Well… since you're here.\n"
+	.string "I'm good with POKéMON, you know.\p"
+	.string "I can tell how much they like\n"
+	.string "someone just by looking.\p"
+	.string "And I groom them. For free.\n"
+	.string "Grandpa's never once paid me.$"
 
 PalletTown_RivalsHouse_EventScript_HeardBattledRival::
 	msgbox PalletTown_RivalsHouse_Text_HeardYouBattledRival

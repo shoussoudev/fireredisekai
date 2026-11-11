@@ -779,6 +779,8 @@ extern const u8 IsekaiEventScript_FineFromWinnings[];
 extern const u8 IsekaiEventScript_OpenParcel[];
 extern const u8 IsekaiEventScript_SharkGoon[];
 extern const u8 IsekaiEventScript_CarePlanLapsed[];
+extern const u8 IsekaiEventScript_TonyTakes[];
+extern const u8 IsekaiEventScript_SharkCall[];
 extern const u8 gOakSpeech_Text_HowMuchSleep[];
 extern const u8 gOakSpeech_Text_SleepMeansHard[];
 extern const u8 gOakSpeech_Text_SleepMeansNormal[];
