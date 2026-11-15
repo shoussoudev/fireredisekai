@@ -6,6 +6,7 @@
 #include "fireredisekai.h"
 #include "main.h"
 #include "metatile_behavior.h"
+#include "item.h"
 #include "money.h"
 #include "overworld.h"
 #include "party_menu.h"
@@ -738,4 +739,16 @@ static void TickHeldMons(void)
             sPendingSharkCall = 2;
         }
     }
+}
+
+// Lied to Oak about the parcel: he takes back the five POKé BALLS he lent (what's left of them).
+// VAR_RESULT / STR_VAR_1 = how many.
+void IsekaiTakeBackBalls(void)
+{
+    u32 have = CountTotalItemQuantityInBag(ITEM_POKE_BALL);
+    u32 take = have < 5 ? have : 5;
+    if (take != 0)
+        RemoveBagItem(ITEM_POKE_BALL, take);
+    ConvertIntToDecimalStringN(gStringVar1, take, STR_CONV_MODE_LEFT_ALIGN, 2);
+    gSpecialVar_Result = take;
 }

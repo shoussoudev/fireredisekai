@@ -80,6 +80,7 @@ void IsekaiSharkTake(void);
 void IsekaiSharkReturnCollateral(void);
 void IsekaiSharkBuildCounter(void);
 void IsekaiSharkBuyBack(void);
+void IsekaiTakeBackBalls(void);
 u32 IsekaiForfeitForbidden(void);
 void IsekaiWardBattleFought(void);
 bool32 IsekaiReturnCenterLoaner(void);

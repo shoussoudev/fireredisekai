@@ -35,8 +35,11 @@ ViridianCity_PokemonCenter_1F_Text_FeelFreeToUsePC::
 ViridianCity_PokemonCenter_1F_Text_PokeCenterInEveryTown::
 	.string "There's a POKéMON CENTER in every\n"
 	.string "town ahead.\p"
-	.string "They charge no money, so don't\n"
-	.string "be shy about healing POKéMON.$"
+	.string "Healing's free while you're new.\n"
+	.string "Once you've got a BADGE, bring\l"
+	.string "cash.\p"
+	.string "Or sign up for that CARE PLAN.\n"
+	.string "My mum swears by it.$"
 
 ViridianCity_PokemonCenter_1F_Text_PokeCentersHealMons::
 	.string "POKéMON CENTERS heal your tired,\n"
@@ -90,6 +93,7 @@ ViridianCity_PokemonCenter_1F_Text_IsekaiWardNurseAgain::
 ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkey::
 	lock
 	faceplayer
+	goto_if_unset FLAG_BADGE01_GET, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyTourist
 	special IsekaiSharkBuildCounter
 	goto_if_eq VAR_RESULT, TRUE, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyCounter
 	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyPitch
@@ -97,6 +101,20 @@ ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkey::
 	goto_if_eq VAR_RESULT, 0, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyLend
 	goto_if_eq VAR_RESULT, 1, ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyCollateral
 	goto ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyNo
+
+@ He doesn't lend to trainers without a BADGE.
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyTourist::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyTourist
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyTourist:
+	.string "SHARKEY: Got a BADGE?\n"
+	.string "…No?\p"
+	.string "Then you're a tourist. I don't lend\n"
+	.string "to tourists. Bad for business.\p"
+	.string "Come back when you've beaten\n"
+	.string "somebody who matters.$"
 
 ViridianCity_PokemonCenter_1F_EventScript_IsekaiSharkeyLend::
 	special IsekaiSharkLend

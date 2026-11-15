@@ -502,6 +502,9 @@ IsekaiEventScript_WantedReminder::
 	switch VAR_0x8004
 	case 0, IsekaiEventScript_Wanted_Poster
 	case 1, IsekaiEventScript_Wanted_Clerk
+	case 3, IsekaiEventScript_Wanted_Fence
+	case 4, IsekaiEventScript_Wanted_Kid
+	case 5, IsekaiEventScript_Wanted_Door
 	msgbox IsekaiText_Wanted_Whisper
 	releaseall
 	end
@@ -513,6 +516,34 @@ IsekaiEventScript_Wanted_Clerk:
 	msgbox IsekaiText_Wanted_Clerk
 	releaseall
 	end
+
+IsekaiEventScript_Wanted_Fence:
+	msgbox IsekaiText_Wanted_Fence
+	releaseall
+	end
+IsekaiEventScript_Wanted_Kid:
+	msgbox IsekaiText_Wanted_Kid
+	releaseall
+	end
+IsekaiEventScript_Wanted_Door:
+	msgbox IsekaiText_Wanted_Door
+	releaseall
+	end
+
+IsekaiText_Wanted_Fence:
+	.string "Someone has pinned a WANTED poster\n"
+	.string "to a fence post.\p"
+	.string "It's you. They got the tired eyes\n"
+	.string "right.$"
+
+IsekaiText_Wanted_Kid:
+	.string "A kid points at you.\p"
+	.string "“MUM! It's the POKéMON thief!”\p"
+	.string "His mum pulls him inside.$"
+
+IsekaiText_Wanted_Door:
+	.string "Somewhere nearby, a door shuts.\n"
+	.string "Then a lock clicks.$"
 
 IsekaiText_Wanted_Poster:
 	.string "A poster by the door:\p"

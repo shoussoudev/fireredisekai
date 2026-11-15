@@ -155,7 +155,8 @@ static void WarpToTruck(void)
     FlagSet(FLAG_HIDE_OAK_IN_PALLET_TOWN);
     FlagSet(FLAG_HIDE_RIVAL_IN_LAB);
     FlagSet(FLAG_HIDE_BULBASAUR_BALL);
-    VarSet(VAR_ISEKAI_LOAN_STATE, 1);
+    VarSet(VAR_ISEKAI_LOAN_STATE, 2);
+    AddBagItem(ITEM_POKE_BALL, 5);
     VarSet(VAR_ISEKAI_LOAN_DEPOSIT, 3000);
     SetMoney(&gSaveBlock1Ptr->money, 0);
     ScriptGiveMon(SPECIES_PSYDUCK, 7, ITEM_NONE);

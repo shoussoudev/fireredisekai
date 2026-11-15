@@ -274,12 +274,12 @@ static bool32 IsSaveBuilding(void)
 // save; leaving one means coming back saves again.
 void IsekaiOnMapWarp(void)
 {
-    // While wanted, Centers and Marts now and then remind him (posters by the door).
-    // (Buildings no longer autosave since v0.10.5; manual SAVE is back.)
+    // While wanted (he kept Oak's POKéMON), people notice him everywhere: about one map in six.
     sPendingWantedReminder = FALSE;
-    if (FlagGet(FLAG_ISEKAI_WANTED) && IsSaveBuilding()
-     && gSaveBlock1Ptr->location.mapGroup != MAP_GROUP(MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB)
-     && (Random() % 2) == 0)
+    if (FlagGet(FLAG_ISEKAI_WANTED)
+     && !(gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB)
+       && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB))
+     && (Random() % 6) == 0)
         sPendingWantedReminder = TRUE;
 }
 
@@ -968,7 +968,7 @@ bool32 IsekaiFieldIdle(void)
     if (sPendingWantedReminder)
     {
         sPendingWantedReminder = FALSE;
-        gSpecialVar_0x8004 = Random() % 3;
+        gSpecialVar_0x8004 = Random() % 3 + (gMapHeader.mapType == MAP_TYPE_INDOOR ? 0 : 3); // 3-5: outdoors
         LockPlayerFieldControls();
         ScriptContext_SetupScript(IsekaiEventScript_WantedReminder);
         return TRUE;

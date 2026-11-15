@@ -193,7 +193,7 @@ IsekaiEventScript_Nurse_OfferPlanEnd:
 
 IsekaiText_Nurse_Newbie:
 	.string "You're new around here, aren't you?\p"
-	.string "First visits are on the house until\n"
+	.string "Healing is on the house until\n"
 	.string "you've earned a BADGE.\l"
 	.string "Everyone's new once.$"
 

@@ -116,6 +116,7 @@ ViridianCity_EventScript_TeachyTVNotHelpful::
 	end
 
 ViridianCity_EventScript_TutorialCompleted::
+	goto_if_set FLAG_ISEKAI_SKIPPED_DEMO, ViridianCity_EventScript_TutorialStart
 	msgbox ViridianCity_Text_WeakenMonsFirstToCatch
 	release
 	end
@@ -220,7 +221,9 @@ ViridianCity_EventScript_TutorialTriggerRight::
 	end
 
 ViridianCity_EventScript_DoTutorialBattle::
-	msgbox ViridianCity_Text_ShowYouHowToCatchMons
+	msgbox ViridianCity_Text_ShowYouHowToCatchMons, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, ViridianCity_EventScript_IsekaiDemoDeclined
+	clearflag FLAG_ISEKAI_SKIPPED_DEMO
 	closemessage
 	special StartOldManTutorialBattle
 	waitstate
@@ -275,6 +278,20 @@ ViridianCity_Text_ThisIsPrivateProperty::
 	.string "going through here!\p"
 	.string "This is private property!$"
 
+@ FireRed Isekai: the demo is optional. Say no and he lets you pass; ask him later if you change your mind.
+ViridianCity_EventScript_IsekaiDemoDeclined::
+	msgbox ViridianCity_Text_IsekaiDemoDeclined
+	setvar VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 2
+	setflag FLAG_ISEKAI_SKIPPED_DEMO
+	return
+
+ViridianCity_Text_IsekaiDemoDeclined::
+	.string "Know it all already, eh?\n"
+	.string "Young people.\p"
+	.string "Ask me if you change your mind.\n"
+	.string "I'm not going anywhere.\l"
+	.string "Not at my age.$"
+
 ViridianCity_Text_ShowYouHowToCatchMons::
 	.string "Well, now, I've had my coffee, and\n"
 	.string "that's what I need to get going!\p"
@@ -284,7 +301,7 @@ ViridianCity_Text_ShowYouHowToCatchMons::
 	.string "is it?\p"
 	.string "(You said that exact thing on\n"
 	.string "ROUTE 1. Out loud. Alone.)\p"
-	.string "Let me show you how it's done.$"
+	.string "Want me to show you how it's done?$"
 
 ViridianCity_Text_ThatWasEducationalTakeThis::
 	.string "You hold that POKé BALL like you've\n"
