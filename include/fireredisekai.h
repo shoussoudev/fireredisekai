@@ -81,6 +81,7 @@ void IsekaiSharkReturnCollateral(void);
 void IsekaiSharkBuildCounter(void);
 void IsekaiSharkBuyBack(void);
 void IsekaiTakeBackBalls(void);
+void IsekaiPoisonDeath(struct Pokemon *mon);
 u32 IsekaiForfeitForbidden(void);
 void IsekaiWardBattleFought(void);
 bool32 IsekaiReturnCenterLoaner(void);

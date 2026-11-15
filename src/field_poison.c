@@ -1,4 +1,7 @@
 #include "global.h"
+#include "fireredisekai.h"
+#include "event_data.h"
+#include "party_menu.h"
 #include "battle.h"
 #include "battle_pike.h"
 #include "battle_pyramid.h"
@@ -18,6 +21,15 @@
 #include "constants/field_poison.h"
 #include "constants/form_change_types.h"
 #include "constants/party_menu.h"
+
+// FireRed Isekai: before the first BADGE, poison stops at 1 HP (4th-gen style).
+// After it, poison can kill: a POKéMON that drops to 0 HP while walking dies.
+static bool32 PoisonKills(void)
+{
+    return IS_FRLG && FlagGet(FLAG_BADGE01_GET);
+}
+
+static const u8 sText_IsekaiPoisonDeath[] = _("{STR_VAR_1} collapsed.\nThe poison was too much…\p{STR_VAR_1} is gone.\p");
 
 static bool32 IsMonValidSpecies(struct Pokemon *pokemon)
 {
@@ -52,12 +64,14 @@ static void FaintFromFieldPoison(u8 partyIdx)
     SetMonData(pokemon, MON_DATA_STATUS, &status);
     GetMonData(pokemon, MON_DATA_NICKNAME, gStringVar1);
     StringGet_Nickname(gStringVar1);
+    if (PoisonKills())
+        IsekaiPoisonDeath(pokemon); // buried; the party is tidied up once the messages are done
 }
 
 static bool32 MonFaintedFromPoison(u8 partyIdx)
 {
     struct Pokemon *pokemon = &gParties[B_TRAINER_PLAYER][partyIdx];
-    if (IsMonValidSpecies(pokemon) && GetMonData(pokemon, MON_DATA_HP) == ((OW_POISON_DAMAGE < GEN_4) ? 0 : 1) && GetAilmentFromStatus(GetMonData(pokemon, MON_DATA_STATUS)) == AILMENT_PSN)
+    if (IsMonValidSpecies(pokemon) && GetMonData(pokemon, MON_DATA_HP) == ((OW_POISON_DAMAGE < GEN_4 || PoisonKills()) ? 0 : 1) && GetAilmentFromStatus(GetMonData(pokemon, MON_DATA_STATUS)) == AILMENT_PSN)
         return TRUE;
 
     return FALSE;
@@ -76,8 +90,9 @@ static void Task_TryFieldPoisonWhiteOut(u8 taskId)
         {
             if (MonFaintedFromPoison(tPartyIdx))
             {
+                bool32 kills = PoisonKills();
                 FaintFromFieldPoison(tPartyIdx);
-                ShowFieldMessage(gText_PkmnFainted_FldPsn);
+                ShowFieldMessage(kills ? sText_IsekaiPoisonDeath : gText_PkmnFainted_FldPsn);
                 tState++;
                 return;
             }
@@ -90,6 +105,8 @@ static void Task_TryFieldPoisonWhiteOut(u8 taskId)
             tState--;
         break;
     case 2:
+        if (PoisonKills())
+            CompactPartySlots();
         if (AllMonsFainted())
         {
             // Battle facilities have their own white out script to handle the challenge loss
@@ -136,12 +153,12 @@ s32 DoPoisonFieldEffect(void)
         {
             // Apply poison damage
             hp = GetMonData(pokemon, MON_DATA_HP);
-            if (OW_POISON_DAMAGE < GEN_4 && (hp == 0 || --hp == 0))
+            if ((OW_POISON_DAMAGE < GEN_4 || PoisonKills()) && (hp == 0 || --hp == 0))
             {
                 TryFormChange(&gParties[B_TRAINER_PLAYER][i], FORM_CHANGE_FAINT, B_TRAINER_PLAYER);
                 numFainted++;
             }
-            else if (OW_POISON_DAMAGE >= GEN_4 && (hp == 1 || --hp == 1))
+            else if (OW_POISON_DAMAGE >= GEN_4 && !PoisonKills() && (hp == 1 || --hp == 1))
                 numFainted++;
 
             SetMonData(pokemon, MON_DATA_HP, &hp);

@@ -199,6 +199,16 @@ static void BuryMon(struct Pokemon *mon)
     sIsekai.graveCount++;
 }
 
+// Poison killed it while walking (after the first BADGE).
+void IsekaiPoisonDeath(struct Pokemon *mon)
+{
+    if (IsekaiIsLoaner(mon))
+        FlagSet(FLAG_ISEKAI_LOANER_DIED);
+    BuryMon(mon);
+    ZeroMonData(mon);
+    sAutosavePending = TRUE; // something important happened
+}
+
 u8 IsekaiGraveCount(void)
 {
     return sIsekai.graveCount;
