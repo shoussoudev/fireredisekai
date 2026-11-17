@@ -20,6 +20,7 @@
 #include "roamer.h"
 #include "safari_zone.h"
 #include "script.h"
+#include "rtc.h"
 #include "string_util.h"
 #include "tv.h"
 #include "wild_encounter.h"
@@ -638,11 +639,14 @@ static u32 IsekaiCordonPerk(const struct WildPokemon *wildPokemon, u32 index, u3
 // 1 time in N; otherwise the slot is rolled again.
 static bool32 IsekaiTooRare(enum Species species)
 {
+    // HOUNDOUR only comes out at night (as on Route 7 in Gold and Silver).
+    if (species == SPECIES_HOUNDOUR && GetTimeOfDay() != TIME_NIGHT)
+        return TRUE;
     if (IsekaiIsCordon())
         return FALSE;
     switch (species)
     {
-    case SPECIES_RIOLU:  return (Random() % 2) != 0;   // 1% slot -> ~1 in 200 Route 2 encounters
+    case SPECIES_RIOLU:  return (Random() % 2) != 0;   // 1% slot -> ~1 in 200 Rock Tunnel encounters
     case SPECIES_FEEBAS: return (Random() % 40) != 0;  // 20% Good Rod slot -> ~1 in 200 bites
     default:             return FALSE;
     }
