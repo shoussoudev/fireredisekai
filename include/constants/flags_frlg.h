@@ -37,6 +37,7 @@
 #define FLAG_ISEKAI_MET_RANGER       FLAG_0x0BE // heard the RANGER's count on Route 1
 #define FLAG_ISEKAI_DAISY_RATES      FLAG_0x0BF // DAISY offered to read friendship and groom
 #define FLAG_ISEKAI_SKIPPED_DEMO     FLAG_0x0C0 // said no to the old man's catching demo (can ask later)
+#define FLAG_ISEKAI_RANGER_MINDFUL   FLAG_0x0C1 // the RANGER asked him to catch mindfully
 #define FLAG_ISEKAI_KEVIN_BEATEN     FLAG_0x0BA // beat KEVIN (FLAG_ISEKAI_KEVIN_DONE = met him)
 
 // Hide/show flags

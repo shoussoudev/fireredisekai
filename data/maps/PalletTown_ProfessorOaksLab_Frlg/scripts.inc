@@ -1900,6 +1900,7 @@ PalletTown_ProfessorOaksLab_EventScript_IsekaiParcel::
 	goto_if_set FLAG_ISEKAI_PARCEL_OPENED, PalletTown_ProfessorOaksLab_EventScript_IsekaiParcelOpened
 	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiErrandDone
 PalletTown_ProfessorOaksLab_EventScript_IsekaiParcelState:
+	call_if_eq VAR_ISEKAI_LOAN_STATE, 2, PalletTown_ProfessorOaksLab_EventScript_IsekaiAfterParcelNoCatch
 	setvar VAR_MAP_SCENE_VIRIDIAN_CITY_MART, 2
 	setvar VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 1
 	setvar VAR_MAP_SCENE_PALLET_TOWN_RIVALS_HOUSE, 1
@@ -2107,6 +2108,25 @@ PalletTown_ProfessorOaksLab_Text_IsekaiParcelLied::
 PalletTown_ProfessorOaksLab_Text_IsekaiHandedBackBalls::
 	.string "{PLAYER} handed back {STR_VAR_1}\n"
 	.string "POKé BALL(S).$"
+
+@ Parcel delivered but nothing caught yet: what to do next.
+PalletTown_ProfessorOaksLab_EventScript_IsekaiAfterParcelNoCatch::
+	msgbox PalletTown_ProfessorOaksLab_Text_IsekaiAfterParcelNoCatch
+	return
+
+PalletTown_ProfessorOaksLab_Text_IsekaiAfterParcelNoCatch::
+	.string "OAK: Now. You still haven't caught\n"
+	.string "anything, have you?\p"
+	.string "Catch one that wants to come with\n"
+	.string "you. Then bring my POKéMON back.\p"
+	.string "And while you're out that way…\n"
+	.string "PEWTER is past VIRIDIAN FOREST.\p"
+	.string "Look in on DR. PEBBLE at the\n"
+	.string "MUSEUM. He hasn't answered my\l"
+	.string "letters in weeks.\p"
+	.string "There's a GYM there too. Try your\n"
+	.string "luck, if you feel like it.\p"
+	.string "…Carefully.$"
 
 PalletTown_ProfessorOaksLab_Text_IsekaiErrandDone::
 	.string "OAK: Good. You can follow simple\n"

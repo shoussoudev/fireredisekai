@@ -86,9 +86,28 @@ Route1_EventScript_IsekaiRanger::
 	end
 
 Route1_EventScript_IsekaiRangerAgain::
+	goto_if_set FLAG_ISEKAI_RANGER_MINDFUL, Route1_EventScript_IsekaiRangerCount
+	goto_if_ge VAR_ISEKAI_LOAN_STATE, 3, Route1_EventScript_IsekaiRangerMindful
+Route1_EventScript_IsekaiRangerCount:
 	msgbox Route1_Text_IsekaiRangerAgain
 	release
 	end
+
+@ He's caught something since: one quiet request.
+Route1_EventScript_IsekaiRangerMindful::
+	faceplayer
+	msgbox Route1_Text_IsekaiRangerMindful
+	setflag FLAG_ISEKAI_RANGER_MINDFUL
+	release
+	end
+
+Route1_Text_IsekaiRangerMindful:
+	.string "RANGER: …You caught one.\n"
+	.string "I can tell. You walk differently.\p"
+	.string "Try being mindful when you catch\n"
+	.string "them, please.\p"
+	.string "Every one you take is one fewer\n"
+	.string "in my count.$"
 
 Route1_Text_IsekaiRangerCount:
 	.string "RANGER: Shh. Forty-one.\n"

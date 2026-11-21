@@ -291,7 +291,10 @@ IsekaiEventScript_CenterWard_StillResting:
 	special IsekaiWardQuote
 	goto_if_eq VAR_RESULT, 2, IsekaiEventScript_CenterWard_CantPay
 	goto_if_eq VAR_RESULT, 0, IsekaiEventScript_CenterWard_Paid
+	showmoneybox 18, 0
+	special IsekaiWardQuote @ again: drawing the money box reuses STR_VAR_1
 	msgbox IsekaiText_WardFee, MSGBOX_YESNO
+	hidemoneybox
 	goto_if_eq VAR_RESULT, NO, IsekaiEventScript_CenterWard_Declined
 	special IsekaiPayWard
 	playse SE_SHOP

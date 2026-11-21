@@ -123,10 +123,15 @@ IsekaiEventScript_Nurse_Insured::
 	goto EventScript_PkmnCenterNurse_DoHeal_Frlg
 
 IsekaiEventScript_Nurse_Quote::
+	showmoneybox 18, 0
+	special IsekaiHealQuote @ again: drawing the money box reuses STR_VAR_1
 	msgbox IsekaiText_Nurse_Quote, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, IsekaiEventScript_Nurse_NotToday
+	goto_if_eq VAR_RESULT, NO, IsekaiEventScript_Nurse_NotTodayMoney
 	special IsekaiPayHeal
+	updatemoneybox
 	playse SE_SHOP
+	waitse
+	hidemoneybox
 	message Text_TakeYourPkmnForFewSeconds_Frlg
 	waitmessage
 	call EventScript_PkmnCenterNurse_TakeAndHealPkmn_Frlg
@@ -135,6 +140,8 @@ IsekaiEventScript_Nurse_Quote::
 	goto EventScript_PkmnCenterNurse_CheckTrainerTowerAndUnionRoom_Frlg
 	end
 
+IsekaiEventScript_Nurse_NotTodayMoney::
+	hidemoneybox
 IsekaiEventScript_Nurse_NotToday::
 	call IsekaiEventScript_CenterWard
 	msgbox Text_WeHopeToSeeYouAgain_Frlg
@@ -142,7 +149,10 @@ IsekaiEventScript_Nurse_NotToday::
 
 @ Not enough money for everyone: one at a time.
 IsekaiEventScript_Nurse_CantAfford::
+	showmoneybox 18, 0
+	special IsekaiHealQuote
 	msgbox IsekaiText_Nurse_CantAfford
+	hidemoneybox
 IsekaiEventScript_Nurse_PickOne:
 	msgbox IsekaiText_Nurse_WhoFirst
 	special ChoosePartyMon
@@ -151,14 +161,22 @@ IsekaiEventScript_Nurse_PickOne:
 	special IsekaiHealOneQuote
 	goto_if_eq VAR_RESULT, 0, IsekaiEventScript_Nurse_PickFine
 	goto_if_eq VAR_RESULT, 2, IsekaiEventScript_Nurse_PickTooMuch
+	showmoneybox 18, 0
+	special IsekaiHealOneQuote
 	msgbox IsekaiText_Nurse_OneQuote, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, IsekaiEventScript_Nurse_PickOne
+	goto_if_eq VAR_RESULT, NO, IsekaiEventScript_Nurse_PickOneNo
 	special IsekaiHealOne
+	updatemoneybox
 	playse SE_SHOP
 	waitse
+	hidemoneybox
 	playfanfare MUS_HEAL
 	msgbox IsekaiText_Nurse_OneHealed
 	waitfanfare
+	goto IsekaiEventScript_Nurse_PickOne
+
+IsekaiEventScript_Nurse_PickOneNo:
+	hidemoneybox
 	goto IsekaiEventScript_Nurse_PickOne
 
 IsekaiEventScript_Nurse_PickFine:
@@ -177,6 +195,8 @@ IsekaiEventScript_Nurse_PickDone:
 IsekaiEventScript_Nurse_OfferPlan::
 	special IsekaiCarePlanShouldOffer
 	goto_if_eq VAR_RESULT, FALSE, IsekaiEventScript_Nurse_OfferPlanEnd
+	msgbox IsekaiText_Nurse_PlanAsk, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, IsekaiEventScript_Nurse_PlanDeclined
 	msgbox IsekaiText_Nurse_PlanPitch, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, IsekaiEventScript_Nurse_PlanDeclined
 	special IsekaiCarePlanSignUp
@@ -229,9 +249,11 @@ IsekaiText_Nurse_PickTooMuch:
 	.string "{STR_VAR_2} would be ¥{STR_VAR_1}.\n"
 	.string "…I'm sorry.$"
 
+IsekaiText_Nurse_PlanAsk:
+	.string "Could I tell you about our\n"
+	.string "POKé CARE PLAN? It's quick.$"
+
 IsekaiText_Nurse_PlanPitch:
-	.string "By the way… have you heard of the\n"
-	.string "POKé CARE PLAN?\p"
 	.string "¥{STR_VAR_3} every 500 steps, and all\n"
 	.string "your healing is free!\l"
 	.string "Ward care is half price!\p"
