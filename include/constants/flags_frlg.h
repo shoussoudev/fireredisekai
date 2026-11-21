@@ -39,6 +39,17 @@
 #define FLAG_ISEKAI_SKIPPED_DEMO     FLAG_0x0C0 // said no to the old man's catching demo (can ask later)
 #define FLAG_ISEKAI_RANGER_MINDFUL   FLAG_0x0C1 // the RANGER asked him to catch mindfully
 #define FLAG_ISEKAI_DEATH_CALL_DONE  FLAG_0x0C2 // someone already phoned to explain what death means
+#define FLAG_ISEKAI_POTION_ACTIVE    FLAG_0x0C3 // drank the ward nurse's potion: next battle, lead is confused
+#define FLAG_ISEKAI_MUSEUM_TOUR      FLAG_0x0C4 // Dr. Pebble's tour done
+#define FLAG_ISEKAI_MUSEUM_STEPS     FLAG_0x0C5 // sat on the museum steps with the elder
+#define FLAG_ISEKAI_BLAISIA_1        FLAG_0x0C6 // met BLAISIA on Route 3
+#define FLAG_HIDE_ISEKAI_BLAISIA_1   FLAG_0x0C7 // BLAISIA has moved off the path
+#define FLAG_HIDE_ISEKAI_PEWTER_ELDER FLAG_0x0C8 // the elder on the museum steps
+#define FLAG_ISEKAI_ROM_CALLED_ONCE  FLAG_0x0C9 // a partner has phoned a CENTER at least once
+#define FLAG_ISEKAI_MUSEUM_PAID      FLAG_0x0CA // paid (or was let in) at the museum
+#define FLAG_ISEKAI_SNES_SEEN        FLAG_0x0CB // looked at the broken SNES with Red's mum
+#define FLAG_ISEKAI_LOANER_GREW_UP   FLAG_0x0CC // the loaner saw the BADGE and lost its quirk
+#define FLAG_ISEKAI_FOREST_KID       FLAG_0x0CD // (unused)
 #define FLAG_ISEKAI_KEVIN_BEATEN     FLAG_0x0BA // beat KEVIN (FLAG_ISEKAI_KEVIN_DONE = met him)
 
 // Hide/show flags

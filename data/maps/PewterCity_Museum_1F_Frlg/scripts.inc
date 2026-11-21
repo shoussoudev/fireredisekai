@@ -100,14 +100,23 @@ PewterCity_Museum_1F_EventScript_PlayerApproachCounterRight::
 	waitmovement 0
 	return
 
+@ FireRed Isekai: broke after Oak's deposit? The receptionist sighs and lets him in.
 PewterCity_Museum_1F_EventScript_NotEnoughMoney::
-	msgbox PewterCity_Museum_1F_Text_DontHaveEnoughMoney
+	msgbox PewterCity_Museum_1F_Text_IsekaiSighLetIn
 	closemessage
+	call_if_eq VAR_TEMP_1, 0, PewterCity_Museum_1F_EventScript_PlayerApproachCounterLeft
+	call_if_eq VAR_TEMP_1, 1, PewterCity_Museum_1F_EventScript_PlayerApproachCounterMid
+	call_if_eq VAR_TEMP_1, 2, PewterCity_Museum_1F_EventScript_PlayerApproachCounterRight
+	setvar VAR_MAP_SCENE_PEWTER_CITY_MUSEUM_1F, 1
 	hidemoneybox
-	applymovement LOCALID_PLAYER, PewterCity_Museum_1F_Movement_ForcePlayerExit
-	waitmovement 0
 	releaseall
 	end
+
+PewterCity_Museum_1F_Text_IsekaiSighLetIn::
+	.string "…You can't afford ¥50?\p"
+	.string "(The receptionist looks at you for\n"
+	.string "a long time. Then sighs.)\p"
+	.string "Go on. Just go.$"
 
 PewterCity_Museum_1F_Movement_ForcePlayerExit::
 	walk_down
@@ -131,9 +140,206 @@ PewterCity_Museum_1F_Movement_ApproachCounterRight::
 	walk_in_place_right
 	step_end
 
+@ FireRed Isekai (v0.14): DR. PEBBLE, researcher of strange phenomena.
 PewterCity_Museum_1F_EventScript_Scientist2::
-	msgbox PewterCity_Museum_1F_Text_WeHaveTwoFossilsOnExhibit, MSGBOX_NPC
+	lock
+	faceplayer
+	textcolor NPC_TEXT_COLOR_MALE
+	goto_if_unset FLAG_ISEKAI_MUSEUM_TOUR, PewterCity_Museum_1F_EventScript_IsekaiPebbleTour
+	goto_if_eq VAR_ISEKAI_MUM_QUEST, MUM_QUEST_ADAPTER, PewterCity_Museum_1F_EventScript_IsekaiPebbleAdapter
+	goto_if_eq VAR_ISEKAI_MUM_QUEST, MUM_QUEST_ASSISTANT, PewterCity_Museum_1F_EventScript_IsekaiPebbleQuiz
+	msgbox PewterCity_Museum_1F_Text_IsekaiPebbleAgain
+	release
 	end
+
+PewterCity_Museum_1F_EventScript_IsekaiPebbleTour::
+	msgbox PewterCity_Museum_1F_Text_IsekaiPebbleTour1
+	msgbox PewterCity_Museum_1F_Text_IsekaiPebbleTour2
+	msgbox PewterCity_Museum_1F_Text_IsekaiPebbleTour3
+	setflag FLAG_ISEKAI_MUSEUM_TOUR
+	closemessage
+	fadescreen FADE_TO_BLACK
+	msgbox PewterCity_Museum_1F_Text_IsekaiSteps
+	msgbox PewterCity_Museum_1F_Text_IsekaiElderSteps
+	setflag FLAG_ISEKAI_MUSEUM_STEPS
+	fadescreen FADE_FROM_BLACK
+	release
+	end
+
+PewterCity_Museum_1F_EventScript_IsekaiPebbleAdapter::
+	msgbox PewterCity_Museum_1F_Text_IsekaiPebbleAdapterAsk
+	msgbox PewterCity_Museum_1F_Text_IsekaiPebbleReady, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, PewterCity_Museum_1F_EventScript_IsekaiPebbleLater
+	msgbox PewterCity_Museum_1F_Text_IsekaiPebbleAssistant
+	closemessage
+	trainerbattle_no_intro TRAINER_ISEKAI_PEBBLE_ASSISTANT, PewterCity_Museum_1F_Text_IsekaiAssistantDefeat
+	setvar VAR_ISEKAI_MUM_QUEST, MUM_QUEST_ASSISTANT
+	msgbox PewterCity_Museum_1F_Text_IsekaiPebbleNowQuiz
+PewterCity_Museum_1F_EventScript_IsekaiPebbleQuiz::
+	msgbox PewterCity_Museum_1F_Text_IsekaiQuiz1
+	dynmultichoice 0, 0, TRUE, 3, 0, DYN_MULTICHOICE_CB_NONE, PewterCity_Museum_1F_Text_IsekaiQ1A, PewterCity_Museum_1F_Text_IsekaiQ1B, PewterCity_Museum_1F_Text_IsekaiQ1C
+	goto_if_ne VAR_RESULT, 1, PewterCity_Museum_1F_EventScript_IsekaiQuizFail
+	msgbox PewterCity_Museum_1F_Text_IsekaiQuiz2
+	dynmultichoice 0, 0, TRUE, 3, 0, DYN_MULTICHOICE_CB_NONE, PewterCity_Museum_1F_Text_IsekaiQ2A, PewterCity_Museum_1F_Text_IsekaiQ2B, PewterCity_Museum_1F_Text_IsekaiQ2C
+	goto_if_ne VAR_RESULT, 1, PewterCity_Museum_1F_EventScript_IsekaiQuizFail
+	msgbox PewterCity_Museum_1F_Text_IsekaiQuiz2Comment
+	msgbox PewterCity_Museum_1F_Text_IsekaiQuiz3
+	dynmultichoice 0, 0, TRUE, 3, 0, DYN_MULTICHOICE_CB_NONE, PewterCity_Museum_1F_Text_IsekaiQ3A, PewterCity_Museum_1F_Text_IsekaiQ3B, PewterCity_Museum_1F_Text_IsekaiQ3C
+	goto_if_ne VAR_RESULT, 2, PewterCity_Museum_1F_EventScript_IsekaiQuizFail
+	msgbox PewterCity_Museum_1F_Text_IsekaiQuizPerfect
+	setvar VAR_ISEKAI_MUM_QUEST, MUM_QUEST_GOT_IT
+	release
+	end
+
+PewterCity_Museum_1F_EventScript_IsekaiQuizFail::
+	msgbox PewterCity_Museum_1F_Text_IsekaiQuizFail
+	release
+	end
+
+PewterCity_Museum_1F_EventScript_IsekaiPebbleLater::
+	msgbox PewterCity_Museum_1F_Text_IsekaiPebbleLater
+	release
+	end
+
+PewterCity_Museum_1F_Text_IsekaiPebbleTour1::
+	.string "DR. PEBBLE: A visitor! A real one!\n"
+	.string "Come, come!\p"
+	.string "Phenomenon No. 1!\n"
+	.string "LIGHTS OVER MT. MOON!\p"
+	.string "(A blurry photo of a CLEFAIRY\n"
+	.string "holding a torch.)\p"
+	.string "Phenomenon No. 2! OBJECTS THAT\n"
+	.string "APPEAR FROM NOWHERE!\p"
+	.string "(A single sock.)\p"
+	.string "Found in my dryer.\n"
+	.string "It is NOT one of mine.$"
+
+PewterCity_Museum_1F_Text_IsekaiPebbleTour2::
+	.string "Phenomenon No. 3! A ROCK THAT\n"
+	.string "LOOKS LIKE A FACE!\p"
+	.string "(It's a GEODUDE. It's asleep.)\p"
+	.string "And my finest case… PEOPLE WHO WAKE\n"
+	.string "UP SOMEWHERE THEY'VE NEVER BEEN!\p"
+	.string "(A photo of his assistant asleep\n"
+	.string "on a bus.)\p"
+	.string "SAFFRON. He was going to CELADON.$"
+
+PewterCity_Museum_1F_Text_IsekaiPebbleTour3::
+	.string "(You tell him everything. The truck.\n"
+	.string "Waking up in RED's bed. Knowing\l"
+	.string "this world from a game.)\p"
+	.string "DR. PEBBLE: …\p"
+	.string "…Fascinating.\n"
+	.string "Have you considered that you might\l"
+	.string "be very tired?\p"
+	.string "Here. Take this.\n"
+	.string "(He hands you a museum leaflet.)$"
+
+PewterCity_Museum_1F_Text_IsekaiSteps::
+	.string "Back to square one.\n"
+	.string "Outside, you sit on the museum steps.\p"
+	.string "So that's it. No answers.\n"
+	.string "…\p"
+	.string "But BROCK's GYM is right there.\n"
+	.string "And MT. MOON after that.\l"
+	.string "And CERULEAN.\p"
+	.string "You know every step of this road.\n"
+	.string "You've just never walked it.\p"
+	.string "…Fine. Just a bit further.$"
+
+PewterCity_Museum_1F_Text_IsekaiElderSteps::
+	.string "The old man from VIRIDIAN sits down\n"
+	.string "next to you, drinking a coffee.\p"
+	.string "ELDER: Didn't find what you came for?\p"
+	.string "At your age you start thinking every\n"
+	.string "trip needs a reason. A plan.\l"
+	.string "A return on investment.\p"
+	.string "Sometimes you just go because you\n"
+	.string "want to see what's there.\p"
+	.string "…Also, that museum is a scam.\n"
+	.string "I asked about my sock. He kept it.$"
+
+PewterCity_Museum_1F_Text_IsekaiPebbleAgain::
+	.string "DR. PEBBLE: Back again? I'm still\n"
+	.string "analysing your… tiredness.$"
+
+PewterCity_Museum_1F_Text_IsekaiPebbleAdapterAsk::
+	.string "DR. PEBBLE: The spare adapter? From\n"
+	.string "my EARLY HOME CONSOLES display?\p"
+	.string "Out of the question!\p"
+	.string "…Unless. My assistant needs battle\n"
+	.string "data, and I need a quiz partner.\p"
+	.string "Beat him, then ace my quiz on old\n"
+	.string "games. Then we'll talk.$"
+
+PewterCity_Museum_1F_Text_IsekaiPebbleReady::
+	.string "Ready?$"
+
+PewterCity_Museum_1F_Text_IsekaiPebbleLater::
+	.string "Science waits for no one.\n"
+	.string "Except, apparently, you.$"
+
+PewterCity_Museum_1F_Text_IsekaiPebbleAssistant::
+	.string "DR. PEBBLE: ASSISTANT!\n"
+	.string "Battle data! Now!$"
+
+PewterCity_Museum_1F_Text_IsekaiAssistantDefeat::
+	.string "I was asleep on a bus last week.\n"
+	.string "I'm still not over it.$"
+
+PewterCity_Museum_1F_Text_IsekaiPebbleNowQuiz::
+	.string "DR. PEBBLE: Excellent data!\n"
+	.string "Now. The quiz.$"
+
+PewterCity_Museum_1F_Text_IsekaiQuiz1::
+	.string "Question one. How many face\n"
+	.string "buttons on an SNES controller?$"
+
+PewterCity_Museum_1F_Text_IsekaiQ1A:
+	.string "Two$"
+PewterCity_Museum_1F_Text_IsekaiQ1B:
+	.string "Four$"
+PewterCity_Museum_1F_Text_IsekaiQ1C:
+	.string "Six$"
+
+PewterCity_Museum_1F_Text_IsekaiQuiz2::
+	.string "Question two. A cartridge won't\n"
+	.string "start. What do you do?$"
+
+PewterCity_Museum_1F_Text_IsekaiQ2A:
+	.string "Hit it$"
+PewterCity_Museum_1F_Text_IsekaiQ2B:
+	.string "Blow on it$"
+PewterCity_Museum_1F_Text_IsekaiQ2C:
+	.string "Pray$"
+
+PewterCity_Museum_1F_Text_IsekaiQuiz2Comment::
+	.string "DR. PEBBLE: That does nothing,\n"
+	.string "scientifically.\p"
+	.string "YOU: It works.$"
+
+PewterCity_Museum_1F_Text_IsekaiQuiz3::
+	.string "Question three. Which colour were\n"
+	.string "the original handheld's A and B\l"
+	.string "buttons?$"
+
+PewterCity_Museum_1F_Text_IsekaiQ3A:
+	.string "Grey$"
+PewterCity_Museum_1F_Text_IsekaiQ3B:
+	.string "Green$"
+PewterCity_Museum_1F_Text_IsekaiQ3C:
+	.string "Magenta$"
+
+PewterCity_Museum_1F_Text_IsekaiQuizPerfect::
+	.string "DR. PEBBLE: …A perfect score.\p"
+	.string "Nobody gets a perfect score.\n"
+	.string "Deeply suspicious.\p"
+	.string "…A deal's a deal. Take it.\p"
+	.string "(You got the spare SNES adapter.)$"
+
+PewterCity_Museum_1F_Text_IsekaiQuizFail::
+	.string "DR. PEBBLE: Wrong! Come back when\n"
+	.string "you've studied.$"
 
 PewterCity_Museum_1F_EventScript_OldMan::
 	msgbox PewterCity_Museum_1F_Text_ShouldBeGratefulForLongLife, MSGBOX_NPC

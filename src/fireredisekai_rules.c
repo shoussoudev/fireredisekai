@@ -4,6 +4,7 @@
 //   v0.9  human lives, the ward, the game-over ending
 //   v0.10 healing injuries at a Center, the grumpy loaner, capture willingness
 #include "global.h"
+#include "constants/fireredisekai_romance.h"
 #include "battle.h"
 #include "battle_setup.h"
 #include "difficulty.h"
@@ -313,6 +314,7 @@ static bool32 IsSaveBuilding(void)
 // save; leaving one means coming back saves again.
 void IsekaiOnMapWarp(void)
 {
+    IsekaiRomOnMapWarp();
     // While wanted (he kept Oak's POKéMON), people notice him everywhere: about one map in six.
     sPendingWantedReminder = FALSE;
     if (FlagGet(FLAG_ISEKAI_WANTED)
@@ -338,6 +340,7 @@ void IsekaiOnFirstCatch(void)
 
 bool32 IsekaiOnStep(u16 metatileBehavior)
 {
+    IsekaiRomOnStep();
     // DAISY's grooming cooldown (FireRed counts steps for it; the expansion doesn't).
     if (VarGet(VAR_MASSAGE_COOLDOWN_STEP_COUNTER) < 500)
         VarSet(VAR_MASSAGE_COOLDOWN_STEP_COUNTER, VarGet(VAR_MASSAGE_COOLDOWN_STEP_COUNTER) + 1);
@@ -354,6 +357,8 @@ bool32 IsekaiOnStep(u16 metatileBehavior)
         }
     }
     if (IsekaiMoneyOnStep(metatileBehavior))
+        return TRUE;
+    if (IsekaiQuestOnStep(metatileBehavior))
         return TRUE;
     // The first step into tall grass on Route 1.
     if (!FlagGet(FLAG_ISEKAI_SEEN_FIRST_GRASS)
@@ -535,6 +540,7 @@ static void RecordAliveAtStart(void)
 static const u16 sIsekaiSpecialTrainers[] =
 {
     TRAINER_ISEKAI_KEVIN,
+    TRAINER_BUG_CATCHER_SAMMY,   // the staring Viridian Forest kid
 };
 
 static bool32 IsSpecialFoe(void)
@@ -593,17 +599,29 @@ static void BoostOpponents(u8 boost)
 
 STATIC_ASSERT(offsetof(struct IsekaiSaveData, wardMons) <= SAVE_BLOCK_3_CHUNK_SIZE, IsekaiHotFieldsInSectorZero);
 
+// DAISY's penalty: she told her brother. BLUE's teams are 2 levels higher.
+static u8 DaisyToldBlue(void)
+{
+    u8 cls = GetTrainerClassFromId(TRAINER_BATTLE_PARAM.opponentA);
+    if (IsekaiRomPenalty(ROM_DAISY)
+     && (cls == TRAINER_CLASS_RIVAL_EARLY_FRLG || cls == TRAINER_CLASS_RIVAL_LATE_FRLG || cls == TRAINER_CLASS_CHAMPION_FRLG))
+        return 2;
+    return 0;
+}
+
 // Called by DoTrainerBattle once the opponent's party exists.
 void IsekaiOnTrainerBattleStart(void)
 {
     if (!IsekaiRulesApply())
         return;
     RecordAliveAtStart();
+    IsekaiQuestOnBattleStart();
+    IsekaiRematchNoteBattleStart();
     if (GetTrainerClassFromId(TRAINER_BATTLE_PARAM.opponentA) == TRAINER_CLASS_TEAM_ROCKET_FRLG)
         IsekaiMaybeGiveGruntSoldMon(); // the auctioned POKéMON, still wearing his nickname
     if (!IsSpecialFoe() || gIsekaiTrainerArgs == NULL)
     {
-        BoostOpponents(DifficultyLevelBoost());
+        BoostOpponents(DifficultyLevelBoost() + DaisyToldBlue());
         OpponentMaxLevel();
         // Ordinary trainer: no save at the start, no reset penalty.
         sIsekai.battleType = ISEKAI_BATTLE_NONE;
@@ -616,7 +634,7 @@ void IsekaiOnTrainerBattleStart(void)
     sIsekai.battleType = ISEKAI_BATTLE_TRAINER;
     sIsekai.trainerArgs = (u32)gIsekaiTrainerArgs;
     sIsekai.battleOpponent = TRAINER_BATTLE_PARAM.opponentA;
-    BoostOpponents(DifficultyLevelBoost() + sIsekai.resetCount * 3);
+    BoostOpponents(DifficultyLevelBoost() + sIsekai.resetCount * 3 + DaisyToldBlue());
     OpponentMaxLevel();
     // Saved once the battle transition has gone black (IsekaiOnBattleInit), so the pause is hidden.
     sBattleStartSavePending = TRUE;
@@ -653,6 +671,8 @@ void IsekaiOnWildBattleStart(void)
     // save (only trainer battles carry the reset penalty). The end of the battle is saved.
     sIsekai.battleType = ISEKAI_BATTLE_NONE;
     RecordAliveAtStart();
+    IsekaiQuestOnBattleStart();
+    IsekaiRematchNoteBattleStart();
 }
 
 // ---------------------------------------------------------------------------
@@ -723,6 +743,7 @@ void IsekaiOnBattleEnd(void)
         return;
 
     IsekaiCountFights();
+    IsekaiQuestOnBattleEnd();
     sIsekai.battleType = ISEKAI_BATTLE_NONE;
     sIsekai.resetCount = 0;
     if (gBattleOutcome == B_OUTCOME_WON)
@@ -784,6 +805,7 @@ void IsekaiOnBattleEnd(void)
     sLastDefeat = ISEKAI_DEFEAT_NONE;
     if (PlayerLost() && !forfeited)
     {
+        IsekaiRematchNoteLoss();
         if (!anyUnprotected)
             sLastDefeat = ISEKAI_DEFEAT_PROTECTED;
         else
@@ -859,6 +881,7 @@ void IsekaiBadgeEarned(void)
     }
     if (sIsekai.lives < IsekaiMaxLives())
         sIsekai.lives++;
+    IsekaiRomOnBadge();
 }
 
 // For the nurse: puts lives left in STR_VAR_1 and VAR_RESULT.
@@ -1020,6 +1043,8 @@ bool32 IsekaiFieldIdle(void)
         return TRUE;
     }
     if (IsekaiMoneyFieldIdle())
+        return TRUE;
+    if (IsekaiRomFieldIdle())
         return TRUE;
     if (sPendingDebtTaken != 0)
     {

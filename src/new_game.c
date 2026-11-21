@@ -1,4 +1,5 @@
 #include "global.h"
+#include "constants/fireredisekai_romance.h"
 #include "config/fireredisekai.h"
 #include "fireredisekai.h"
 #include "clock.h"
@@ -169,6 +170,61 @@ static void WarpToTruck(void)
     WarpIntoMap();
     return;
 #endif
+#if ISEKAI_START_AT == ISEKAI_START_PEWTER
+    // Developer checkpoint: arrived in Pewter. Parcel delivered, PSYDUCK returned on time and kept,
+    // the POKéDEX, and a team that can take BROCK (Water, Grass, Fighting).
+    VarSet(VAR_ISEKAI_INTRO, 4);
+    VarSet(VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 6);
+    VarSet(VAR_MAP_SCENE_PALLET_TOWN_OAK, 1);
+    VarSet(VAR_MAP_SCENE_PALLET_TOWN_PLAYERS_HOUSE_2F, 1);
+    VarSet(VAR_MAP_SCENE_VIRIDIAN_CITY_MART, 2);
+    VarSet(VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 1);
+    VarSet(VAR_MAP_SCENE_PALLET_TOWN_RIVALS_HOUSE, 1);
+    VarSet(VAR_STARTER_MON, 0);
+    FlagSet(FLAG_SYS_POKEMON_GET);
+    FlagSet(FLAG_SYS_POKEDEX_GET);
+    FlagSet(FLAG_ISEKAI_HAS_LOANER);
+    FlagSet(FLAG_ISEKAI_HAS_PHONE);
+    FlagSet(FLAG_BEAT_RIVAL_IN_OAKS_LAB);
+    FlagSet(FLAG_ISEKAI_WARD_NURSE_MET);
+    VarSet(VAR_ISEKAI_LOAN_STATE, 5);
+    // Met at low levels (so they obey before the first BADGE), then trained up.
+    ScriptGiveMon(SPECIES_PSYDUCK, 7, ITEM_NONE);
+    VarSet(VAR_ISEKAI_LOANER_SPECIES, SPECIES_PSYDUCK);
+    IsekaiRememberLoaner();
+    ScriptGiveMon(SPECIES_ODDISH, 6, ITEM_NONE);
+    ScriptGiveMon(SPECIES_MANKEY, 6, ITEM_NONE);
+    {
+        static const u8 sLevels[] = {14, 13, 13};
+        u32 i;
+        for (i = 0; i < 3; i++)
+        {
+            struct Pokemon *mon = &gParties[B_TRAINER_PLAYER][i];
+            u32 exp = gExperienceTables[gSpeciesInfo[GetMonData(mon, MON_DATA_SPECIES)].growthRate][sLevels[i]];
+            SetMonData(mon, MON_DATA_EXP, &exp);
+            CalculateMonStats(mon);
+        }
+        {
+            static const u16 sMoves[3][4] = {
+                {MOVE_WATER_GUN, MOVE_CONFUSION, MOVE_SCRATCH, MOVE_TAIL_WHIP},
+                {MOVE_ABSORB, MOVE_ACID, MOVE_POISON_POWDER, MOVE_GROWTH},
+                {MOVE_LOW_KICK, MOVE_KARATE_CHOP, MOVE_FURY_SWIPES, MOVE_LEER},
+            };
+            u32 m, k;
+            for (m = 0; m < 3; m++)
+                for (k = 0; k < 4; k++)
+                    SetMonMoveSlot(&gParties[B_TRAINER_PLAYER][m], sMoves[m][k], k);
+        }
+    }
+    AddBagItem(ITEM_POKE_BALL, 5);
+    AddBagItem(ITEM_POTION, 8);
+    AddBagItem(ITEM_ANTIDOTE, 2);
+    SetMoney(&gSaveBlock1Ptr->money, 1500);
+    SetLastHealLocationWarp(HEAL_LOCATION_PEWTER_CITY);
+    SetWarpDestination(MAP_GROUP(MAP_PEWTER_CITY), MAP_NUM(MAP_PEWTER_CITY), WARP_ID_NONE, 17, 26);
+    WarpIntoMap();
+    return;
+#endif
 #if ISEKAI_START_AT == ISEKAI_START_RULES_TEST
     // Developer checkpoint: the core rules sandbox. Route 22 tall grass (next to Viridian), Oak's PSYDUCK at Lv10
     // (so its faints count) on 1 HP, a few healing items, Viridian as the last heal spot.
@@ -311,7 +367,7 @@ void NewGameInitData(void)
     if (gIsekaiChosenDifficulty != 0)
         SetCurrentDifficultyLevel(gIsekaiChosenDifficulty - 1);
     IsekaiNewGameInit(); // lives, running shoes
-#if ISEKAI_START_AT == ISEKAI_START_VIRIDIAN
+#if ISEKAI_START_AT == ISEKAI_START_VIRIDIAN || ISEKAI_START_AT == ISEKAI_START_PEWTER
     // (after the map flags were reset) Oak is back in his lab, Blue has left.
     FlagClear(FLAG_HIDE_OAK_IN_HIS_LAB);
     FlagSet(FLAG_HIDE_RIVAL_IN_LAB);

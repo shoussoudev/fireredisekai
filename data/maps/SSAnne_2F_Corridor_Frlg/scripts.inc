@@ -38,6 +38,7 @@ SSAnne_2F_Corridor_EventScript_RivalTrigger::
 	call_if_eq VAR_STARTER_MON, 1, SSAnne_2F_Corridor_EventScript_RivalBulbasaur
 	call_if_eq VAR_STARTER_MON, 0, SSAnne_2F_Corridor_EventScript_RivalCharmander
 	msgbox SSAnne_2F_Corridor_Text_RivalPostBattle
+	call IsekaiEventScript_DaisyMessageToBlue
 	closemessage
 	delay 10
 	playbgm MUS_RG_RIVAL_EXIT, 0

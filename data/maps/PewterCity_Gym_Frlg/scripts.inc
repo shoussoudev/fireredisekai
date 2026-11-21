@@ -17,6 +17,7 @@ PewterCity_Gym_EventScript_DefeatedBrock::
 	setflag FLAG_HIDE_PEWTER_CITY_GYM_GUIDE
 	clearflag FLAG_HIDE_PEWTER_CITY_RUNNING_SHOES_GUY
 	set_gym_trainers_frlg 1
+	call IsekaiEventScript_BrockLicence
 	goto PewterCity_Gym_EventScript_GiveTM39
 	end
 
@@ -82,35 +83,22 @@ PewterCity_Gym_EventScript_GymStatuePostVictory::
 	end
 
 PewterCity_Gym_Text_BrockIntro::
-	.string "So, you're here. I'm BROCK.\n"
-	.string "I'm PEWTER's GYM LEADER.\p"
-	.string "My rock-hard willpower is evident\n"
-	.string "even in my POKéMON.\p"
-	.string "My POKéMON are all rock hard, and\n"
-	.string "have true-grit determination.\p"
-	.string "That's right - my POKéMON are all\n"
-	.string "the ROCK type!\p"
-	.string "Fuhaha! You're going to challenge\n"
-	.string "me knowing that you'll lose?\p"
-	.string "That's the TRAINER's honor that\n"
-	.string "compels you to challenge me.\p"
-	.string "Fine, then!\n"
-	.string "Show me your best!{PLAY_BGM}{MUS_RG_ENCOUNTER_GYM_LEADER}$"
+	.string "The GYM is quiet. BROCK is doing\n"
+	.string "paperwork with a toddler on his lap.\p"
+	.string "BROCK: Sorry. My sitter cancelled.\n"
+	.string "These are two of nine.\p"
+	.string "I run the GYM in the mornings and\n"
+	.string "the quarry in the afternoons.\p"
+	.string "You're a challenger?\n"
+	.string "…Fine. Let's be quick.{PLAY_BGM}{MUS_RG_ENCOUNTER_GYM_LEADER}$"
 
 PewterCity_Gym_Text_BrockDefeat::
-	.string "I took you for granted, and so\n"
-	.string "I lost.\p"
-	.string "As proof of your victory, I confer\n"
-	.string "on you this…the official POKéMON\l"
-	.string "LEAGUE BOULDERBADGE.\p"
+	.string "…You're good. Like, scarily good.\n"
+	.string "Did you study me?\p"
+	.string "(You studied him for 25 years.\n"
+	.string "You don't say that.)\p"
 	.string "{FONT_NORMAL}{PLAYER} received the BOULDERBADGE\n"
-	.string "from BROCK!{PAUSE_MUSIC}{PLAY_BGM}{MUS_OBTAIN_BADGE}{PAUSE 0xFE}{PAUSE 0x56}{RESUME_MUSIC}\p"
-	.string "{FONT_MALE}Just having the BOULDERBADGE makes\n"
-	.string "your POKéMON more powerful.\p"
-	.string "It also enables the use of the\n"
-	.string "move FLASH outside of battle.\p"
-	.string "Of course, a POKéMON must know the\n"
-	.string "move FLASH to use it.$"
+	.string "from BROCK!{PAUSE_MUSIC}{PLAY_BGM}{MUS_OBTAIN_BADGE}{PAUSE 0xFE}{PAUSE 0x56}{RESUME_MUSIC}$"
 
 PewterCity_Gym_Text_TakeThisWithYou::
 	.string "Wait!\n"
@@ -134,13 +122,10 @@ PewterCity_Gym_Text_ExplainTM39::
 	.string "lowers its SPEED.$"
 
 PewterCity_Gym_Text_BrockPostBattle::
-	.string "There are all kinds of TRAINERS in\n"
-	.string "this huge world of ours.\p"
-	.string "You appear to be very gifted as a\n"
-	.string "POKéMON TRAINER.\p"
-	.string "So let me make a suggestion.\p"
-	.string "Go to the GYM in CERULEAN and test\n"
-	.string "your abilities.$"
+	.string "BROCK: CERULEAN's next. MISTY.\n"
+	.string "She doesn't do paperwork.\p"
+	.string "…Remember what I said.\n"
+	.string "Nobody goes easy on you now.$"
 
 PewterCity_Gym_Text_DontHaveRoomForThis::
 	.string "You don't have room for this.$"

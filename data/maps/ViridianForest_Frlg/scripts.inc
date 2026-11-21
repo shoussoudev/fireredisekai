@@ -95,12 +95,14 @@ ViridianForest_Text_DougPostBattle::
 	.string "catch some stronger ones!$"
 
 ViridianForest_Text_SammyIntro::
-	.string "Hey, wait up!\n"
-	.string "What's the hurry? Why the rush?$"
+	.string "(A small boy has been staring at you\n"
+	.string "for a while.)\p"
+	.string "Mister, are you lost?\n"
+	.string "Should I get an adult?$"
 
 ViridianForest_Text_SammyDefeat::
-	.string "I give!\n"
-	.string "You're good at this!$"
+	.string "You ARE an adult.\n"
+	.string "…That's so weird.$"
 
 ViridianForest_Text_SammyPostBattle::
 	.string "Sometimes, you can find stuff on\n"
@@ -166,5 +168,7 @@ ViridianForest_Text_WeakenMonsBeforeCapture::
 
 ViridianForest_Text_LeavingViridianForest::
 	.string "LEAVING VIRIDIAN FOREST\n"
-	.string "PEWTER CITY AHEAD$"
+	.string "PEWTER CITY AHEAD\p"
+	.string "Underneath, in a child's handwriting:\n"
+	.string "RED WAS HERE$"
 

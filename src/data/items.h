@@ -14666,6 +14666,22 @@ const struct ItemInfo gItemsInfo[] =
         .iconPalette = gItemIconPalette_Parcel,
     },
 
+    [ITEM_REMATCH_PASS] =
+    {
+        .name = ITEM_NAME("Rematch Pass"),
+        .price = 0,
+        .description = COMPOUND_STRING(
+            "A flying taxi back\n"
+            "to the spot of your\n"
+            "last loss."),
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_RematchPass,
+        .iconPic = gItemIcon_TriPass,
+        .iconPalette = gItemIconPalette_TriPass,
+    },
+
     [ITEM_SECRET_KEY] =
     {
         .name = ITEM_NAME("Secret Key"),

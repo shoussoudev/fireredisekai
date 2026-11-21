@@ -62,6 +62,26 @@ gSpecials::
 	def_special IsekaiSharkBuildCounter
 	def_special IsekaiSharkBuyBack
 	def_special IsekaiTonyDone
+	def_special IsekaiNurseQuestStage
+	def_special IsekaiNurseSetStage
+	def_special IsekaiNurseHerbCount
+	def_special IsekaiWardWakeRomance
+	def_special IsekaiRematchPassCheck
+	def_special IsekaiRematchPassSetWarp
+	def_special IsekaiRomBufferLine
+	def_special IsekaiRomGetState
+	def_special IsekaiRomQuestDone
+	def_special IsekaiRomOfferCheck
+	def_special IsekaiRomAccept
+	def_special IsekaiRomHold
+	def_special IsekaiRomDecline
+	def_special IsekaiRomBreakUp
+	def_special IsekaiRomPromise
+	def_special IsekaiRomApologised
+	def_special IsekaiRomTalk
+	def_special IsekaiRomFortunaRead
+	def_special IsekaiRomCheckPerk
+	def_special IsekaiRomCheckPenalty
 	def_special IsekaiTakeBackBalls
 	def_special SetCableClubWarp
 	def_special DoCableClubWarp, waitstate=1

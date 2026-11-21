@@ -3793,6 +3793,7 @@ static void HandleTurnActionSelectionState(void)
 
     if (IS_FRLG)
         IsekaiNoteFighters(); // FireRed Isekai: who got to act (the "most used" count)
+        IsekaiQuestOnTurn();  // FireRed Isekai: the ward nurse's potion
 
     gBattleCommunication[ACTIONS_CONFIRMED_COUNT] = 0;
     for (enum BattlerId battlerIndex = 0; battlerIndex < gBattlersCount; battlerIndex++)

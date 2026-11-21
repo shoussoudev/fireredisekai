@@ -92,6 +92,41 @@ void IsekaiOnMonCaught(u16 species);
 void IsekaiCatchCooldownTick(void);
 void IsekaiOnMonReleased(struct BoxPokemon *boxMon);
 bool32 IsekaiWildIsOverCaught(void);
+// fireredisekai_romance.c
+void IsekaiRomBufferLine(void);
+void IsekaiRomGetState(void);
+void IsekaiRomQuestDone(void);
+void IsekaiRomOfferCheck(void);
+void IsekaiRomAccept(void);
+void IsekaiRomHold(void);
+void IsekaiRomDecline(void);
+void IsekaiRomBreakUp(void);
+void IsekaiRomPromise(void);
+void IsekaiRomApologised(void);
+void IsekaiRomTalk(void);
+void IsekaiRomFortunaRead(void);
+void IsekaiRomCheckPerk(void);
+void IsekaiRomCheckPenalty(void);
+bool32 IsekaiRomPerk(u8 partner);
+bool32 IsekaiRomPenalty(u8 partner);
+void IsekaiRomOnStep(void);
+void IsekaiRomOnMapWarp(void);
+void IsekaiRomOnBadge(void);
+bool32 IsekaiRomFieldIdle(void);
+void IsekaiRomLongTellsEveryone(void);
+// fireredisekai_quests.c
+void IsekaiNurseQuestStage(void);
+void IsekaiNurseSetStage(void);
+void IsekaiNurseHerbCount(void);
+void IsekaiWardWakeRomance(void);
+void IsekaiRematchPassCheck(void);
+void IsekaiRematchPassSetWarp(void);
+bool32 IsekaiQuestOnStep(u16 metatileBehavior);
+void IsekaiQuestOnBattleStart(void);
+void IsekaiQuestOnTurn(void);
+void IsekaiQuestOnBattleEnd(void);
+void IsekaiRematchNoteBattleStart(void);
+void IsekaiRematchNoteLoss(void);
 void IsekaiRestartTrainerBattleFromArgs(const u8 *args); // battle_setup.c
 
 #endif // GUARD_FIREREDISEKAI_H

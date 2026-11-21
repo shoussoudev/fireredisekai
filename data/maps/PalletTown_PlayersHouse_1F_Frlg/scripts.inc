@@ -51,12 +51,73 @@ PalletTown_PlayersHouse_1F_EventScript_MomOakLookingForYouFemale::
 
 @ FireRed Isekai: she's not healing a stranger's POKéMON (that may change with her romance)
 PalletTown_PlayersHouse_1F_EventScript_MomHeal::
+	@ v0.14: the SNES, then the romance (home cooking heals the team).
+	setvar VAR_0x8004, ROM_REDS_MUM
+	special IsekaiRomGetState
+	goto_if_ne VAR_RESULT, ROM_STATE_NONE, PalletTown_PlayersHouse_1F_EventScript_IsekaiMumHub
+	switch VAR_ISEKAI_MUM_QUEST
+	case MUM_QUEST_ADAPTER, PalletTown_PlayersHouse_1F_EventScript_IsekaiMumWaiting
+	case MUM_QUEST_ASSISTANT, PalletTown_PlayersHouse_1F_EventScript_IsekaiMumWaiting
+	case MUM_QUEST_GOT_IT, PalletTown_PlayersHouse_1F_EventScript_IsekaiMumFix
 	msgbox PalletTown_PlayersHouse_1F_Text_IsekaiNotACenter
+	msgbox PalletTown_PlayersHouse_1F_Text_IsekaiSnes
+	setvar VAR_ISEKAI_MUM_QUEST, MUM_QUEST_ADAPTER
+	goto PalletTown_PlayersHouse_1F_EventScript_IsekaiMumEnd
+
+PalletTown_PlayersHouse_1F_EventScript_IsekaiMumWaiting::
+	msgbox PalletTown_PlayersHouse_1F_Text_IsekaiMumWaiting
+	goto PalletTown_PlayersHouse_1F_EventScript_IsekaiMumEnd
+
+PalletTown_PlayersHouse_1F_EventScript_IsekaiMumFix::
+	msgbox PalletTown_PlayersHouse_1F_Text_IsekaiMumFix
+	setvar VAR_ISEKAI_MUM_QUEST, MUM_QUEST_DONE
+	special IsekaiRomQuestDone
+PalletTown_PlayersHouse_1F_EventScript_IsekaiMumHub::
+	call IsekaiEventScript_RomHub
+	special IsekaiRomCheckPerk
+	goto_if_eq VAR_RESULT, FALSE, PalletTown_PlayersHouse_1F_EventScript_IsekaiMumEnd
+	msgbox PalletTown_PlayersHouse_1F_Text_IsekaiMumCooks
+	closemessage
+	fadescreen FADE_TO_BLACK
+	playfanfare MUS_HEAL
+	waitfanfare
+	special HealPlayerParty
+	fadescreen FADE_FROM_BLACK
+PalletTown_PlayersHouse_1F_EventScript_IsekaiMumEnd::
 	closemessage
 	applymovement LOCALID_PLAYERS_HOUSE_1F_MOM, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	release
 	end
+
+PalletTown_PlayersHouse_1F_Text_IsekaiSnes::
+	.string "…Although. Since you're here.\p"
+	.string "RED's SNES broke the week before\n"
+	.string "he left. He's been sulking about it\l"
+	.string "every time he calls.\p"
+	.string "(You know exactly which pin to blow\n"
+	.string "on. You blow on it.)\p"
+	.string "…Nothing. It's not the cartridge.\n"
+	.string "The power adapter's dead.\p"
+	.string "RED'S MOM: Where would you even get\n"
+	.string "one of those?\p"
+	.string "(The PEWTER MUSEUM has an Early Home\n"
+	.string "Consoles display. You'd bet on it.)$"
+
+PalletTown_PlayersHouse_1F_Text_IsekaiMumWaiting::
+	.string "RED'S MOM: Any luck with that\n"
+	.string "adapter? The museum in PEWTER,\l"
+	.string "you said?$"
+
+PalletTown_PlayersHouse_1F_Text_IsekaiMumFix::
+	.string "(You plug in the museum's adapter.\n"
+	.string "The SNES hums. The screen flickers.)\p"
+	.string "RED'S MOM: It works! He's been…\n"
+	.string "It just works!$"
+
+PalletTown_PlayersHouse_1F_Text_IsekaiMumCooks::
+	.string "RED'S MOM: Sit. Eat. All of you.\n"
+	.string "The POKéMON too.$"
 
 PalletTown_PlayersHouse_1F_Text_IsekaiNotACenter::
 	.string "RED'S MOM: You again.\p"

@@ -11,6 +11,8 @@
 #define ISEKAI_START_RULES_TEST 2
 //   3 = Viridian City with Oak's PSYDUCK and his parcel (the v0.11 loan story)
 #define ISEKAI_START_VIRIDIAN   3
+//   4 = Pewter City before BROCK: loan settled, PSYDUCK kept, a team ready for the GYM (v0.14)
+#define ISEKAI_START_PEWTER     4
 
 #ifndef ISEKAI_START_AT
 #define ISEKAI_START_AT ISEKAI_START_NORMAL

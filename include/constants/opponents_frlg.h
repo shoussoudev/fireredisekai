@@ -629,12 +629,14 @@
 #define TRAINER_CUE_BALL_PAXTON                    623
 #define TRAINER_ISEKAI_KEVIN                       624 // FireRed Isekai: Kevin on the bench, Viridian
 #define TRAINER_ISEKAI_SHARK_GOON                  625 // FireRed Isekai: SHARKEY's associate
+#define TRAINER_ISEKAI_PEBBLE_ASSISTANT            626 // FireRed Isekai: Dr. Pebble's assistant
+#define TRAINER_ISEKAI_BLAISIA_1                   627 // FireRed Isekai: Blaisia, Route 3
 
 // NOTE: Because each Trainer uses a flag to determine when they are defeated, there is
 //       only space for 25 additional trainers before trainer flag space overflows.
 //       MAX_TRAINERS_COUNT_FRLG can be increased but will take up additional saveblock space
 
-#define TRAINERS_COUNT_FRLG                      626
+#define TRAINERS_COUNT_FRLG                      628
 #define MAX_TRAINERS_COUNT_FRLG                  768
 
 #endif  // GUARD_CONSTANTS_OPPONENTS_FRLG_H

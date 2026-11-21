@@ -164,6 +164,9 @@ IsekaiEventScript_WakeUp_Again:
 	msgbox IsekaiText_WakeUp_Again
 IsekaiEventScript_WakeUp_Ankle:
 	call_if_set FLAG_ISEKAI_LIMPING, IsekaiEventScript_TreatAnkle
+	special IsekaiWardWakeRomance
+	call_if_eq VAR_RESULT, 1, IsekaiEventScript_WakeUp_NursePerk
+	call_if_eq VAR_RESULT, 2, IsekaiEventScript_WakeUp_NursePenalty
 	fadescreen FADE_FROM_BLACK
 	return
 

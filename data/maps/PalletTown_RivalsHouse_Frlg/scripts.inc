@@ -37,10 +37,51 @@ PalletTown_RivalsHouse_EventScript_Daisy::
 	end
 
 PalletTown_RivalsHouse_EventScript_IsekaiDaisyRates::
-	goto_if_set FLAG_ISEKAI_DAISY_RATES, PalletTown_RivalsHouse_EventScript_GroomMon
+	goto_if_set FLAG_ISEKAI_DAISY_RATES, PalletTown_RivalsHouse_EventScript_IsekaiDaisyQuest
 	setflag FLAG_ISEKAI_DAISY_RATES
 	msgbox PalletTown_RivalsHouse_Text_IsekaiDaisyRates
 	goto PalletTown_RivalsHouse_EventScript_GroomMon
+
+@ v0.14: her brother won't call home. Then the romance.
+PalletTown_RivalsHouse_EventScript_IsekaiDaisyQuest::
+	setvar VAR_0x8004, ROM_DAISY
+	special IsekaiRomGetState
+	goto_if_ne VAR_RESULT, ROM_STATE_NONE, PalletTown_RivalsHouse_EventScript_IsekaiDaisyHub
+	switch VAR_ISEKAI_DAISY_QUEST
+	case DAISY_QUEST_MESSAGE, PalletTown_RivalsHouse_EventScript_IsekaiDaisyWaiting
+	case DAISY_QUEST_DELIVERED, PalletTown_RivalsHouse_EventScript_IsekaiDaisyHeCalled
+	msgbox PalletTown_RivalsHouse_Text_IsekaiDaisyAsk
+	setvar VAR_ISEKAI_DAISY_QUEST, DAISY_QUEST_MESSAGE
+	goto PalletTown_RivalsHouse_EventScript_GroomMon
+
+PalletTown_RivalsHouse_EventScript_IsekaiDaisyWaiting::
+	msgbox PalletTown_RivalsHouse_Text_IsekaiDaisyWaiting
+	goto PalletTown_RivalsHouse_EventScript_GroomMon
+
+PalletTown_RivalsHouse_EventScript_IsekaiDaisyHeCalled::
+	setvar VAR_ISEKAI_DAISY_QUEST, DAISY_QUEST_DONE
+	special IsekaiRomQuestDone
+PalletTown_RivalsHouse_EventScript_IsekaiDaisyHub::
+	call IsekaiEventScript_RomHub
+	goto PalletTown_RivalsHouse_EventScript_GroomMon
+
+PalletTown_RivalsHouse_Text_IsekaiDaisyAsk::
+	.string "DAISY: Can I ask you something?\p"
+	.string "BLUE hasn't called since he left.\n"
+	.string "Not once.\p"
+	.string "Our parents are abroad. Grandpa\n"
+	.string "lives in his lab. So it's me,\l"
+	.string "keeping this house going.\p"
+	.string "I'm twenty-two. I've been running\n"
+	.string "this house since I was sixteen.\p"
+	.string "If you see him… pass on a message?\n"
+	.string "He won't listen unless you beat him.\l"
+	.string "He's like that.$"
+
+PalletTown_RivalsHouse_Text_IsekaiDaisyWaiting::
+	.string "DAISY: Seen BLUE yet?\n"
+	.string "Beat him first. Then talk.\l"
+	.string "Find the right words.$"
 
 PalletTown_RivalsHouse_Text_IsekaiDaisyRates::
 	.string "DAISY: Oh. It's you again.\p"
@@ -57,7 +98,12 @@ PalletTown_RivalsHouse_EventScript_HeardBattledRival::
 	end
 
 PalletTown_RivalsHouse_EventScript_GroomMon::
+	@ v0.14: dating DAISY, grooming any time.
+	setvar VAR_0x8004, ROM_DAISY
+	special IsekaiRomCheckPerk
+	goto_if_eq VAR_RESULT, TRUE, PalletTown_RivalsHouse_EventScript_IsekaiGroomAnyTime
 	goto_if_lt VAR_MASSAGE_COOLDOWN_STEP_COUNTER, 500, PalletTown_RivalsHouse_EventScript_RateMonFriendship
+PalletTown_RivalsHouse_EventScript_IsekaiGroomAnyTime:
 	msgbox PalletTown_RivalsHouse_Text_LikeMeToGroomMon, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, PalletTown_RivalsHouse_EventScript_DeclineGrooming
 	msgbox PalletTown_RivalsHouse_Text_GroomWhichOne

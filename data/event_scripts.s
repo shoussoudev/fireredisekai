@@ -34,6 +34,7 @@
 #include "constants/field_tasks.h"
 #include "constants/field_weather.h"
 #include "constants/flags.h"
+#include "constants/fireredisekai_romance.h"
 #include "constants/follower_npc.h"
 #include "constants/frontier_util.h"
 #include "constants/game_stat.h"
@@ -1047,6 +1048,7 @@ gStdScripts_End::
 	.include "data/scripts/flavor_text.inc"
 	.include "data/scripts/pkmn_center_nurse_frlg.inc"
 	.include "data/scripts/fireredisekai_rules.inc"
+	.include "data/scripts/fireredisekai_romance.inc"
 
 .endif
 

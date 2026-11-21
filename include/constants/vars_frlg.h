@@ -192,24 +192,39 @@
 #define VAR_0x409F                 0x409F
 #define VAR_ISEKAI_SHARK_STEPS            VAR_0x409F // FireRed Isekai: steps toward the next interest
 #define VAR_0x40A0                 0x40A0
+#define VAR_ISEKAI_ROM_0                      VAR_0x40A0 // FireRed Isekai: romance state, partner 0 (see constants/fireredisekai_romance.h)
 #define VAR_0x40A1                 0x40A1
+#define VAR_ISEKAI_ROM_1                      VAR_0x40A1 // FireRed Isekai: romance
 #define VAR_0x40A2                 0x40A2
+#define VAR_ISEKAI_ROM_2                      VAR_0x40A2 // FireRed Isekai: romance
 #define VAR_0x40A3                 0x40A3
+#define VAR_ISEKAI_ROM_3                      VAR_0x40A3 // FireRed Isekai: romance
 #define VAR_0x40A4                 0x40A4
+#define VAR_ISEKAI_ROM_4                      VAR_0x40A4 // FireRed Isekai: romance
 #define VAR_0x40A5                 0x40A5
+#define VAR_ISEKAI_ROM_5                      VAR_0x40A5 // FireRed Isekai: romance
 #define VAR_0x40A6                 0x40A6
+#define VAR_ISEKAI_ROM_6                      VAR_0x40A6 // FireRed Isekai: romance
 #define VAR_0x40A7                 0x40A7
+#define VAR_ISEKAI_ROM_7                      VAR_0x40A7 // FireRed Isekai: romance
 #define VAR_0x40A8                 0x40A8
+#define VAR_ISEKAI_ROM_8                      VAR_0x40A8 // FireRed Isekai: romance
 #define VAR_0x40A9                 0x40A9
+#define VAR_ISEKAI_ROM_9                      VAR_0x40A9 // FireRed Isekai: romance
 
 #define VAR_QLBAK_TRAINER_REMATCHES 0x40AA // array of 4
 #define VAR_QLBAK_MAP_LAYOUT        0x40AE
 
 #define VAR_0x40AF                 0x40AF
+#define VAR_ISEKAI_ROM_SUSP_01                VAR_0x40AF // FireRed Isekai: romance
 #define VAR_0x40B0                 0x40B0
+#define VAR_ISEKAI_ROM_SUSP_23                VAR_0x40B0 // FireRed Isekai: romance
 #define VAR_0x40B1                 0x40B1
+#define VAR_ISEKAI_ROM_SUSP_45                VAR_0x40B1 // FireRed Isekai: romance
 #define VAR_0x40B2                 0x40B2
+#define VAR_ISEKAI_ROM_SUSP_67                VAR_0x40B2 // FireRed Isekai: romance
 #define VAR_0x40B3                 0x40B3
+#define VAR_ISEKAI_ROM_SUSP_89                VAR_0x40B3 // FireRed Isekai: romance
 #define VAR_PORTHOLE               0x40B4
 #define VAR_EVENT_PICHU_SLOT       0x40B5
 #define VAR_MYSTERY_GIFT_1         0x40B6
@@ -220,14 +235,23 @@
 #define VAR_MYSTERY_GIFT_6         0x40BB
 #define VAR_MYSTERY_GIFT_7         0x40BC
 #define VAR_0x40BD                 0x40BD
+#define VAR_ISEKAI_ROM_META                   VAR_0x40BD // FireRed Isekai: romance: breakups (bits 0-3), Glacia chain next (4-7), chain broken (8), Fortuna read (9)
 #define VAR_0x40BE                 0x40BE
+#define VAR_ISEKAI_ROM_CALL_STEPS             VAR_0x40BE // FireRed Isekai: steps since the last Center call
 #define VAR_0x40BF                 0x40BF
+#define VAR_ISEKAI_NURSE_QUEST                VAR_0x40BF // FireRed Isekai: ward nurse quest: herbs bits 0-2, stage bits 4-7
 #define VAR_0x40C0                 0x40C0
+#define VAR_ISEKAI_MUM_QUEST                  VAR_0x40C0 // FireRed Isekai: Red's mum quest stage
 #define VAR_0x40C1                 0x40C1
+#define VAR_ISEKAI_DAISY_QUEST                VAR_0x40C1 // FireRed Isekai: Daisy's quest stage
 #define VAR_0x40C2                 0x40C2
+#define VAR_ISEKAI_LAST_LOSS_MAP              VAR_0x40C2 // FireRed Isekai: Rematch Pass: map of the last loss (group<<8 | num)
 #define VAR_0x40C3                 0x40C3
+#define VAR_ISEKAI_LAST_LOSS_X                VAR_0x40C3 // FireRed Isekai: Rematch Pass: x
 #define VAR_0x40C4                 0x40C4
+#define VAR_ISEKAI_LAST_LOSS_Y                VAR_0x40C4 // FireRed Isekai: Rematch Pass: y
 #define VAR_0x40C5                 0x40C5
+#define VAR_ISEKAI_BLAISIA                    VAR_0x40C5 // FireRed Isekai: Blaisia on Route 3: 0 not yet, 1 waiting (after BROCK), 2 met
 #define VAR_0x40C6                 0x40C6
 #define VAR_0x40C7                 0x40C7
 #define VAR_0x40C8                 0x40C8

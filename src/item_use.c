@@ -1603,4 +1603,27 @@ void ItemUseOutOfBattle_Parcel(u8 taskId)
     }
 }
 
+// FireRed Isekai: Brock's Rematch Pass flies him back to his last loss.
+static void ItemUseOnFieldCB_RematchPass(u8 taskId)
+{
+    LockPlayerFieldControls();
+    ScriptContext_SetupScript(IsekaiEventScript_RematchPass);
+    DestroyTask(taskId);
+}
+
+void ItemUseOutOfBattle_RematchPass(u8 taskId)
+{
+    if (!gTasks[taskId].tUsingRegisteredKeyItem)
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_RematchPass;
+        gFieldCallback = FieldCB_UseItemOnField;
+        gBagMenu->newScreenCallback = CB2_ReturnToField;
+        Task_FadeAndCloseBagMenu(taskId);
+    }
+    else
+    {
+        gTasks[taskId].func = ItemUseOnFieldCB_RematchPass;
+    }
+}
+
 #undef tUsingRegisteredKeyItem

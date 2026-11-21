@@ -47,6 +47,7 @@ CeruleanCity_EventScript_Rival::
 	call_if_eq VAR_STARTER_MON, 0, CeruleanCity_EventScript_RivalCharmander
 	famechecker FAMECHECKER_BILL, 0
 	msgbox CeruleanCity_Text_RivalPostBattle
+	call IsekaiEventScript_DaisyMessageToBlue
 	closemessage
 	playbgm MUS_RG_RIVAL_EXIT, 0
 	call_if_eq VAR_TEMP_1, 0, CeruleanCity_EventScript_RivalStartExit

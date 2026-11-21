@@ -61,10 +61,138 @@ ViridianCity_PokemonCenter_1F_EventScript_IsekaiWardNurse::
 	end
 
 ViridianCity_PokemonCenter_1F_EventScript_IsekaiWardNurseAgain::
+	@ v0.14: her potion trial, then the romance.
+	setvar VAR_0x8004, ROM_WARD_NURSE
+	special IsekaiRomGetState
+	goto_if_ne VAR_RESULT, ROM_STATE_NONE, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseHub
+	special IsekaiNurseQuestStage
+	switch VAR_RESULT
+	case NURSE_QUEST_HERBS, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseHerbs
+	case NURSE_QUEST_DRANK, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseDrank
+	case NURSE_QUEST_DONE, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseResults
 	special IsekaiBufferLives
 	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiWardNurseAgain
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseVolunteer, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseNoVolunteer
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseIsItSafe
+	setvar VAR_0x8005, NURSE_QUEST_HERBS
+	special IsekaiNurseSetStage
 	release
 	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseNoVolunteer::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseNoVolunteer
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseHerbs::
+	special IsekaiNurseHerbCount
+	goto_if_eq VAR_RESULT, 3, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseBrew
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseStillNeed
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseBrew::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseBrew
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseDrink::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseDrinkIt, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseLater
+	closemessage
+	fadescreen FADE_TO_BLACK
+	playse SE_M_SWEET_SCENT
+	waitse
+	fadescreen FADE_FROM_BLACK
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseDrank
+	setflag FLAG_ISEKAI_POTION_ACTIVE
+	setvar VAR_0x8005, NURSE_QUEST_DRANK
+	special IsekaiNurseSetStage
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseLater::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseLater
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseDrank::
+	goto_if_unset FLAG_ISEKAI_POTION_ACTIVE, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseFailed
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseGoFight
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseFailed::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseFailed
+	goto ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseDrink
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseResults::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseResults
+	special IsekaiRomQuestDone
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseHub::
+	call IsekaiEventScript_RomHub
+	release
+	end
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiNurseVolunteer::
+	.string "…While you're here.\p"
+	.string "I'm testing a POTION for humans.\n"
+	.string "I need a volunteer. Interested?$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiNurseNoVolunteer::
+	.string "Coward. Sensible, but a coward.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiNurseIsItSafe::
+	.string "YOU: Is it safe?\p"
+	.string "NURSE: That's what the trial\n"
+	.string "is for.\p"
+	.string "I need three herbs. They grow in\n"
+	.string "the tall grass: one on ROUTE 2,\l"
+	.string "one in VIRIDIAN FOREST, one on\l"
+	.string "ROUTE 22.\p"
+	.string "Keep your eyes on the ground while\n"
+	.string "you walk. Bring them here.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiNurseStillNeed::
+	.string "Herbs: {STR_VAR_1} of 3.\p"
+	.string "ROUTE 2, VIRIDIAN FOREST, ROUTE 22.\n"
+	.string "In the tall grass. Look down.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiNurseBrew::
+	.string "All three. Good.\p"
+	.string "She grinds them, adds something\n"
+	.string "from a brown bottle, and stirs.\p"
+	.string "It's bubbling. Slightly.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiNurseDrinkIt::
+	.string "NURSE: Drink it, then win your next\n"
+	.string "fight while it's working.\p"
+	.string "Drink it now?$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiNurseLater::
+	.string "It'll keep. I think.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiNurseDrank::
+	.string "It tastes like a battery.\p"
+	.string "…For a moment, you can hear\n"
+	.string "colours.\p"
+	.string "NURSE: Your POKéMON will pick up on\n"
+	.string "it. Expect it to be confused.\p"
+	.string "Now go and win a fight.\n"
+	.string "I'm taking notes.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiNurseGoFight::
+	.string "Still hearing colours? Good.\n"
+	.string "Go and win a fight.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiNurseFailed::
+	.string "You lost? Then the data's useless.\p"
+	.string "I made a second batch.\n"
+	.string "Of course I did.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiNurseResults::
+	.string "NURSE: You won? While hearing\n"
+	.string "colours?\p"
+	.string "…Interesting.\n"
+	.string "Same time next week?$"
 
 ViridianCity_PokemonCenter_1F_Text_IsekaiWardNurseFirst::
 	.string "I run the HUMAN WARD, through\n"

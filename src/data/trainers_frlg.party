@@ -13966,3 +13966,39 @@ IVs: 15 HP / 15 Atk / 15 Def / 15 SpA / 15 SpD / 15 Spe
 - Low Kick
 - Fury Swipes
 - Leer
+
+=== TRAINER_ISEKAI_PEBBLE_ASSISTANT ===
+Name: KIMBA
+Class: Scientist Frlg
+Pic: Scientist Frlg
+Gender: Male
+Music: Dangerous
+Double Battle: No
+AI: Check Bad Move
+
+Geodude
+Level: 9
+IVs: 10 HP / 10 Atk / 10 Def / 10 SpA / 10 SpD / 10 Spe
+- Tackle
+- Defense Curl
+
+Voltorb
+Level: 9
+IVs: 10 HP / 10 Atk / 10 Def / 10 SpA / 10 SpD / 10 Spe
+- Tackle
+- Charge
+
+=== TRAINER_ISEKAI_BLAISIA_1 ===
+Name: BLAISIA
+Class: Pokefan
+Pic: Pokefan F
+Gender: Female
+Music: Cute
+Double Battle: No
+AI: Check Bad Move
+
+Little One (Rattata) @ Oran Berry
+Level: 5
+IVs: 5 HP / 5 Atk / 5 Def / 5 SpA / 5 SpD / 5 Spe
+- Tackle
+- Tail Whip
