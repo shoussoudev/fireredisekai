@@ -99,7 +99,10 @@ IsekaiText_ProtectedNote_Badge:
 
 IsekaiText_DidntGetBackUp:
 	.string "{STR_VAR_1} didn't get back up.\p"
-	.string "…$"
+	.string "…\p"
+	.string "{STR_VAR_1} is gone. It was taken to\n"
+	.string "the GARDEN OF REST in VIRIDIAN.\p"
+	.string "It is no longer in your team.$"
 
 IsekaiText_BadlyInjured:
 	.string "{STR_VAR_1} gets back up. Slowly.\n"
@@ -739,3 +742,94 @@ IsekaiText_SharkSold:
 	.string "going twice…\p"
 	.string "Your {STR_VAR_1} found a new home.\n"
 	.string "Nothing personal.$"
+
+@ ---------------------------------------------------------------------------
+@ FireRed Isekai: the phone call after a death. VAR_0x8004: 0 Oak (first time, explains),
+@ 1 Oak (later), 2 Oak (his own POKéMON), 3 the ward nurse (Oak's POKéMON, Oak won't call),
+@ 4 the ward nurse (first time, Oak won't call). STR_VAR_1 = its name.
+@ ---------------------------------------------------------------------------
+IsekaiEventScript_DeathCall::
+	lockall
+	playse SE_POKENAV_CALL
+	waitse
+	playse SE_POKENAV_CALL
+	msgbox IsekaiText_PhoneRings
+	switch VAR_0x8004
+	case 1, IsekaiEventScript_DeathCall_OakLater
+	case 2, IsekaiEventScript_DeathCall_OakLoaner
+	case 3, IsekaiEventScript_DeathCall_NurseLoaner
+	case 4, IsekaiEventScript_DeathCall_Nurse
+	textcolor NPC_TEXT_COLOR_MALE
+	msgbox IsekaiText_DeathCall_OakFirst
+	releaseall
+	end
+IsekaiEventScript_DeathCall_OakLater:
+	textcolor NPC_TEXT_COLOR_MALE
+	msgbox IsekaiText_DeathCall_OakLater
+	releaseall
+	end
+IsekaiEventScript_DeathCall_OakLoaner:
+	textcolor NPC_TEXT_COLOR_MALE
+	msgbox IsekaiText_DeathCall_OakLoaner
+	releaseall
+	end
+IsekaiEventScript_DeathCall_NurseLoaner:
+	textcolor NPC_TEXT_COLOR_FEMALE
+	msgbox IsekaiText_DeathCall_NurseLoaner
+	releaseall
+	end
+IsekaiEventScript_DeathCall_Nurse:
+	textcolor NPC_TEXT_COLOR_FEMALE
+	msgbox IsekaiText_DeathCall_Nurse
+	releaseall
+	end
+
+IsekaiText_DeathCall_OakFirst:
+	.string "OAK: …I heard about {STR_VAR_1}.\p"
+	.string "I'm sorry. Truly.\p"
+	.string "Out there, they don't come back.\n"
+	.string "Not ever.\p"
+	.string "The CENTER takes them to the GARDEN\n"
+	.string "OF REST in VIRIDIAN. Their names go\l"
+	.string "on the stone.\p"
+	.string "Visit, if you need to.\p"
+	.string "…Be careful out there. Please.$"
+
+IsekaiText_DeathCall_OakLater:
+	.string "OAK: I heard about {STR_VAR_1}.\p"
+	.string "…I'm sorry.\n"
+	.string "Look after the others.$"
+
+IsekaiText_DeathCall_OakLoaner:
+	.string "OAK: …{STR_VAR_1}.\p"
+	.string "…\p"
+	.string "I raised it from an EGG, you know.\n"
+	.string "Always so worried. About everything.\p"
+	.string "It's not your fault. Out there,\n"
+	.string "it's nobody's fault.\p"
+	.string "They'll put its name on the stone\n"
+	.string "in VIRIDIAN. I'll… go and see it.$"
+
+IsekaiText_DeathCall_NurseLoaner:
+	.string "Hello? This is the ward at the\n"
+	.string "VIRIDIAN POKéMON CENTER.\p"
+	.string "I'm calling about {STR_VAR_1}.\n"
+	.string "I'm so sorry.\p"
+	.string "Its name is on the stone in our\n"
+	.string "GARDEN OF REST now.\p"
+	.string "…PROF. OAK has been told. It was his.\n"
+	.string "He asked me to call you.\p"
+	.string "He didn't want to.$"
+
+IsekaiText_DeathCall_Nurse:
+	.string "Hello? This is the ward at the\n"
+	.string "VIRIDIAN POKéMON CENTER.\p"
+	.string "I'm calling about {STR_VAR_1}.\n"
+	.string "I'm so sorry.\p"
+	.string "Out there, when a POKéMON goes down\n"
+	.string "for good, it doesn't get back up.\p"
+	.string "We take them to the GARDEN OF REST,\n"
+	.string "beside the CENTER. Their names go on\l"
+	.string "the stone.\p"
+	.string "…PROF. OAK asked me to call you.\n"
+	.string "He didn't want to.$"

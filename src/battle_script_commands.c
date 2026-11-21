@@ -8097,8 +8097,8 @@ static u32 ComputeCaptureOdds(u32 wildMonBattler, u32 playerBattler)
 
     if (GetConfig(B_LOW_LEVEL_CATCH_BONUS) == GEN_8 && battleMon->level <= 20)
          odds = odds * (30 - battleMon->level) / 10;
-    else if (GetConfig(B_LOW_LEVEL_CATCH_BONUS) >= GEN_9 && battleMon->level <= 13)
-        odds = odds * (36 - (battleMon->level * 2)) / 10;
+    else if (GetConfig(B_LOW_LEVEL_CATCH_BONUS) >= GEN_9 && battleMon->level <= (IS_FRLG ? 10 : 13))
+        odds = odds * (36 - (battleMon->level * 2)) / 10; // FireRed Isekai: above level 10, weaken them first
 
     if (battleMon->status1 & STATUS1_INCAPACITATED)
     {

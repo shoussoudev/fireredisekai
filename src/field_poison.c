@@ -29,7 +29,7 @@ static bool32 PoisonKills(void)
     return IS_FRLG && FlagGet(FLAG_BADGE01_GET);
 }
 
-static const u8 sText_IsekaiPoisonDeath[] = _("{STR_VAR_1} collapsed.\nThe poison was too much…\p{STR_VAR_1} is gone.\p");
+static const u8 sText_IsekaiPoisonDeath[] = _("{STR_VAR_1} collapsed.\nThe poison was too much…\p{STR_VAR_1} is gone. It was taken to\nthe GARDEN OF REST in VIRIDIAN.\pIt is no longer in your team.\p");
 
 static bool32 IsMonValidSpecies(struct Pokemon *pokemon)
 {

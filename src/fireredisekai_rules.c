@@ -179,8 +179,24 @@ void IsekaiOnReviveUsed(struct Pokemon *mon, u16 item)
 // The graveyard
 // ---------------------------------------------------------------------------
 
+// Someone phones after a death: Oak if he still likes you, the Viridian ward nurse if not.
+EWRAM_DATA static bool8 sDeathCallPending = FALSE;
+EWRAM_DATA static bool8 sDeathCallLoaner = FALSE;
+EWRAM_DATA static u8 sDeathCallName[POKEMON_NAME_LENGTH + 1] = {0};
+
+static void QueueDeathCall(struct Pokemon *mon)
+{
+    if (!FlagGet(FLAG_ISEKAI_HAS_PHONE))
+        return;
+    GetMonData(mon, MON_DATA_NICKNAME, sDeathCallName);
+    StringGet_Nickname(sDeathCallName);
+    sDeathCallLoaner = IsekaiIsLoaner(mon);
+    sDeathCallPending = TRUE;
+}
+
 static void BuryMon(struct Pokemon *mon)
 {
+    QueueDeathCall(mon);
     IsekaiCarePlanOnDeath();
     u8 slot = sIsekai.graveCount;
     u8 name[POKEMON_NAME_LENGTH + 1];
@@ -954,6 +970,29 @@ bool32 IsekaiFieldIdle(void)
         LockPlayerFieldControls();
         ScriptContext_SetupScript(IsekaiEventScript_AfterBattleNews);
         return TRUE;
+    }
+    if (sDeathCallPending)
+    {
+        bool32 cold = FlagGet(FLAG_ISEKAI_OAK_COLD) || FlagGet(FLAG_ISEKAI_WANTED)
+                   || VarGet(VAR_ISEKAI_LOAN_STATE) == 7;
+        bool32 first = !FlagGet(FLAG_ISEKAI_DEATH_CALL_DONE);
+        sDeathCallPending = FALSE;
+        StringCopy(gStringVar1, sDeathCallName);
+        if (sDeathCallLoaner)
+            gSpecialVar_0x8004 = cold ? 3 : 2;   // Oak's own POKéMON
+        else if (!cold)
+            gSpecialVar_0x8004 = first ? 0 : 1; // Oak, sorry
+        else if (first)
+            gSpecialVar_0x8004 = 4;              // the ward nurse, because Oak won't
+        else
+            gSpecialVar_0x8004 = 0xFF;
+        FlagSet(FLAG_ISEKAI_DEATH_CALL_DONE);
+        if (gSpecialVar_0x8004 != 0xFF)
+        {
+            LockPlayerFieldControls();
+            ScriptContext_SetupScript(IsekaiEventScript_DeathCall);
+            return TRUE;
+        }
     }
     if (sPendingCall != 0)
     {
