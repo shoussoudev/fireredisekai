@@ -147,7 +147,20 @@ static bool32 IsProtectedFaint(struct Pokemon *mon, u8 opponentMaxLevel)
     return opponentMaxLevel < 10;
 }
 
+// The opponent's party is wiped before the end-of-battle hook runs, so the highest level is
+// remembered as the battle goes (start, after level boosts, and on every look during it).
+EWRAM_DATA static u8 sOppMaxLevelSeen = 0;
+
+static u8 OpponentMaxLevelNow(void);
 static u8 OpponentMaxLevel(void)
+{
+    u8 now = OpponentMaxLevelNow();
+    if (now > sOppMaxLevelSeen)
+        sOppMaxLevelSeen = now;
+    return sOppMaxLevelSeen;
+}
+
+static u8 OpponentMaxLevelNow(void)
 {
     u8 i, maxLevel = 0;
     for (i = 0; i < PARTY_SIZE; i++)
@@ -504,6 +517,8 @@ static bool32 IsekaiRulesApply(void)
 static void RecordAliveAtStart(void)
 {
     u8 i;
+    sOppMaxLevelSeen = 0;
+    OpponentMaxLevel();
     sAliveAtStart = 0;
     for (i = 0; i < PARTY_SIZE; i++)
     {
@@ -589,6 +604,7 @@ void IsekaiOnTrainerBattleStart(void)
     if (!IsSpecialFoe() || gIsekaiTrainerArgs == NULL)
     {
         BoostOpponents(DifficultyLevelBoost());
+        OpponentMaxLevel();
         // Ordinary trainer: no save at the start, no reset penalty.
         sIsekai.battleType = ISEKAI_BATTLE_NONE;
         sResumingBattle = FALSE;
@@ -601,6 +617,7 @@ void IsekaiOnTrainerBattleStart(void)
     sIsekai.trainerArgs = (u32)gIsekaiTrainerArgs;
     sIsekai.battleOpponent = TRAINER_BATTLE_PARAM.opponentA;
     BoostOpponents(DifficultyLevelBoost() + sIsekai.resetCount * 3);
+    OpponentMaxLevel();
     // Saved once the battle transition has gone black (IsekaiOnBattleInit), so the pause is hidden.
     sBattleStartSavePending = TRUE;
 }
