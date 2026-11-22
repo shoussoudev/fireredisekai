@@ -828,6 +828,16 @@ void IsekaiOnBattleEnd(void)
      && (sLastDefeat == ISEKAI_DEFEAT_NONE || sLastDefeat == ISEKAI_DEFEAT_PROTECTED))
         return;
 
+    // A won TRAINER battle: the game still has to mark the trainer as beaten and run the
+    // after-battle script (BADGES, items). Saving here would write a "not beaten yet" state
+    // (v0.14.3 bug: BROCK fought again after reloading). Save once he's back in control.
+    if (!PlayerLost() && !forfeited && (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
+     && CalculatePlayerPartyCount() != 0)
+    {
+        sAutosavePending = TRUE;
+        return;
+    }
+
     // Whiteouts heal and warp to a Center; write that outcome so a reset can't dodge it.
     if (PlayerLost() || forfeited || CalculatePlayerPartyCount() == 0)
     {
