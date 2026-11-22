@@ -1,11 +1,92 @@
 PewterCity_Frlg_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, PewterCity_OnTransition
+	map_script MAP_SCRIPT_ON_FRAME_TABLE, PewterCity_OnFrame
 	.byte 0
 
 PewterCity_OnTransition::
 	setworldmapflag FLAG_WORLD_MAP_PEWTER_CITY
 	setvar VAR_MAP_SCENE_PEWTER_CITY_MUSEUM_1F, 0
+	@ FireRed Isekai: the museum steps, once, right after DR. PEBBLE's tour.
+	setflag FLAG_HIDE_ISEKAI_PEWTER_ELDER
+	goto_if_unset FLAG_ISEKAI_MUSEUM_TOUR, PewterCity_OnTransition_End
+	goto_if_set FLAG_ISEKAI_MUSEUM_STEPS, PewterCity_OnTransition_End
+	getplayerxy VAR_TEMP_2, VAR_TEMP_3
+	goto_if_ne VAR_TEMP_2, 17, PewterCity_OnTransition_End
+	goto_if_gt VAR_TEMP_3, 7, PewterCity_OnTransition_End
+	setvar VAR_TEMP_4, 1
+PewterCity_OnTransition_End:
 	end
+
+PewterCity_OnFrame::
+	map_script_2 VAR_TEMP_4, 1, PewterCity_EventScript_IsekaiMuseumSteps
+	.2byte 0
+
+PewterCity_EventScript_IsekaiMuseumSteps::
+	lockall
+	setvar VAR_TEMP_4, 0
+	setflag FLAG_ISEKAI_MUSEUM_STEPS
+	applymovement LOCALID_PLAYER, Common_Movement_FaceDown
+	waitmovement 0
+	delay 30
+	msgbox PewterCity_Text_IsekaiSteps
+	closemessage
+	delay 30
+	clearflag FLAG_HIDE_ISEKAI_PEWTER_ELDER
+	addobject LOCALID_PEWTER_ISEKAI_ELDER
+	applymovement LOCALID_PEWTER_ISEKAI_ELDER, PewterCity_Movement_IsekaiElderArrive
+	waitmovement 0
+	textcolor NPC_TEXT_COLOR_MALE
+	msgbox PewterCity_Text_IsekaiElderSteps
+	closemessage
+	applymovement LOCALID_PEWTER_ISEKAI_ELDER, PewterCity_Movement_IsekaiElderLeave
+	waitmovement 0
+	removeobject LOCALID_PEWTER_ISEKAI_ELDER
+	setflag FLAG_HIDE_ISEKAI_PEWTER_ELDER
+	releaseall
+	end
+
+PewterCity_Movement_IsekaiElderArrive:
+	walk_slow_right
+	walk_slow_right
+	walk_slow_right
+	walk_slow_right
+	walk_slow_right
+	walk_slow_up
+	face_up
+	step_end
+
+PewterCity_Movement_IsekaiElderLeave:
+	walk_down
+	walk_left
+	walk_left
+	walk_left
+	walk_left
+	walk_left
+	walk_left
+	step_end
+
+PewterCity_Text_IsekaiSteps::
+	.string "(Back to square one.\n"
+	.string "You sit down on the museum steps.)\p"
+	.string "(So that's it. No answers.)\p"
+	.string "(…But BROCK's GYM is right there.\n"
+	.string "And MT. MOON after that.\l"
+	.string "And CERULEAN.)\p"
+	.string "(You know every step of this road.\n"
+	.string "You've just never walked it.)\p"
+	.string "(…Fine. Just a bit further.)$"
+
+PewterCity_Text_IsekaiElderSteps::
+	.string "The old man from VIRIDIAN sits down\n"
+	.string "next to you, drinking a coffee.\p"
+	.string "ELDER: Didn't find what you came for?\p"
+	.string "At your age you start thinking every\n"
+	.string "trip needs a reason. A plan.\l"
+	.string "A return on investment.\p"
+	.string "Sometimes you just go because you\n"
+	.string "want to see what's there.\p"
+	.string "…Also, that museum is a scam.\n"
+	.string "I asked about my sock. He kept it.$"
 
 @ Impossible to speak to this NPC from a facing dir != DIR_EAST normally, so they arent checked
 @ Additionally, no movement script exists for facing DIR_SOUTH, which would necessitate walking out of bounds

@@ -127,6 +127,21 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "PewterCity_EventScript_RunningShoesAide",
       "flag": "FLAG_HIDE_PEWTER_CITY_RUNNING_SHOES_GUY"
+    },
+    {
+      "type": "object",
+      "graphics_id": "OBJ_EVENT_GFX_OLD_MAN_1",
+      "x": 12,
+      "y": 9,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_FACE_RIGHT",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "0x0",
+      "flag": "FLAG_HIDE_ISEKAI_PEWTER_ELDER",
+      "local_id": "LOCALID_PEWTER_ISEKAI_ELDER"
     }
   ],
   "warp_events": [

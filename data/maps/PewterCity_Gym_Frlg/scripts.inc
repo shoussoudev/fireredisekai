@@ -3,6 +3,14 @@ PewterCity_Gym_Frlg_MapScripts::
 
 PewterCity_Gym_EventScript_Brock::
 	famechecker FAMECHECKER_BROCK, FCPICKSTATE_COLORED, UpdatePickStateFromSpecialVar8005
+	goto_if_set FLAG_BADGE01_GET, PewterCity_Gym_EventScript_IsekaiBrockReady
+	goto_if_set FLAG_ISEKAI_MUSEUM_TOUR, PewterCity_Gym_EventScript_IsekaiBrockReady
+	lock
+	faceplayer
+	msgbox PewterCity_Gym_Text_IsekaiMuseumFirst
+	release
+	end
+PewterCity_Gym_EventScript_IsekaiBrockReady:
 	trainerbattle_single TRAINER_LEADER_BROCK, PewterCity_Gym_Text_BrockIntro, PewterCity_Gym_Text_BrockDefeat, PewterCity_Gym_EventScript_DefeatedBrock, NO_MUSIC
 	goto_if_unset FLAG_GOT_TM39_FROM_BROCK, PewterCity_Gym_EventScript_GiveTM39
 	msgbox PewterCity_Gym_Text_BrockPostBattle
@@ -188,3 +196,13 @@ PewterCity_Gym_Text_GymStatuePlayerWon::
 	.string "WINNING TRAINERS:\n"
 	.string "{RIVAL}, {PLAYER}$"
 
+
+@ FireRed Isekai: the MC came to PEWTER for the museum. BROCK sends him there first.
+PewterCity_Gym_Text_IsekaiMuseumFirst:
+	.string "BROCK: You don't look like a\n"
+	.string "challenger. You look like a man who\l"
+	.string "came to PEWTER for the MUSEUM.\p"
+	.string "DR. PEBBLE collects people like you.\n"
+	.string "Go and see him first.\p"
+	.string "I'll still be here.\n"
+	.string "With my paperwork.$"

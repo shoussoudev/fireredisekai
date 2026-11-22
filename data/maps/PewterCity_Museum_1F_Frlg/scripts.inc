@@ -157,12 +157,6 @@ PewterCity_Museum_1F_EventScript_IsekaiPebbleTour::
 	msgbox PewterCity_Museum_1F_Text_IsekaiPebbleTour2
 	msgbox PewterCity_Museum_1F_Text_IsekaiPebbleTour3
 	setflag FLAG_ISEKAI_MUSEUM_TOUR
-	closemessage
-	fadescreen FADE_TO_BLACK
-	msgbox PewterCity_Museum_1F_Text_IsekaiSteps
-	msgbox PewterCity_Museum_1F_Text_IsekaiElderSteps
-	setflag FLAG_ISEKAI_MUSEUM_STEPS
-	fadescreen FADE_FROM_BLACK
 	release
 	end
 
@@ -234,30 +228,6 @@ PewterCity_Museum_1F_Text_IsekaiPebbleTour3::
 	.string "be very tired?\p"
 	.string "Here. Take this.\n"
 	.string "(He hands you a museum leaflet.)$"
-
-PewterCity_Museum_1F_Text_IsekaiSteps::
-	.string "Back to square one.\n"
-	.string "Outside, you sit on the museum steps.\p"
-	.string "So that's it. No answers.\n"
-	.string "…\p"
-	.string "But BROCK's GYM is right there.\n"
-	.string "And MT. MOON after that.\l"
-	.string "And CERULEAN.\p"
-	.string "You know every step of this road.\n"
-	.string "You've just never walked it.\p"
-	.string "…Fine. Just a bit further.$"
-
-PewterCity_Museum_1F_Text_IsekaiElderSteps::
-	.string "The old man from VIRIDIAN sits down\n"
-	.string "next to you, drinking a coffee.\p"
-	.string "ELDER: Didn't find what you came for?\p"
-	.string "At your age you start thinking every\n"
-	.string "trip needs a reason. A plan.\l"
-	.string "A return on investment.\p"
-	.string "Sometimes you just go because you\n"
-	.string "want to see what's there.\p"
-	.string "…Also, that museum is a scam.\n"
-	.string "I asked about my sock. He kept it.$"
 
 PewterCity_Museum_1F_Text_IsekaiPebbleAgain::
 	.string "DR. PEBBLE: Back again? I'm still\n"
