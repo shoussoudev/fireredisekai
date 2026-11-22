@@ -21,9 +21,8 @@ PewterCity_Gym_EventScript_DefeatedBrock::
 	famechecker FAMECHECKER_BROCK, 1
 	setflag FLAG_DEFEATED_BROCK
 	setflag FLAG_BADGE01_GET
-	setvar VAR_MAP_SCENE_PEWTER_CITY, 1
+	setvar VAR_MAP_SCENE_PEWTER_CITY, 2 @ FireRed Isekai: no running-shoes aide (he can run from the start)
 	setflag FLAG_HIDE_PEWTER_CITY_GYM_GUIDE
-	clearflag FLAG_HIDE_PEWTER_CITY_RUNNING_SHOES_GUY
 	set_gym_trainers_frlg 1
 	call IsekaiEventScript_BrockLicence
 	goto PewterCity_Gym_EventScript_GiveTM39

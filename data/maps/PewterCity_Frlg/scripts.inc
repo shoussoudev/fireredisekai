@@ -8,6 +8,10 @@ PewterCity_OnTransition::
 	setvar VAR_MAP_SCENE_PEWTER_CITY_MUSEUM_1F, 0
 	@ FireRed Isekai: the museum steps, once, right after DR. PEBBLE's tour.
 	setflag FLAG_HIDE_ISEKAI_PEWTER_ELDER
+	setflag FLAG_HIDE_PEWTER_CITY_RUNNING_SHOES_GUY
+	call_if_eq VAR_MAP_SCENE_PEWTER_CITY, 1, PewterCity_EventScript_IsekaiSkipAide
+	call_if_ne VAR_ISEKAI_BLAISIA, 1, PewterCity_EventScript_IsekaiHideBlaisia
+	call_if_eq VAR_ISEKAI_BLAISIA, 1, PewterCity_EventScript_IsekaiShowBlaisia
 	goto_if_unset FLAG_ISEKAI_MUSEUM_TOUR, PewterCity_OnTransition_End
 	goto_if_set FLAG_ISEKAI_MUSEUM_STEPS, PewterCity_OnTransition_End
 	getplayerxy VAR_TEMP_2, VAR_TEMP_3
@@ -1073,3 +1077,78 @@ PewterCity_Text_RunningShoesLetterFromMom::
 	.string "you! Don't ever give up!\p"
 	.string "From Mom$"
 
+
+@ FireRed Isekai: BLAISIA waits at the road east after BROCK, until he's met her.
+PewterCity_EventScript_IsekaiHideBlaisia::
+	setflag FLAG_HIDE_ISEKAI_BLAISIA_1
+	return
+
+PewterCity_EventScript_IsekaiShowBlaisia::
+	clearflag FLAG_HIDE_ISEKAI_BLAISIA_1
+	return
+
+@ FireRed Isekai (v0.14): BLAISIA, first meeting. She won't let him pass until he answers.
+PewterCity_EventScript_IsekaiBlaisiaTrigger::
+	lockall
+	applymovement LOCALID_PEWTER_BLAISIA, Common_Movement_ExclamationMark
+	waitmovement 0
+	goto PewterCity_EventScript_IsekaiBlaisiaTalk
+
+PewterCity_EventScript_IsekaiBlaisia::
+	lockall
+	faceplayer
+PewterCity_EventScript_IsekaiBlaisiaTalk::
+	textcolor NPC_TEXT_COLOR_FEMALE
+	msgbox PewterCity_Text_IsekaiBlaisia1
+	msgbox PewterCity_Text_IsekaiBlaisia2
+	closemessage
+	trainerbattle_no_intro TRAINER_ISEKAI_BLAISIA_1, PewterCity_Text_IsekaiBlaisiaDefeat
+	msgbox PewterCity_Text_IsekaiBlaisiaAfter
+	closemessage
+	setvar VAR_ISEKAI_BLAISIA, 2
+	setflag FLAG_HIDE_ISEKAI_BLAISIA_1
+	fadescreen FADE_TO_BLACK
+	removeobject LOCALID_PEWTER_BLAISIA
+	fadescreen FADE_FROM_BLACK
+	releaseall
+	end
+
+PewterCity_Text_IsekaiBlaisia1:
+	.string "A woman about your mum's age stands\n"
+	.string "in the path, holding a RATTATA like\l"
+	.string "a newborn.\p"
+	.string "WOMAN: Excuse me, young man. You\n"
+	.string "look like you know what you're doing.\p"
+	.string "I'm BLAISIA. I have questions.\n"
+	.string "Three. You can't pass until then.\p"
+	.string "Question one. How do you make it do\n"
+	.string "the electricity?\p"
+	.string "YOU: …That's a RATTATA.\n"
+	.string "It doesn't do electricity.\p"
+	.string "BLAISIA: Oh. Well, I've named it\n"
+	.string "Little One, so it can do what\l"
+	.string "it likes.$"
+
+PewterCity_Text_IsekaiBlaisia2:
+	.string "Question two. Where does it go when\n"
+	.string "it's in the ball? Is it comfortable?\l"
+	.string "Is it cold in there?\p"
+	.string "(You don't actually know.)\p"
+	.string "Question three. Would you battle me?\n"
+	.string "I've never done one. My son made it\l"
+	.string "look easy.$"
+
+PewterCity_Text_IsekaiBlaisiaDefeat:
+	.string "Oh! Sorry! Sorry, little one!\n"
+	.string "Not you, Little One. The other one.$"
+
+PewterCity_Text_IsekaiBlaisiaAfter:
+	.string "BLAISIA: That was wonderful.\n"
+	.string "I didn't understand a single thing.\p"
+	.string "I'll see you around!\n"
+	.string "I'll have more questions!\p"
+	.string "(She will.)$"
+
+PewterCity_EventScript_IsekaiSkipAide::
+	setvar VAR_MAP_SCENE_PEWTER_CITY, 2
+	return
