@@ -62,6 +62,8 @@ ViridianCity_PokemonCenter_1F_EventScript_IsekaiWardNurse::
 
 ViridianCity_PokemonCenter_1F_EventScript_IsekaiWardNurseAgain::
 	@ v0.14: her potion trial, then the romance.
+	@ v0.14.8: first, the ward itself (take in / give back Badly Injured POKéMON)
+	call IsekaiEventScript_CenterWard
 	setvar VAR_0x8004, ROM_WARD_NURSE
 	special IsekaiRomGetState
 	goto_if_ne VAR_RESULT, ROM_STATE_NONE, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseHub
@@ -434,3 +436,4 @@ ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyBroke::
 ViridianCity_PokemonCenter_1F_Text_IsekaiSharkeyLater::
 	.string "SHARKEY: No rush.\p"
 	.string "…Well. A little rush.$"
+

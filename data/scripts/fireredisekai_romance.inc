@@ -452,6 +452,7 @@ IsekaiEventScript_WardNurseGeneric::
 	goto_if_eq VAR_RESULT, FALSE, IsekaiEventScript_WardNurseGeneric_End
 	msgbox IsekaiText_WardNurseGenericDating
 IsekaiEventScript_WardNurseGeneric_End:
+	call IsekaiEventScript_CenterWard
 	release
 	end
 

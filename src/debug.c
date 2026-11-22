@@ -1746,6 +1746,9 @@ static void DebugAction_OpenSubMenuCreateFollowerNPC(u8 taskId, const struct Deb
 
 static void DebugAction_Util_Fly(u8 taskId)
 {
+    // FireRed Isekai (testing): every town is a destination.
+    for (u32 i = 0; i < ARRAY_COUNT(sLocationFlags); i++)
+        FlagSet(sLocationFlags[i]);
     Debug_DestroyMenu(taskId);
     SetMainCallback2(CB2_OpenFlyMap);
 }

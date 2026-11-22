@@ -74,6 +74,20 @@ IsekaiEventScript_AfterBattleNews_Done:
 	releaseall
 	end
 
+@ The same news, from inside another script (the wake-up). Returns.
+IsekaiEventScript_BattleNewsInline::
+	special IsekaiNextDeathMessage
+	goto_if_eq VAR_RESULT, FALSE, IsekaiEventScript_BattleNewsInline_Injuries
+	msgbox IsekaiText_DidntGetBackUp
+	goto IsekaiEventScript_BattleNewsInline
+IsekaiEventScript_BattleNewsInline_Injuries:
+	special IsekaiNextInjuryMessage
+	goto_if_eq VAR_RESULT, FALSE, IsekaiEventScript_BattleNewsInline_Done
+	msgbox IsekaiText_BadlyInjured
+	goto IsekaiEventScript_BattleNewsInline_Injuries
+IsekaiEventScript_BattleNewsInline_Done:
+	return
+
 IsekaiEventScript_ProtectedNote_NoBadge:
 	msgbox IsekaiText_ProtectedNote_NoBadge
 	return
@@ -114,6 +128,7 @@ IsekaiText_BadlyInjured:
 @ Waking up after a whiteout (replaces FireRed's nurse scene).
 @ ---------------------------------------------------------------------------
 IsekaiEventScript_WakeUp::
+	call IsekaiEventScript_BattleNewsInline @ v0.14.8: deaths and injuries first, then the wake-up
 	special IsekaiGetWakeUpScene
 	switch VAR_RESULT
 	case 0, IsekaiEventScript_WakeUp_WaitingRoom
@@ -139,7 +154,7 @@ IsekaiText_WakeUp_WaitingRoomBadge:
 	.string "Anything level 10 or up won't be.$"
 
 IsekaiEventScript_WakeUp_Ward:
-	fadescreen FADE_TO_BLACK
+	@ v0.14.8: no black screen; he's discharged at the counter.
 	switch VAR_0x8004
 	case 2, IsekaiEventScript_WakeUp_HowWild  @ ISEKAI_DEFEAT_WILD
 	case 4, IsekaiEventScript_WakeUp_HowRocket  @ ISEKAI_DEFEAT_ROCKET
@@ -167,11 +182,11 @@ IsekaiEventScript_WakeUp_Ankle:
 	special IsekaiWardWakeRomance
 	call_if_eq VAR_RESULT, 1, IsekaiEventScript_WakeUp_NursePerk
 	call_if_eq VAR_RESULT, 2, IsekaiEventScript_WakeUp_NursePenalty
-	fadescreen FADE_FROM_BLACK
 	return
 
 @ Before the first Center: Red's mum finds him.
 IsekaiEventScript_WakeUpHome::
+	call IsekaiEventScript_BattleNewsInline
 	special IsekaiGetWakeUpScene
 	goto_if_eq VAR_RESULT, 2, IsekaiEventScript_GameOver
 	goto_if_ne VAR_RESULT, 1, IsekaiEventScript_WakeUpHome_End
@@ -212,27 +227,28 @@ IsekaiText_WakeUp_WaitingRoom:
 	.string "first BADGE.$"
 
 IsekaiText_WakeUp_HowWild:
-	.string "With your team down, nothing stood\n"
+	.string "(With your team down, nothing stood\n"
 	.string "between you and the wild {STR_VAR_2}.\p"
-	.string "It turned its attention to you.$"
+	.string "It turned its attention to you.)$"
 
 IsekaiText_WakeUp_HowTrainer:
-	.string "Your last POKéMON was about to take\n"
+	.string "(Your last POKéMON was about to take\n"
 	.string "the final hit.\p"
-	.string "You don't remember deciding to move.$"
+	.string "You don't remember deciding to move.)$"
 
 IsekaiText_WakeUp_HowGrass:
-	.string "The last thing you remember is the\n"
-	.string "grass moving the wrong way.$"
+	.string "(The last thing you remember is the\n"
+	.string "grass moving the wrong way.)$"
 
 IsekaiText_WakeUp_HowRocket:
-	.string "Your POKéMON were already down.\p"
-	.string "The ROCKETS kept going anyway.\n"
-	.string "That was the point.$"
+	.string "(Your POKéMON were already down.\n"
+	.string "The ROCKETS kept going anyway.\l"
+	.string "That was the point.)$"
 
 IsekaiText_WakeUp_FirstTime:
-	.string "You wake up in a bed. White sheets.\n"
-	.string "A sign on the door: HUMAN WARD.\p"
+	.string "(You spent the night in the HUMAN\n"
+	.string "WARD. White sheets. A sign on the\l"
+	.string "door. This morning they let you out.)\p"
 	.string "NURSE: Easy. People get hurt out\n"
 	.string "there too. We just don't put it on\l"
 	.string "the posters.\p"
@@ -242,7 +258,7 @@ IsekaiText_WakeUp_FirstTime:
 	.string "of it. I mean that kindly.$"
 
 IsekaiText_WakeUp_Again:
-	.string "You wake up in a bed. Again.\p"
+	.string "(Another night in the HUMAN WARD.)\p"
 	.string "NURSE: Welcome back. Try not to make\n"
 	.string "this a habit.\p"
 	.string "(Lives left: {STR_VAR_1})$"
@@ -836,3 +852,24 @@ IsekaiText_DeathCall_Nurse:
 	.string "the stone.\p"
 	.string "…PROF. OAK asked me to call you.\n"
 	.string "He didn't want to.$"
+
+@ v0.14.8: after a whiteout, the counter nurse has already treated the team.
+IsekaiEventScript_AfterWhiteOutTreated::
+	msgbox IsekaiText_TreatedWhileOut
+	call EventScript_PkmnCenterNurse_TakeAndHealPkmn_Frlg
+	call_if_set FLAG_ISEKAI_LIMPING, IsekaiEventScript_TreatAnkle
+	special IsekaiCountInjuredInParty
+	goto_if_eq VAR_RESULT, 0, IsekaiEventScript_AfterWhiteOutTreated_End
+	msgbox IsekaiText_SeeTheWardNurse
+IsekaiEventScript_AfterWhiteOutTreated_End:
+	return
+
+IsekaiText_TreatedWhileOut:
+	.string "NURSE: We treated your POKéMON while\n"
+	.string "you were out.$"
+
+IsekaiText_SeeTheWardNurse:
+	.string "The Badly Injured ones need more than\n"
+	.string "the machine, though.\p"
+	.string "Talk to our ward nurse when you're\n"
+	.string "ready. She's just over there.$"

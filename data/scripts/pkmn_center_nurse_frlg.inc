@@ -3,9 +3,7 @@ EventScript_AfterWhiteOutHeal_Frlg::
 	textcolor NPC_TEXT_COLOR_FEMALE
 	call IsekaiEventScript_WakeUp @ FireRed Isekai: waiting room, human ward, or the end
 	textcolor NPC_TEXT_COLOR_FEMALE
-	msgbox gText_FirstShouldRestoreMonsHealth
-	call EventScript_PkmnCenterNurse_TakeAndHealPkmn_Frlg
-	call IsekaiEventScript_CenterWard
+	call IsekaiEventScript_AfterWhiteOutTreated @ FireRed Isekai: the ward nurse handles the Badly Injured
 	applymovement VAR_LAST_TALKED, Movement_Bow
 	waitmovement 0
 	fadedefaultbgm
