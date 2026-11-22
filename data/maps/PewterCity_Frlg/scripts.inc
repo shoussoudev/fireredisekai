@@ -45,24 +45,42 @@ PewterCity_EventScript_IsekaiMuseumSteps::
 	releaseall
 	end
 
+@ From the road south (from VIRIDIAN), up to the museum steps.
 PewterCity_Movement_IsekaiElderArrive:
-	walk_slow_right
-	walk_slow_right
-	walk_slow_right
-	walk_slow_right
-	walk_slow_right
-	walk_slow_up
+	walk_up
+	walk_up
+	walk_up
+	walk_up
+	walk_up
+	walk_up
+	walk_up
+	walk_up
+	walk_up
+	walk_up
+	walk_left
+	walk_left
+	walk_left
+	walk_left
+	walk_left
 	face_up
 	step_end
 
 PewterCity_Movement_IsekaiElderLeave:
+	walk_right
+	walk_right
+	walk_right
+	walk_right
+	walk_right
 	walk_down
-	walk_left
-	walk_left
-	walk_left
-	walk_left
-	walk_left
-	walk_left
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	walk_down
 	step_end
 
 PewterCity_Text_IsekaiSteps::
