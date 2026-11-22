@@ -366,7 +366,7 @@ IsekaiText_WardOffer:
 	.string "…{STR_VAR_1} is Badly Injured.\n"
 	.string "The machine can't fix that.\p"
 	.string "It needs real rest. Leave it with\n"
-	.string "us while you fight {STR_VAR_2} battles?$"
+	.string "us while you fight {STR_VAR_2} TRAINERS?$"
 
 IsekaiText_WardDeclined:
 	.string "Then please be careful.\n"
@@ -375,7 +375,7 @@ IsekaiText_WardDeclined:
 IsekaiText_WardTaken:
 	.string "We'll take good care of it.\p"
 	.string "Come back to any POKéMON CENTER\n"
-	.string "once you've fought {STR_VAR_2} battles.$"
+	.string "once you've fought {STR_VAR_2} TRAINERS.$"
 
 IsekaiText_WardLastOne:
 	.string "That would leave you with nobody.\p"

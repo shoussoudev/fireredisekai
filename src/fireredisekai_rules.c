@@ -86,12 +86,7 @@ u8 IsekaiMaxLives(void)
 
 u8 IsekaiWardBattles(void)
 {
-    switch (GetCurrentDifficultyLevel())
-    {
-    case DIFFICULTY_EASY: return 2;
-    case DIFFICULTY_HARD: return 4;
-    default:              return 3;
-    }
+    return 3; // three TRAINER battles, any difficulty (v0.14.1)
 }
 
 static u8 CountBadges(void)
@@ -754,8 +749,8 @@ void IsekaiOnBattleEnd(void)
         IsekaiSharkTakesAll();
         IsekaiTonyWillTake();
     }
-    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER || gBattleOutcome == B_OUTCOME_WON
-     || gBattleOutcome == B_OUTCOME_CAUGHT || gBattleOutcome == B_OUTCOME_LOST)
+    // Ward recovery counts TRAINER battles only (v0.14.1).
+    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
         IsekaiWardBattleFought();
     if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER))
         IsekaiCatchCooldownTick();
