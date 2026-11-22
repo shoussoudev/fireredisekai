@@ -437,3 +437,35 @@ IsekaiText_DaisyBlueLecture:
 IsekaiText_DaisyBlueGrandpa:
 	.string "BLUE: Tell him I don't care.\p"
 	.string "(Wrong words. Maybe next time.)$"
+
+@ ---------------------------------------------------------------------------
+@ v0.14.7: a ward nurse in every CENTER (the VIRIDIAN one, in lavender, is the romance).
+@ ---------------------------------------------------------------------------
+IsekaiEventScript_WardNurseGeneric::
+	lock
+	faceplayer
+	textcolor NPC_TEXT_COLOR_FEMALE
+	special IsekaiBufferLives
+	msgbox IsekaiText_WardNurseGeneric
+	setvar VAR_0x8004, ROM_WARD_NURSE
+	special IsekaiRomCheckPerk
+	goto_if_eq VAR_RESULT, FALSE, IsekaiEventScript_WardNurseGeneric_End
+	msgbox IsekaiText_WardNurseGenericDating
+IsekaiEventScript_WardNurseGeneric_End:
+	release
+	end
+
+IsekaiText_WardNurseGeneric:
+	.string "WARD NURSE: This is the ward.\p"
+	.string "Badly Injured POKéMON rest here while\n"
+	.string "you fight a few TRAINERS. Ask the\l"
+	.string "nurse at the counter.\p"
+	.string "And if you're ever carried in\n"
+	.string "yourself… you can come through that\l"
+	.string "door {STR_VAR_1} more times.\p"
+	.string "Let's not find out.$"
+
+IsekaiText_WardNurseGenericDating:
+	.string "…Wait. You're the one VIRIDIAN's ward\n"
+	.string "nurse won't stop talking about?\p"
+	.string "Huh. I pictured you taller.$"
