@@ -86,7 +86,13 @@ u8 IsekaiMaxLives(void)
 
 u8 IsekaiWardBattles(void)
 {
-    return 3; // three TRAINER battles, any difficulty (v0.14.1)
+    // TRAINER battles only (v0.14.1)
+    switch (GetCurrentDifficultyLevel())
+    {
+    case DIFFICULTY_EASY: return 2;
+    case DIFFICULTY_HARD: return 4;
+    default:              return 3;
+    }
 }
 
 static u8 CountBadges(void)

@@ -90,7 +90,10 @@ PewterCity_Gym_Text_BrockIntro::
 	.string "I run the GYM in the mornings and\n"
 	.string "the quarry in the afternoons.\p"
 	.string "You're a challenger?\n"
-	.string "…Fine. Let's be quick.{PLAY_BGM}{MUS_RG_ENCOUNTER_GYM_LEADER}$"
+	.string "…Fine. Let's be quick.\p"
+	.string "Fair warning. Everyone who walks in\n"
+	.string "here has a SQUIRTLE or a BULBASAUR.\p"
+	.string "I did the maths.{PLAY_BGM}{MUS_RG_ENCOUNTER_GYM_LEADER}$"
 
 PewterCity_Gym_Text_BrockDefeat::
 	.string "…You're good. Like, scarily good.\n"

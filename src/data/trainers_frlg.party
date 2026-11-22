@@ -7052,6 +7052,14 @@ IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 - Tackle
 - Defense Curl
 
+Lileep
+Level: 14
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+- Mega Drain
+- Acid
+- Confuse Ray
+- Ingrain
+
 Onix
 Level: 14
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
@@ -7185,6 +7193,14 @@ IVs: 25 HP / 25 Atk / 25 Def / 25 SpA / 25 SpD / 25 Spe
 - Horn Attack
 - Tail Whip
 - Stomp
+
+Lileep @ Oran Berry
+Level: 13
+IVs: 25 HP / 25 Atk / 25 Def / 25 SpA / 25 SpD / 25 Spe
+- Mega Drain
+- Acid
+- Confuse Ray
+- Ingrain
 
 Onix @ Sitrus Berry
 Level: 13
