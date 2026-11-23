@@ -37,12 +37,12 @@ PalletTown_RivalsHouse_EventScript_Daisy::
 	end
 
 PalletTown_RivalsHouse_EventScript_IsekaiDaisyRates::
+	@ v0.14.9: one topic per talk. First the introduction, then her request, then her services menu.
 	goto_if_set FLAG_ISEKAI_DAISY_RATES, PalletTown_RivalsHouse_EventScript_IsekaiDaisyQuest
 	setflag FLAG_ISEKAI_DAISY_RATES
 	msgbox PalletTown_RivalsHouse_Text_IsekaiDaisyRates
-	goto PalletTown_RivalsHouse_EventScript_GroomMon
+	goto PalletTown_RivalsHouse_EventScript_IsekaiDaisyMenu
 
-@ v0.14: her brother won't call home. Then the romance.
 PalletTown_RivalsHouse_EventScript_IsekaiDaisyQuest::
 	setvar VAR_0x8004, ROM_DAISY
 	special IsekaiRomGetState
@@ -50,62 +50,46 @@ PalletTown_RivalsHouse_EventScript_IsekaiDaisyQuest::
 	switch VAR_ISEKAI_DAISY_QUEST
 	case DAISY_QUEST_MESSAGE, PalletTown_RivalsHouse_EventScript_IsekaiDaisyWaiting
 	case DAISY_QUEST_DELIVERED, PalletTown_RivalsHouse_EventScript_IsekaiDaisyHeCalled
+	@ her request, on its own
 	msgbox PalletTown_RivalsHouse_Text_IsekaiDaisyAsk
 	setvar VAR_ISEKAI_DAISY_QUEST, DAISY_QUEST_MESSAGE
-	goto PalletTown_RivalsHouse_EventScript_GroomMon
+	release
+	end
 
 PalletTown_RivalsHouse_EventScript_IsekaiDaisyWaiting::
 	msgbox PalletTown_RivalsHouse_Text_IsekaiDaisyWaiting
-	goto PalletTown_RivalsHouse_EventScript_GroomMon
+	goto PalletTown_RivalsHouse_EventScript_IsekaiDaisyMenu
 
 PalletTown_RivalsHouse_EventScript_IsekaiDaisyHeCalled::
 	setvar VAR_ISEKAI_DAISY_QUEST, DAISY_QUEST_DONE
 	special IsekaiRomQuestDone
-PalletTown_RivalsHouse_EventScript_IsekaiDaisyHub::
 	call IsekaiEventScript_RomHub
-	goto PalletTown_RivalsHouse_EventScript_GroomMon
-
-PalletTown_RivalsHouse_Text_IsekaiDaisyAsk::
-	.string "DAISY: Can I ask you something?\p"
-	.string "BLUE hasn't called since he left.\n"
-	.string "Not once.\p"
-	.string "Our parents are abroad. Grandpa\n"
-	.string "lives in his lab. So it's me,\l"
-	.string "keeping this house going.\p"
-	.string "I'm twenty-two. I've been running\n"
-	.string "this house since I was sixteen.\p"
-	.string "If you see him… pass on a message?\n"
-	.string "He won't listen unless you beat him.\l"
-	.string "He's like that.$"
-
-PalletTown_RivalsHouse_Text_IsekaiDaisyWaiting::
-	.string "DAISY: Seen BLUE yet?\n"
-	.string "Beat him first. Then talk.\l"
-	.string "Find the right words.$"
-
-PalletTown_RivalsHouse_Text_IsekaiDaisyRates::
-	.string "DAISY: Oh. It's you again.\p"
-	.string "Well… since you're here.\n"
-	.string "I'm good with POKéMON, you know.\p"
-	.string "I can tell how much they like\n"
-	.string "someone just by looking.\p"
-	.string "And I groom them. For free.\n"
-	.string "Grandpa's never once paid me.$"
-
-PalletTown_RivalsHouse_EventScript_HeardBattledRival::
-	msgbox PalletTown_RivalsHouse_Text_HeardYouBattledRival
 	release
 	end
 
+PalletTown_RivalsHouse_EventScript_IsekaiDaisyHub::
+	call IsekaiEventScript_RomHub
+	goto PalletTown_RivalsHouse_EventScript_IsekaiDaisyMenu
+
+@ Her services: read the lead POKéMON's friendship, or groom one.
 PalletTown_RivalsHouse_EventScript_GroomMon::
-	@ v0.14: dating DAISY, grooming any time.
+PalletTown_RivalsHouse_EventScript_IsekaiDaisyMenu::
+	msgbox PalletTown_RivalsHouse_Text_IsekaiDaisyWhatNow
+	dynmultichoice 0, 0, FALSE, 3, 0, DYN_MULTICHOICE_CB_NONE, PalletTown_RivalsHouse_Text_IsekaiOptRate, PalletTown_RivalsHouse_Text_IsekaiOptGroom, PalletTown_RivalsHouse_Text_IsekaiOptNothing
+	switch VAR_RESULT
+	case 0, PalletTown_RivalsHouse_EventScript_RateMonFriendship
+	case 1, PalletTown_RivalsHouse_EventScript_IsekaiDaisyGroom
+	msgbox PalletTown_RivalsHouse_Text_DontNeedAnyGrooming
+	release
+	end
+
+PalletTown_RivalsHouse_EventScript_IsekaiDaisyGroom::
+	@ dating DAISY: grooming any time
 	setvar VAR_0x8004, ROM_DAISY
 	special IsekaiRomCheckPerk
 	goto_if_eq VAR_RESULT, TRUE, PalletTown_RivalsHouse_EventScript_IsekaiGroomAnyTime
-	goto_if_lt VAR_MASSAGE_COOLDOWN_STEP_COUNTER, 500, PalletTown_RivalsHouse_EventScript_RateMonFriendship
+	goto_if_lt VAR_MASSAGE_COOLDOWN_STEP_COUNTER, 500, PalletTown_RivalsHouse_EventScript_IsekaiGroomTooSoon
 PalletTown_RivalsHouse_EventScript_IsekaiGroomAnyTime:
-	msgbox PalletTown_RivalsHouse_Text_LikeMeToGroomMon, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, PalletTown_RivalsHouse_EventScript_DeclineGrooming
 	msgbox PalletTown_RivalsHouse_Text_GroomWhichOne
 	special ChoosePartyMon
 	lock
@@ -122,6 +106,60 @@ PalletTown_RivalsHouse_EventScript_IsekaiGroomAnyTime:
 	fadescreen FADE_FROM_BLACK
 	special BufferMonNickname
 	msgbox PalletTown_RivalsHouse_Text_ThereYouGoAllDone
+	release
+	end
+
+PalletTown_RivalsHouse_EventScript_IsekaiGroomTooSoon::
+	msgbox PalletTown_RivalsHouse_Text_IsekaiGroomTooSoon
+	release
+	end
+
+PalletTown_RivalsHouse_Text_IsekaiDaisyAsk::
+	.string "DAISY: Can I ask you something?\p"
+	.string "BLUE hasn't called since he left.\n"
+	.string "Not once.\p"
+	.string "Our parents work abroad, and Grandpa\n"
+	.string "practically lives in his LAB.\p"
+	.string "I've kept this house running since\n"
+	.string "I was sixteen. I'm twenty-two now.\p"
+	.string "If you run into him… tell him to\n"
+	.string "call home?\p"
+	.string "He only listens to people who beat\n"
+	.string "him. He's like that.$"
+
+PalletTown_RivalsHouse_Text_IsekaiDaisyWaiting::
+	.string "DAISY: Any news from BLUE?\n"
+	.string "…No?\p"
+	.string "Beat him first. Then find the\n"
+	.string "right words.$"
+
+PalletTown_RivalsHouse_Text_IsekaiDaisyRates::
+	.string "DAISY: Oh. It's you again.\p"
+	.string "Well… since you're here.\n"
+	.string "I'm good with POKéMON, you know.\p"
+	.string "I can tell how much they like\n"
+	.string "someone just by looking.\p"
+	.string "And I groom them. For free.\n"
+	.string "Grandpa's never once paid me.$"
+
+PalletTown_RivalsHouse_Text_IsekaiDaisyWhatNow::
+	.string "DAISY: So. What can I do for you?$"
+
+PalletTown_RivalsHouse_Text_IsekaiOptRate:
+	.string "How do they feel?$"
+
+PalletTown_RivalsHouse_Text_IsekaiOptGroom:
+	.string "Groom one$"
+
+PalletTown_RivalsHouse_Text_IsekaiOptNothing:
+	.string "Nothing$"
+
+PalletTown_RivalsHouse_Text_IsekaiGroomTooSoon::
+	.string "DAISY: I just did one.\n"
+	.string "Give it a few hundred steps.$"
+
+PalletTown_RivalsHouse_EventScript_HeardBattledRival::
+	msgbox PalletTown_RivalsHouse_Text_HeardYouBattledRival
 	release
 	end
 
@@ -286,37 +324,28 @@ PalletTown_RivalsHouse_Text_LikeMeToGroomMon::
 	.string "Would you like me to groom one?$"
 
 PalletTown_RivalsHouse_Text_DontNeedAnyGrooming::
-	.string "You don't need any grooming done?\n"
-	.string "Okay, we'll just have tea.$"
+	.string "DAISY: Okay. Mind the cat on your\n"
+	.string "way out.$"
 
 PalletTown_RivalsHouse_Text_GroomWhichOne::
-	.string "Which one should I groom?$"
+	.string "DAISY: Which one?$"
 
 PalletTown_RivalsHouse_Text_LookingNiceInNoTime::
-	.string "DAISY: Okay, I'll get it looking\n"
-	.string "nice in no time.$"
+	.string "DAISY: Hold still. This won't take\n"
+	.string "long.$"
 
 PalletTown_RivalsHouse_Text_ThereYouGoAllDone::
-#ifdef BUGFIX @ The localizers missed what should be a textcolor change in the localizations.
-	.string "{COLOR DARK_GRAY}{STR_VAR_1} looks dreamily content…\p"
-	.string "{COLOR RED}DAISY: There you go! All done.\n"
-#else @ In the JP games, gender-based text used a different font instead of different colors.
 	.string "{FONT_NORMAL}{STR_VAR_1} looks dreamily content…\p"
-	.string "{FONT_FEMALE}DAISY: There you go! All done.\n"
-#endif
-	.string "See? Doesn't it look nice?\p"
-	.string "Giggle…\n"
-	.string "It's such a cute POKéMON.$"
+	.string "{FONT_FEMALE}DAISY: There. Much better.\n"
+	.string "Try to keep it that way.$"
 
 PalletTown_RivalsHouse_Text_CantGroomAnEgg::
-	.string "Oh, sorry. I honestly can't\n"
-	.string "groom an EGG.$"
+	.string "DAISY: That's an EGG.\n"
+	.string "I'm good, but not that good.$"
 
 PalletTown_RivalsHouse_Text_MayISeeFirstMon::
-	.string "DAISY: Your POKéMON grow to love\n"
-	.string "you if you raise them with love.\p"
-	.string "For example, {PLAYER}, may I see\n"
-	.string "your first POKéMON?$"
+	.string "DAISY: Let me see your first\n"
+	.string "POKéMON.$"
 
 PalletTown_RivalsHouse_Text_CouldntLoveYouMore::
 	.string "It couldn't possibly love you\n"
@@ -338,16 +367,12 @@ PalletTown_RivalsHouse_Text_ItsWarmingUpToYou::
 	.string "Trust must be growing between you.$"
 
 PalletTown_RivalsHouse_Text_NotFamiliarWithYouYet::
-	.string "It's not quite familiar with you\n"
-	.string "yet.\p"
-	.string "POKéMON are all quite wary when\n"
-	.string "you first get them.$"
+	.string "It doesn't know you very well yet.\n"
+	.string "Give it time.$"
 
 PalletTown_RivalsHouse_Text_DontLikeWayItGlaresAtYou::
-	.string "{PLAYER}, I don't like the way it\n"
-	.string "glares at you.\p"
-	.string "Could you try being a little nicer\n"
-	.string "to it?$"
+	.string "I don't like the way it glares at\n"
+	.string "you. Be a little nicer to it.$"
 
 PalletTown_RivalsHouse_Text_WhyWouldMonHateYouSoMuch::
 	.string "…Um, it's not easy for me to say\n"
