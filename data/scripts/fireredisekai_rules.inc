@@ -161,6 +161,17 @@ IsekaiText_WakeUp_WaitingRoomBadge:
 @ He wakes up standing in front of the ward nurse (VAR_LAST_TALKED), and she does the talking.
 IsekaiEventScript_WakeUp_Ward:
 	textcolor NPC_TEXT_COLOR_FEMALE
+	special IsekaiWardWakeLine @ v0.14.12: if the ward nurse is (or was) his partner, it's personal
+	goto_if_eq VAR_RESULT, FALSE, IsekaiEventScript_WakeUp_Usual
+	msgbox gStringVar4
+	goto_if_set FLAG_ISEKAI_SEEN_WARD, IsekaiEventScript_WakeUp_LivesLeft
+	setflag FLAG_ISEKAI_SEEN_WARD
+	msgbox IsekaiText_WakeUp_Rules
+	goto IsekaiEventScript_WakeUp_Ankle
+IsekaiEventScript_WakeUp_LivesLeft:
+	msgbox IsekaiText_WakeUp_LivesLeft
+	goto IsekaiEventScript_WakeUp_Ankle
+IsekaiEventScript_WakeUp_Usual:
 	goto_if_set FLAG_ISEKAI_SEEN_WARD, IsekaiEventScript_WakeUp_Again
 	setflag FLAG_ISEKAI_SEEN_WARD
 	msgbox IsekaiText_WakeUp_FirstTime
@@ -257,6 +268,15 @@ IsekaiText_WakeUp_FirstTime:
 	.string "After that, you won't walk back out\n"
 	.string "of it. I mean that kindly.$"
 
+IsekaiText_WakeUp_Rules:
+	.string "NURSE: And listen. You can come\n"
+	.string "through that door {STR_VAR_1} more times.\p"
+	.string "After that, you won't walk back out\n"
+	.string "of it. So don't.$"
+
+IsekaiText_WakeUp_LivesLeft:
+	.string "(Lives left: {STR_VAR_1})$"
+
 IsekaiText_WakeUp_Again:
 	.string "NURSE: Welcome back. Try not to make\n"
 	.string "this a habit.\p"
@@ -301,18 +321,23 @@ IsekaiEventScript_CenterWard::
 	goto_if_eq VAR_RESULT, 0, IsekaiEventScript_CenterWard_StillResting
 	setvar VAR_0x8008, 1
 	playfanfare MUS_HEAL
-	msgbox IsekaiText_WardHealed
+	call_if_eq VAR_RESULT, 1, IsekaiEventScript_CenterWard_HealedOne
+	call_if_gt VAR_RESULT, 1, IsekaiEventScript_CenterWard_HealedMany
 	waitfanfare
 IsekaiEventScript_CenterWard_StillResting:
 	call_if_eq VAR_0x8004, TRUE, IsekaiEventScript_CenterWard_MankeyLeaves
 	special IsekaiWardStatus
-	call_if_ne VAR_RESULT, 0, IsekaiEventScript_CenterWard_ShowResting
+	call_if_eq VAR_RESULT, 1, IsekaiEventScript_CenterWard_ShowResting
+	call_if_gt VAR_RESULT, 1, IsekaiEventScript_CenterWard_ShowRestingMany
 	special IsekaiPartyCount
 	goto_if_eq VAR_RESULT, 0, IsekaiEventScript_CenterWard_NoTeam
 	special IsekaiCountInjuredInParty
 	goto_if_eq VAR_RESULT, 0, IsekaiEventScript_CenterWard_End
+	copyvar VAR_0x8009, VAR_RESULT @ v0.14.12: how many, so she says "it" or "them"
 	setvar VAR_0x8008, 1
+	goto_if_gt VAR_0x8009, 1, IsekaiEventScript_CenterWard_OfferMany
 	msgbox IsekaiText_WardOffer, MSGBOX_YESNO
+IsekaiEventScript_CenterWard_Offered:
 	goto_if_eq VAR_RESULT, NO, IsekaiEventScript_CenterWard_Declined
 	special IsekaiWardQuote
 	goto_if_eq VAR_RESULT, 2, IsekaiEventScript_CenterWard_CantPay
@@ -328,7 +353,7 @@ IsekaiEventScript_CenterWard_Paid:
 	special IsekaiWouldLeaveEmptyParty
 	goto_if_eq VAR_RESULT, TRUE, IsekaiEventScript_CenterWard_LastOne
 	special IsekaiLeaveInjuredAtCenter
-	msgbox IsekaiText_WardTaken
+	call IsekaiEventScript_CenterWard_SayTaken
 IsekaiEventScript_CenterWard_End:
 	return
 
@@ -404,8 +429,53 @@ IsekaiEventScript_CenterWard_LastOne:
 	playfanfare MUS_LEVEL_UP
 	msgbox IsekaiText_GotMankey
 	waitfanfare
+	call IsekaiEventScript_CenterWard_SayTaken
+	return
+
+IsekaiEventScript_CenterWard_OfferMany:
+	msgbox IsekaiText_WardOfferMany, MSGBOX_YESNO
+	goto IsekaiEventScript_CenterWard_Offered
+
+IsekaiEventScript_CenterWard_SayTaken:
+	goto_if_gt VAR_0x8009, 1, IsekaiEventScript_CenterWard_SayTakenMany
 	msgbox IsekaiText_WardTaken
 	return
+IsekaiEventScript_CenterWard_SayTakenMany:
+	msgbox IsekaiText_WardTakenMany
+	return
+
+IsekaiEventScript_CenterWard_HealedOne:
+	msgbox IsekaiText_WardHealed
+	return
+IsekaiEventScript_CenterWard_HealedMany:
+	msgbox IsekaiText_WardHealedMany
+	return
+
+IsekaiEventScript_CenterWard_ShowRestingMany:
+	setvar VAR_0x8008, 1
+	msgbox IsekaiText_WardRestingMany
+	return
+
+IsekaiText_WardOfferMany:
+	.string "…{STR_VAR_3} of your POKéMON are\n"
+	.string "Badly Injured. The machine can't\l"
+	.string "fix that.\p"
+	.string "They need real rest. Leave them with\n"
+	.string "us while you fight {STR_VAR_2} TRAINERS?$"
+
+IsekaiText_WardTakenMany:
+	.string "We'll take good care of them.\p"
+	.string "Come back to any POKéMON CENTER\n"
+	.string "once you've fought {STR_VAR_2} TRAINERS.$"
+
+IsekaiText_WardHealedMany:
+	.string "Oh, and your {STR_VAR_3} POKéMON from\n"
+	.string "the ward are all better! Here.$"
+
+IsekaiText_WardRestingMany:
+	.string "Your POKéMON in our ward are still\n"
+	.string "resting. Fight {STR_VAR_2} more TRAINER(S)\l"
+	.string "and come back to any CENTER.$"
 
 IsekaiText_WardFee:
 	.string "Ward care is ¥{STR_VAR_1}.\n"
@@ -449,7 +519,7 @@ IsekaiText_WardLastOne:
 	.string "That would leave you with nobody.\p"
 	.string "We do have a MANKEY nobody's come\n"
 	.string "back for. It's… grumpy.\p"
-	.string "Take it until yours is better?$"
+	.string "Take it until your team is better?$"
 
 IsekaiText_GotMankey:
 	.string "{PLAYER} received MANKEY.\n"

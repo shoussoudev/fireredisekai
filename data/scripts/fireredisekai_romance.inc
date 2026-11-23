@@ -157,7 +157,7 @@ IsekaiEventScript_RomApology_Fail:
 	msgbox IsekaiText_RomSorryFail
 	return
 
-@ A partner calls the CENTER (from IsekaiFieldIdle). gStringVar4 = her line.
+@ A partner calls on the cheap phone OAK gave him (from IsekaiFieldIdle), wherever he is.
 IsekaiEventScript_RomCall::
 	lockall
 	playse SE_POKENAV_CALL
@@ -199,7 +199,7 @@ IsekaiText_RomYouLie:
 
 IsekaiText_RomHint:
 	.string "(You're seeing someone now.\n"
-	.string "She might call you at a CENTER.\p"
+	.string "She might call you now and then.\p"
 	.string "Visit her now and then. Go two\n"
 	.string "BADGES without stopping by, and\l"
 	.string "she'll stop waiting.\p"
@@ -274,8 +274,8 @@ IsekaiText_RomSorryFail:
 	.string "…Come back when you mean it.$"
 
 IsekaiText_RomBzzz:
-	.string "Bzzz. The CENTER's phone.\n"
-	.string "The nurse waves you over. It's for you.$"
+	.string "The cheap phone OAK gave you is\n"
+	.string "ringing. It's {STR_VAR_1}.$"
 
 IsekaiText_RomGift:
 	.string "(She left something for you in\n"
@@ -290,15 +290,25 @@ IsekaiText_RomGhosted:
 
 @ v0.14: the ward nurse's perk and penalty when he wakes in a ward.
 IsekaiEventScript_WakeUp_NursePerk::
+	special IsekaiWardWakeIsHerCenter
+	goto_if_eq VAR_RESULT, TRUE, IsekaiEventScript_WakeUp_NursePerkHere
 	msgbox IsekaiText_WakeUp_NursePerk
 	return
+IsekaiEventScript_WakeUp_NursePerkHere:
+	msgbox IsekaiText_WakeUp_NursePerkHere
+	return
+
+IsekaiText_WakeUp_NursePerkHere:
+	.string "NURSE: I patched up your team too.\n"
+	.string "No charge. Don't tell my supervisor.$"
 
 IsekaiEventScript_WakeUp_NursePenalty::
 	msgbox IsekaiText_WakeUp_NursePenalty
 	return
 
 IsekaiText_WakeUp_NursePerk:
-	.string "A note on the bedside table:\p"
+	.string "NURSE: Oh, and this came for you\n"
+	.string "from VIRIDIAN. A note:\p"
 	.string "“Patched up your team too. No charge.\n"
 	.string "Don't make a habit of this.”$"
 

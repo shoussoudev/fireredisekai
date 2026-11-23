@@ -237,7 +237,7 @@
 #define VAR_0x40BD                 0x40BD
 #define VAR_ISEKAI_ROM_META                   VAR_0x40BD // FireRed Isekai: romance: breakups (bits 0-3), Glacia chain next (4-7), chain broken (8), Fortuna read (9)
 #define VAR_0x40BE                 0x40BE
-#define VAR_ISEKAI_ROM_CALL_STEPS             VAR_0x40BE // FireRed Isekai: steps since the last Center call
+#define VAR_ISEKAI_ROM_CALL_STEPS             VAR_0x40BE // FireRed Isekai: steps since the last partner phone call
 #define VAR_0x40BF                 0x40BF
 #define VAR_ISEKAI_NURSE_QUEST                VAR_0x40BF // FireRed Isekai: ward nurse quest: herbs bits 0-2, stage bits 4-7
 #define VAR_0x40C0                 0x40C0

@@ -245,8 +245,52 @@ static const u8 *const *const sLines[ROM_COUNT] =
     [ROM_DAISY]      = sLinesDaisy,
 };
 
+// v0.14.12: phone calls and "you came by" greetings vary. [partner][variant]
+#define ROM_VARIANTS 3
+static const u8 *const sCallLines[ROM_COUNT][ROM_VARIANTS] =
+{
+    [ROM_WARD_NURSE] = {
+        COMPOUND_STRING("NURSE: It's me. From the ward.\pQuiet shift. Nobody's bleeding.\nI hate it. Talk to me a minute?\p…OK. That's enough. Go be careful."),
+        COMPOUND_STRING("NURSE: Checking in.\nProfessionally.\pAny dizziness? Chest pain? Missing\nsomeone in VIRIDIAN?\p…Good. The last one's the right\nanswer."),
+        COMPOUND_STRING("NURSE: It's me. I just wanted to\nhear you were walking around.\pNo stretcher this time? Good.\nKeep it that way."),
+    },
+    [ROM_REDS_MUM] = {
+        COMPOUND_STRING("MUM: Hello? Is this thing on?\nOAK gave me this number.\p…It's you! Are you eating properly?\nRED never calls either."),
+        COMPOUND_STRING("MUM: It's me. I found your mug in\nthe sink and got silly about it.\pThat's all. Go on. Be safe."),
+        COMPOUND_STRING("MUM: Hello, love. Just a quick one.\pI aired out the spare blanket.\nIn case you're passing PALLET."),
+    },
+    [ROM_DAISY] = {
+        COMPOUND_STRING("DAISY: It's me. Grandpa's finally\nasleep.\pThe house is quiet. It's weird.\n…Come by sometime."),
+        COMPOUND_STRING("DAISY: Quick one. Grandpa asked who\nI keep phoning.\pI said the bank. Don't make me\na liar for too long."),
+        COMPOUND_STRING("DAISY: Hey. The accounts are done\nand I had time left over.\pSo. Hi. That's it.\nThat's the call."),
+    },
+};
+
+static const u8 *const sDatingLines[ROM_COUNT][ROM_VARIANTS] =
+{
+    [ROM_WARD_NURSE] = {
+        COMPOUND_STRING("You're back. …Good.\pI keep looking at the door when\nmy shift's quiet. Don't tell anyone."),
+        COMPOUND_STRING("There you are. Pull up a chair.\nNot the patient one."),
+        COMPOUND_STRING("You walked in. On your own feet.\pDo you know how rare that is in\nhere? I missed this face."),
+    },
+    [ROM_REDS_MUM] = {
+        COMPOUND_STRING("There you are. Sit, sit.\pI made too much again. I always\nmake too much when I hope you'll come."),
+        COMPOUND_STRING("Oh! Wipe your feet.\n…Come here first, actually."),
+        COMPOUND_STRING("I was just thinking about you.\nDon't laugh. Tea?"),
+    },
+    [ROM_DAISY] = {
+        COMPOUND_STRING("You came. Good.\pSit with me. I'm doing the\naccounts, but I like you here."),
+        COMPOUND_STRING("Took you long enough.\nSit. The tea's still hot."),
+        COMPOUND_STRING("Grandpa's at the lab, so it's\nquiet for once. Stay a bit?"),
+    },
+};
+
 static const u8 *RomLine(u8 p, u8 line)
 {
+    if (p < ROM_COUNT && line == ROMLINE_CALL && sCallLines[p][0] != NULL)
+        return sCallLines[p][Random() % ROM_VARIANTS];
+    if (p < ROM_COUNT && line == ROMLINE_DATING && sDatingLines[p][0] != NULL)
+        return sDatingLines[p][Random() % ROM_VARIANTS];
     if (p < ROM_COUNT && sLines[p] != NULL && sLines[p][line] != NULL)
         return sLines[p][line];
     return sLinesGeneric[line];
@@ -446,30 +490,6 @@ static EWRAM_DATA u8 sCallPending = 0;      // partner + 1
 static EWRAM_DATA bool8 sCallMissYou = FALSE;
 static EWRAM_DATA u8 sGhostedPending = 0;   // bitmask of partners who left (ghosting), shown one at a time
 
-static const u16 sCenters[][2] =
-{
-    {MAP_GROUP(MAP_VIRIDIAN_CITY_POKEMON_CENTER_1F), MAP_NUM(MAP_VIRIDIAN_CITY_POKEMON_CENTER_1F)},
-    {MAP_GROUP(MAP_PEWTER_CITY_POKEMON_CENTER_1F),   MAP_NUM(MAP_PEWTER_CITY_POKEMON_CENTER_1F)},
-    {MAP_GROUP(MAP_CERULEAN_CITY_POKEMON_CENTER_1F), MAP_NUM(MAP_CERULEAN_CITY_POKEMON_CENTER_1F)},
-    {MAP_GROUP(MAP_VERMILION_CITY_POKEMON_CENTER_1F),MAP_NUM(MAP_VERMILION_CITY_POKEMON_CENTER_1F)},
-    {MAP_GROUP(MAP_LAVENDER_TOWN_POKEMON_CENTER_1F), MAP_NUM(MAP_LAVENDER_TOWN_POKEMON_CENTER_1F)},
-    {MAP_GROUP(MAP_CELADON_CITY_POKEMON_CENTER_1F),  MAP_NUM(MAP_CELADON_CITY_POKEMON_CENTER_1F)},
-    {MAP_GROUP(MAP_FUCHSIA_CITY_POKEMON_CENTER_1F),  MAP_NUM(MAP_FUCHSIA_CITY_POKEMON_CENTER_1F)},
-    {MAP_GROUP(MAP_SAFFRON_CITY_POKEMON_CENTER_1F),  MAP_NUM(MAP_SAFFRON_CITY_POKEMON_CENTER_1F)},
-    {MAP_GROUP(MAP_CINNABAR_ISLAND_POKEMON_CENTER_1F),MAP_NUM(MAP_CINNABAR_ISLAND_POKEMON_CENTER_1F)},
-    {MAP_GROUP(MAP_ROUTE4_POKEMON_CENTER_1F),        MAP_NUM(MAP_ROUTE4_POKEMON_CENTER_1F)},
-    {MAP_GROUP(MAP_ROUTE10_POKEMON_CENTER_1F),       MAP_NUM(MAP_ROUTE10_POKEMON_CENTER_1F)},
-};
-
-static bool32 InCenter(void)
-{
-    u32 i;
-    for (i = 0; i < ARRAY_COUNT(sCenters); i++)
-        if (gSaveBlock1Ptr->location.mapGroup == sCenters[i][0] && gSaveBlock1Ptr->location.mapNum == sCenters[i][1])
-            return TRUE;
-    return FALSE;
-}
-
 static bool32 GiftReady(u8 p)
 {
     u16 v = RomVar(p);
@@ -478,15 +498,19 @@ static bool32 GiftReady(u8 p)
         && BadgeCount() > ((v >> ROM_START_SHIFT) & 0xF);
 }
 
+static void RomPickCaller(void);
+
 void IsekaiRomOnStep(void)
 {
     if (VarGet(VAR_ISEKAI_ROM_CALL_STEPS) < 0xFFFF)
         VarSet(VAR_ISEKAI_ROM_CALL_STEPS, VarGet(VAR_ISEKAI_ROM_CALL_STEPS) + 1);
+    if (IS_FRLG)
+        RomPickCaller();
 }
 
 void IsekaiRomOnMapWarp(void)
 {
-    u8 p, n, pick, sec;
+    u8 p, sec;
 
     if (!IS_FRLG || DatingCount() == 0)
         return;
@@ -497,7 +521,14 @@ void IsekaiRomOnMapWarp(void)
         if (sHometown[p] == sec && gMapHeader.mapType != MAP_TYPE_INDOOR)
             RaiseSuspicion(p, 3);
 
-    if (!InCenter() || VarGet(VAR_ISEKAI_ROM_CALL_STEPS) < CALL_EVERY_STEPS)
+}
+
+// v0.14.12: partners call on the cheap phone OAK gave him, wherever he is, every so many steps.
+static void RomPickCaller(void)
+{
+    u8 p, n, pick;
+
+    if (sCallPending || DatingCount() == 0 || VarGet(VAR_ISEKAI_ROM_CALL_STEPS) < CALL_EVERY_STEPS)
         return;
     // Someone he hasn't visited since the last BADGE calls first (once): a warning before ghosting.
     for (p = 0; p < ROM_COUNT; p++)
@@ -596,4 +627,52 @@ bool32 IsekaiRomFieldIdle(void)
         return TRUE;
     }
     return FALSE;
+}
+
+// v0.14.12: waking up after a blackout. If the ward nurse is (or was) his partner, the wake-up is personal.
+// gStringVar4 = her line (or the local nurse's, passing on a message); VAR_RESULT = FALSE for the usual lines.
+// Leaves gStringVar1 (lives left) alone.
+void IsekaiWardWakeLine(void)
+{
+    static const u8 *const sHerCenterDating[] = {
+        COMPOUND_STRING("NURSE: …There you are.\pI was on shift when they brought\nyou in. Do you know what that's like?\p…Don't answer. You're here.\nYou're whole. That's enough."),
+        COMPOUND_STRING("NURSE: You scared me half to death.\pI sat with you all night. I charted\nit as 'observation.' It wasn't.\pPlease be more careful. For me."),
+        COMPOUND_STRING("NURSE: Hey. Hey. Look at me.\pYou're all right. I checked.\nThen I checked again.\p…I'm keeping my hand here a bit\nlonger. Doctor's orders. Mine."),
+    };
+    static const u8 *const sOtherCenterDating[] = {
+        COMPOUND_STRING("NURSE: Easy. You're up.\p…Also, the ward nurse in VIRIDIAN\ncalled. Twice. Word travels.\pShe said to tell you: “Idiot.”\nAnd then: “Come and see me.”"),
+        COMPOUND_STRING("NURSE: Easy now.\pYour girlfriend in VIRIDIAN has\nphoned every hour since you came in.\pPlease call her back.\nFor all our sakes."),
+    };
+    bool32 herCenter = gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_VIRIDIAN_CITY_POKEMON_CENTER_1F)
+                    && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_VIRIDIAN_CITY_POKEMON_CENTER_1F);
+    const u8 *line = NULL;
+
+    switch (RomState(ROM_WARD_NURSE))
+    {
+    case ROM_STATE_DATING:
+        if (herCenter)
+            line = sHerCenterDating[Random() % ARRAY_COUNT(sHerCenterDating)];
+        else
+            line = sOtherCenterDating[Random() % ARRAY_COUNT(sOtherCenterDating)];
+        break;
+    case ROM_STATE_EX_MESSY:
+        if (herCenter)
+            line = COMPOUND_STRING("NURSE: …Of course it's you.\pYou're discharged. Someone else\ncan do your paperwork.");
+        break;
+    case ROM_STATE_EX_CLEAN:
+    case ROM_STATE_EX_SORRY:
+        if (herCenter)
+            line = COMPOUND_STRING("NURSE: Still in one piece. Mostly.\pI'm glad. That's all.\nThat's all it is.");
+        break;
+    }
+    gSpecialVar_Result = (line != NULL);
+    if (line != NULL)
+        StringCopy(gStringVar4, line);
+}
+
+// VAR_RESULT = TRUE if he wakes up in the VIRIDIAN ward, in front of her.
+void IsekaiWardWakeIsHerCenter(void)
+{
+    gSpecialVar_Result = gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_VIRIDIAN_CITY_POKEMON_CENTER_1F)
+                      && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_VIRIDIAN_CITY_POKEMON_CENTER_1F);
 }

@@ -32,6 +32,8 @@ gSpecials::
 	def_special IsekaiWardStatus
 	def_special IsekaiCountInjuredInParty
 	def_special IsekaiPartyCount
+	def_special IsekaiWardWakeLine
+	def_special IsekaiWardWakeIsHerCenter
 	def_special IsekaiHasMonsInPC
 	def_special IsekaiWouldLeaveEmptyParty
 	def_special IsekaiLeaveInjuredAtCenter

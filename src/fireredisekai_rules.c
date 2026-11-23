@@ -1135,7 +1135,24 @@ static u8 CountWardMons(void)
     return count;
 }
 
-// VAR_RESULT = how many party Pokémon are Badly Injured; STR_VAR_1 = the first one's name.
+// "Two", "three"... for the ward nurse's plurals (STR_VAR_3).
+static void BufferCountWord(u8 n, bool32 capital)
+{
+    static const u8 *const sWords[] = {
+        COMPOUND_STRING("two"), COMPOUND_STRING("three"), COMPOUND_STRING("four"),
+        COMPOUND_STRING("five"), COMPOUND_STRING("six"),
+    };
+    if (n < 2 || n > 6)
+    {
+        ConvertIntToDecimalStringN(gStringVar3, n, STR_CONV_MODE_LEFT_ALIGN, 2);
+        return;
+    }
+    StringCopy(gStringVar3, sWords[n - 2]);
+    if (capital)
+        gStringVar3[0] = gStringVar3[0] - CHAR_a + CHAR_A;
+}
+
+// VAR_RESULT = how many party Pokémon are Badly Injured; STR_VAR_1 = the first one's name; STR_VAR_3 = "Three".
 void IsekaiCountInjuredInParty(void)
 {
     u8 i, count = 0;
@@ -1153,6 +1170,7 @@ void IsekaiCountInjuredInParty(void)
         }
     }
     gSpecialVar_Result = count;
+    BufferCountWord(count, TRUE);
     ConvertIntToDecimalStringN(gStringVar2, IsekaiWardBattles(), STR_CONV_MODE_LEFT_ALIGN, 1);
 }
 
@@ -1239,6 +1257,7 @@ void IsekaiCollectHealedMons(void)
         count++;
     }
     gSpecialVar_Result = count;
+    BufferCountWord(count, FALSE);
     // When nobody of his is left in the ward and he has someone of his own again, the grumpy loaner goes home.
     if (sIsekai.loanerOut && CountWardMons() == 0)
         gSpecialVar_0x8004 = IsekaiReturnCenterLoaner();
