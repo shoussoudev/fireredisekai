@@ -391,12 +391,38 @@ static void (*const sMovementStatusHandler[])(struct LinkPlayerObjectEvent *, st
 };
 
 // code
+// FireRed Isekai (v0.14.11): when the MC himself was hurt, he's discharged from the human ward,
+// so he wakes up standing in front of that Center's ward nurse instead of the counter.
+static void IsekaiWhiteoutToWardNurse(void)
+{
+    const struct MapHeader *header;
+    u32 i;
+
+    if (!IS_FRLG || IsekaiLastDefeat() < ISEKAI_DEFEAT_WILD || IsekaiLives() == 0)
+        return;
+    header = Overworld_GetMapHeaderByGroupAndId(sWarpDestination.mapGroup, sWarpDestination.mapNum);
+    if (header == NULL || header->events == NULL)
+        return;
+    for (i = 0; i < header->events->objectEventCount; i++)
+    {
+        const struct ObjectEventTemplate *t = &header->events->objectEvents[i];
+        if (t->script == IsekaiEventScript_WardNurseGeneric || t->script == ViridianCity_PokemonCenter_1F_EventScript_IsekaiWardNurse)
+        {
+            sWarpDestination.x = t->x;
+            sWarpDestination.y = t->y + 1;
+            VarSet(VAR_LAST_TALKED, t->localId);
+            return;
+        }
+    }
+}
+
 void DoWhiteOut(void)
 {
     RunScriptImmediately(EventScript_WhiteOut);
     HealPlayerParty();
     Overworld_ResetStateAfterWhiteOut();
     SetWarpDestinationToLastHealLocation();
+    IsekaiWhiteoutToWardNurse();
     WarpIntoMap();
 }
 

@@ -51,6 +51,7 @@ void IsekaiOnTrainerBattleStart(void);
 void IsekaiOnWildBattleStart(void);
 void IsekaiOnBattleEnd(void);
 u8 IsekaiLastDefeat(void);
+const u8 *IsekaiWhiteoutBlackText(void);
 u16 IsekaiLastWildSpecies(void);
 bool32 IsekaiFieldIdle(void);
 // fireredisekai_money.c

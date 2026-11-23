@@ -935,6 +935,12 @@ static bool8 CheckStandardWildEncounter(u16 metatileBehavior)
         ScriptContext_SetupScript(IsekaiEventScript_AttackedInGrass);
         return TRUE;
     }
+    // v0.14.11: with nobody to send out, no normal wild battle can start (it used to start with an empty slot).
+    if (IS_FRLG && CalculatePlayerPartyCount() == 0)
+    {
+        sPrevMetatileBehavior = metatileBehavior;
+        return FALSE;
+    }
 
     if (StandardWildEncounter(metatileBehavior, sPrevMetatileBehavior) == TRUE)
     {

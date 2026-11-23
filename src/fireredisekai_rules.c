@@ -916,7 +916,6 @@ void IsekaiGetWakeUpScene(void)
     else
         gSpecialVar_Result = 1;
     gSpecialVar_0x8004 = sLastDefeat;
-    sPendingInjuries = 0; // the nurse is about to talk about them anyway
     sPendingProtectedNote = FALSE;
     ConvertIntToDecimalStringN(gStringVar1, sIsekai.lives, STR_CONV_MODE_LEFT_ALIGN, 1);
     StringCopy(gStringVar2, GetSpeciesName(sLastWildSpecies));
@@ -1240,8 +1239,8 @@ void IsekaiCollectHealedMons(void)
         count++;
     }
     gSpecialVar_Result = count;
-    // When the last one is back, the grumpy loaner goes home.
-    if (count != 0 && sIsekai.loanerOut && CountWardMons() == 0)
+    // When nobody of his is left in the ward and he has someone of his own again, the grumpy loaner goes home.
+    if (sIsekai.loanerOut && CountWardMons() == 0)
         gSpecialVar_0x8004 = IsekaiReturnCenterLoaner();
     else
         gSpecialVar_0x8004 = FALSE;
@@ -1269,6 +1268,11 @@ void IsekaiGiveCenterLoaner(void)
 {
     u8 i, level = 5;
     struct Pokemon *mon;
+
+    // With nobody in the ward (the whole team is gone), it's about as strong as a BADGE count suggests.
+    for (i = 0; i < 8; i++)
+        if (FlagGet(FLAG_BADGE01_GET + i))
+            level += 4;
 
     for (i = 0; i < ISEKAI_WARD_SLOTS; i++)
     {
@@ -1453,4 +1457,60 @@ void IsekaiOnMonReleased(struct BoxPokemon *boxMon)
 bool32 IsekaiWildIsOverCaught(void)
 {
     return IsOverCaught(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_SPECIES));
+}
+
+// v0.14.11: the MC's own blackout is told on the black screen, before he wakes up in front of the ward nurse.
+EWRAM_DATA static u8 sWhiteoutBlackText[400] = {0};
+const u8 *IsekaiWhiteoutBlackText(void)
+{
+    u8 *s = sWhiteoutBlackText;
+
+    StringCopy(gStringVar2, GetSpeciesName(sLastWildSpecies));
+    s = StringCopy(s, COMPOUND_STRING("Everything goes dark…\p"));
+    if (sIsekai.lives == 0)
+        return sWhiteoutBlackText;
+    switch (sLastDefeat)
+    {
+    case ISEKAI_DEFEAT_WILD:
+        s = StringCopy(s, COMPOUND_STRING("With your team down, nothing stood\nbetween you and the wild {STR_VAR_2}.\p"
+                                          "It turned its attention to you.\p"));
+        break;
+    case ISEKAI_DEFEAT_ROCKET:
+        s = StringCopy(s, COMPOUND_STRING("Your POKéMON were already down.\nThe ROCKETS kept going anyway.\p"
+                                          "That was the point.\p"));
+        break;
+    case ISEKAI_DEFEAT_GRASS:
+        s = StringCopy(s, COMPOUND_STRING("The last thing you remember is the\ngrass moving the wrong way.\p"));
+        break;
+    default:
+        s = StringCopy(s, COMPOUND_STRING("Your last POKéMON was about to take\nthe final hit.\p"
+                                          "You don't remember deciding to move.\p"));
+        break;
+    }
+    if (FlagGet(FLAG_ISEKAI_SEEN_WARD))
+        StringCopy(s, COMPOUND_STRING("…\pAnother night in the HUMAN WARD.\nThis morning, they let you out."));
+    else
+        StringCopy(s, COMPOUND_STRING("…\pYou spent the night in the HUMAN\nWARD. White sheets. A sign on the\ndoor.\p"
+                                      "This morning, they let you out."));
+    return sWhiteoutBlackText;
+}
+
+// VAR_RESULT = how many Pokémon are in the party.
+void IsekaiPartyCount(void)
+{
+    gSpecialVar_Result = CalculatePlayerPartyCount();
+}
+
+// Nobody left in the party. VAR_RESULT = TRUE if there's still someone in the PC to take out.
+void IsekaiHasMonsInPC(void)
+{
+    u32 box, pos;
+    gSpecialVar_Result = FALSE;
+    for (box = 0; box < TOTAL_BOXES_COUNT; box++)
+        for (pos = 0; pos < IN_BOX_COUNT; pos++)
+            if (GetBoxMonDataAt(box, pos, MON_DATA_SPECIES) != SPECIES_NONE && !GetBoxMonDataAt(box, pos, MON_DATA_IS_EGG))
+            {
+                gSpecialVar_Result = TRUE;
+                return;
+            }
 }

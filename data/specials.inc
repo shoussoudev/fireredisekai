@@ -31,6 +31,8 @@ gSpecials::
 	def_special IsekaiCollectHealedMons
 	def_special IsekaiWardStatus
 	def_special IsekaiCountInjuredInParty
+	def_special IsekaiPartyCount
+	def_special IsekaiHasMonsInPC
 	def_special IsekaiWouldLeaveEmptyParty
 	def_special IsekaiLeaveInjuredAtCenter
 	def_special IsekaiGiveCenterLoaner

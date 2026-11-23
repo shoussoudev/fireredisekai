@@ -441,6 +441,9 @@ bool8 CheckForTrainersWantingBattle(void)
 
     if (FlagGet(OW_FLAG_NO_TRAINER_SEE))
         return FALSE;
+    // FireRed Isekai: trainers don't challenge someone with no POKéMON.
+    if (IS_FRLG && CalculatePlayerPartyCount() == 0)
+        return FALSE;
 
     gNoOfApproachingTrainers = 0;
     gApproachingTrainerId = 0;

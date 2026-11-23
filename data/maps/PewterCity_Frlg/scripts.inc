@@ -1087,25 +1087,122 @@ PewterCity_EventScript_IsekaiShowBlaisia::
 	clearflag FLAG_HIDE_ISEKAI_BLAISIA_1
 	return
 
-@ FireRed Isekai (v0.14): BLAISIA, first meeting. She won't let him pass until he answers.
+@ FireRed Isekai (v0.14.11): BLAISIA, first meeting. She spots him, walks over, and asks
+@ her three questions. Each one has an impatient and a thoughtful answer; VAR_TEMP_5 counts
+@ the thoughtful ones and is kept in VAR_ISEKAI_BLAISIA (2 + count, so 2-5 = met).
 PewterCity_EventScript_IsekaiBlaisiaTrigger::
 	lockall
+	setvar VAR_TEMP_5, 0
+	textcolor NPC_TEXT_COLOR_FEMALE
 	applymovement LOCALID_PEWTER_BLAISIA, Common_Movement_ExclamationMark
 	waitmovement 0
+	msgbox PewterCity_Text_IsekaiBlaisiaCall
+	closemessage
+	getplayerxy VAR_TEMP_2, VAR_TEMP_6
+	call_if_eq VAR_TEMP_6, 20, PewterCity_EventScript_IsekaiBlaisiaWalk20
+	call_if_eq VAR_TEMP_6, 21, PewterCity_EventScript_IsekaiBlaisiaWalk21
+	call_if_eq VAR_TEMP_6, 22, PewterCity_EventScript_IsekaiBlaisiaWalk22
+	call_if_eq VAR_TEMP_6, 23, PewterCity_EventScript_IsekaiBlaisiaWalk23
+	applymovement LOCALID_PLAYER, Common_Movement_FaceRight
+	waitmovement 0
 	goto PewterCity_EventScript_IsekaiBlaisiaTalk
+
+PewterCity_EventScript_IsekaiBlaisiaWalk20:
+	applymovement LOCALID_PEWTER_BLAISIA, PewterCity_Movement_IsekaiBlaisia20
+	waitmovement 0
+	return
+PewterCity_EventScript_IsekaiBlaisiaWalk21:
+	applymovement LOCALID_PEWTER_BLAISIA, PewterCity_Movement_IsekaiBlaisia21
+	waitmovement 0
+	return
+PewterCity_EventScript_IsekaiBlaisiaWalk22:
+	applymovement LOCALID_PEWTER_BLAISIA, PewterCity_Movement_IsekaiBlaisia22
+	waitmovement 0
+	return
+PewterCity_EventScript_IsekaiBlaisiaWalk23:
+	applymovement LOCALID_PEWTER_BLAISIA, PewterCity_Movement_IsekaiBlaisia23
+	waitmovement 0
+	return
+
+PewterCity_Movement_IsekaiBlaisia20:
+	walk_up
+	walk_left
+	walk_left
+	walk_left
+	walk_left
+	step_end
+PewterCity_Movement_IsekaiBlaisia21:
+	walk_left
+	walk_left
+	walk_left
+	walk_left
+	step_end
+PewterCity_Movement_IsekaiBlaisia22:
+	walk_down
+	walk_left
+	walk_left
+	walk_left
+	walk_left
+	step_end
+PewterCity_Movement_IsekaiBlaisia23:
+	walk_down
+	walk_down
+	walk_left
+	walk_left
+	walk_left
+	walk_left
+	step_end
 
 PewterCity_EventScript_IsekaiBlaisia::
 	lockall
 	faceplayer
+	setvar VAR_TEMP_5, 0
 PewterCity_EventScript_IsekaiBlaisiaTalk::
 	textcolor NPC_TEXT_COLOR_FEMALE
-	msgbox PewterCity_Text_IsekaiBlaisia1
-	msgbox PewterCity_Text_IsekaiBlaisia2
+	msgbox PewterCity_Text_IsekaiBlaisiaIntro
+	@ Question one
+	message PewterCity_Text_IsekaiBlaisiaQ1
+	waitmessage
+	dynmultichoice 0, 0, FALSE, 2, 0, DYN_MULTICHOICE_CB_NONE, PewterCity_Text_IsekaiBlaisiaQ1Short, PewterCity_Text_IsekaiBlaisiaQ1Kind
+	goto_if_eq VAR_RESULT, 1, PewterCity_EventScript_IsekaiBlaisiaQ1Kind
+	msgbox PewterCity_Text_IsekaiBlaisiaA1Short
+	goto PewterCity_EventScript_IsekaiBlaisiaQ2
+PewterCity_EventScript_IsekaiBlaisiaQ1Kind:
+	addvar VAR_TEMP_5, 1
+	msgbox PewterCity_Text_IsekaiBlaisiaA1Kind
+PewterCity_EventScript_IsekaiBlaisiaQ2:
+	message PewterCity_Text_IsekaiBlaisiaQ2
+	waitmessage
+	dynmultichoice 0, 0, FALSE, 2, 0, DYN_MULTICHOICE_CB_NONE, PewterCity_Text_IsekaiBlaisiaQ2Short, PewterCity_Text_IsekaiBlaisiaQ2Kind
+	goto_if_eq VAR_RESULT, 1, PewterCity_EventScript_IsekaiBlaisiaQ2Kind
+	msgbox PewterCity_Text_IsekaiBlaisiaA2Short
+	goto PewterCity_EventScript_IsekaiBlaisiaQ3
+PewterCity_EventScript_IsekaiBlaisiaQ2Kind:
+	addvar VAR_TEMP_5, 1
+	msgbox PewterCity_Text_IsekaiBlaisiaA2Kind
+PewterCity_EventScript_IsekaiBlaisiaQ3:
+	message PewterCity_Text_IsekaiBlaisiaQ3
+	waitmessage
+	dynmultichoice 0, 0, FALSE, 2, 0, DYN_MULTICHOICE_CB_NONE, PewterCity_Text_IsekaiBlaisiaQ3Short, PewterCity_Text_IsekaiBlaisiaQ3Kind
+	goto_if_eq VAR_RESULT, 1, PewterCity_EventScript_IsekaiBlaisiaQ3Kind
+	msgbox PewterCity_Text_IsekaiBlaisiaA3Short
+	goto PewterCity_EventScript_IsekaiBlaisiaBattle
+PewterCity_EventScript_IsekaiBlaisiaQ3Kind:
+	addvar VAR_TEMP_5, 1
+	msgbox PewterCity_Text_IsekaiBlaisiaA3Kind
+PewterCity_EventScript_IsekaiBlaisiaBattle:
 	closemessage
 	trainerbattle_no_intro TRAINER_ISEKAI_BLAISIA_1, PewterCity_Text_IsekaiBlaisiaDefeat
+	textcolor NPC_TEXT_COLOR_FEMALE
+	goto_if_ge VAR_TEMP_5, 2, PewterCity_EventScript_IsekaiBlaisiaAfterKind
 	msgbox PewterCity_Text_IsekaiBlaisiaAfter
+	goto PewterCity_EventScript_IsekaiBlaisiaLeave
+PewterCity_EventScript_IsekaiBlaisiaAfterKind:
+	msgbox PewterCity_Text_IsekaiBlaisiaAfterKind
+PewterCity_EventScript_IsekaiBlaisiaLeave:
 	closemessage
-	setvar VAR_ISEKAI_BLAISIA, 2
+	copyvar VAR_ISEKAI_BLAISIA, VAR_TEMP_5
+	addvar VAR_ISEKAI_BLAISIA, 2
 	setflag FLAG_HIDE_ISEKAI_BLAISIA_1
 	fadescreen FADE_TO_BLACK
 	removeobject LOCALID_PEWTER_BLAISIA
@@ -1113,30 +1210,91 @@ PewterCity_EventScript_IsekaiBlaisiaTalk::
 	releaseall
 	end
 
-PewterCity_Text_IsekaiBlaisia1:
-	.string "A woman about your mum's age stands\n"
-	.string "in the path, holding a RATTATA like\l"
-	.string "a newborn.\p"
-	.string "WOMAN: Excuse me, young man. You\n"
-	.string "look like you know what you're doing.\p"
-	.string "I'm BLAISIA. I have questions.\n"
-	.string "Three. You can't pass until then.\p"
-	.string "Question one. How do you make it do\n"
-	.string "the electricity?\p"
-	.string "YOU: …That's a RATTATA.\n"
-	.string "It doesn't do electricity.\p"
-	.string "BLAISIA: Oh. Well, I've named it\n"
-	.string "Little One, so it can do what\l"
-	.string "it likes.$"
+PewterCity_Text_IsekaiBlaisiaCall:
+	.string "WOMAN: Excuse me! Young man!\n"
+	.string "Yes, you! Wait there!$"
 
-PewterCity_Text_IsekaiBlaisia2:
+PewterCity_Text_IsekaiBlaisiaIntro:
+	.string "She's about your mum's age, and\n"
+	.string "holding a RATTATA like a newborn.\p"
+	.string "WOMAN: Sorry. Hello. You look like\n"
+	.string "you know what you're doing.\p"
+	.string "I'm BLAISIA. I have questions.\n"
+	.string "Three. You can't pass until then.$"
+
+PewterCity_Text_IsekaiBlaisiaQ1:
+	.string "Question one. How do you make it do\n"
+	.string "the electricity?$"
+
+PewterCity_Text_IsekaiBlaisiaQ1Short:
+	.string "It's a RATTATA. No.$"
+
+PewterCity_Text_IsekaiBlaisiaQ1Kind:
+	.string "Tell her what it can do$"
+
+PewterCity_Text_IsekaiBlaisiaA1Short:
+	.string "YOU: That's a RATTATA. It doesn't\n"
+	.string "do electricity. Obviously.\p"
+	.string "BLAISIA: Oh. …Well. I've named it\n"
+	.string "Little One, so it can do what it\l"
+	.string "likes.$"
+
+PewterCity_Text_IsekaiBlaisiaA1Kind:
+	.string "YOU: Not that one, no. It's not an\n"
+	.string "ELECTRIC type.\p"
+	.string "But it's quick, and it bites hard.\n"
+	.string "It could be the fastest thing on\l"
+	.string "this road.\p"
+	.string "BLAISIA: The fastest thing on this\n"
+	.string "road! Did you hear that, Little One?$"
+
+PewterCity_Text_IsekaiBlaisiaQ2:
 	.string "Question two. Where does it go when\n"
 	.string "it's in the ball? Is it comfortable?\l"
-	.string "Is it cold in there?\p"
-	.string "(You don't actually know.)\p"
+	.string "Is it cold in there?$"
+
+PewterCity_Text_IsekaiBlaisiaQ2Short:
+	.string "No idea. Can I go?$"
+
+PewterCity_Text_IsekaiBlaisiaQ2Kind:
+	.string "Think about it$"
+
+PewterCity_Text_IsekaiBlaisiaA2Short:
+	.string "YOU: No idea. Nobody knows.\n"
+	.string "Can I go now?\p"
+	.string "BLAISIA: …Not yet. One more.$"
+
+PewterCity_Text_IsekaiBlaisiaA2Kind:
+	.string "YOU: Honestly? I don't know.\p"
+	.string "(You actually think about it.)\p"
+	.string "YOU: But it comes out happy every\n"
+	.string "time, doesn't it? I don't think it\l"
+	.string "minds.\p"
+	.string "BLAISIA: …It does come out happy.\p"
+	.string "Thank you. I've been worrying about\n"
+	.string "that all week.$"
+
+PewterCity_Text_IsekaiBlaisiaQ3:
 	.string "Question three. Would you battle me?\n"
 	.string "I've never done one. My son made it\l"
 	.string "look easy.$"
+
+PewterCity_Text_IsekaiBlaisiaQ3Short:
+	.string "Fine. Quickly.$"
+
+PewterCity_Text_IsekaiBlaisiaQ3Kind:
+	.string "Sure. I'll talk you through it$"
+
+PewterCity_Text_IsekaiBlaisiaA3Short:
+	.string "YOU: Fine. Quickly.\p"
+	.string "BLAISIA: Quickly! Yes!\n"
+	.string "I can do quickly!$"
+
+PewterCity_Text_IsekaiBlaisiaA3Kind:
+	.string "YOU: Sure. I'll tell you what's\n"
+	.string "happening as we go.\p"
+	.string "BLAISIA: Oh, would you?\n"
+	.string "You're a sweetheart.$"
 
 PewterCity_Text_IsekaiBlaisiaDefeat:
 	.string "Oh! Sorry! Sorry, little one!\n"
@@ -1148,6 +1306,16 @@ PewterCity_Text_IsekaiBlaisiaAfter:
 	.string "I'll see you around!\n"
 	.string "I'll have more questions!\p"
 	.string "(She will.)$"
+
+PewterCity_Text_IsekaiBlaisiaAfterKind:
+	.string "BLAISIA: That was wonderful.\n"
+	.string "And I understood about half of it!\p"
+	.string "You explain things nicely. Better\n"
+	.string "than my son ever did.\p"
+	.string "I'll see you around!\n"
+	.string "I'll have more questions!\p"
+	.string "(You find you don't mind.)$"
+
 
 PewterCity_EventScript_IsekaiSkipAide::
 	setvar VAR_MAP_SCENE_PEWTER_CITY, 2

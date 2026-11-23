@@ -1416,7 +1416,7 @@ static const u8 *GenerateRecoveryMessage(u8 taskId)
 
     // FireRed Isekai: when the MC himself got hurt, there's no scurrying anywhere.
     if (IS_FRLG && IsekaiLastDefeat() >= ISEKAI_DEFEAT_WILD)
-        return COMPOUND_STRING("Everything goes dark…\p");
+        return IsekaiWhiteoutBlackText();
     if (forfeitTrainer && destinationIsPlayersHouse)
         return sText_PlayerRegroupHome;
     else if (forfeitTrainer && !destinationIsPlayersHouse)

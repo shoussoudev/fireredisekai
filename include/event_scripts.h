@@ -770,6 +770,8 @@ extern const u8 gOakSpeech_Text_WhatDoesHeLookLike[];
 extern const u8 IsekaiEventScript_ResumeBattle[];
 extern const u8 IsekaiEventScript_AfterBattleNews[];
 extern const u8 IsekaiEventScript_GameOver[];
+extern const u8 IsekaiEventScript_WardNurseGeneric[];
+extern const u8 ViridianCity_PokemonCenter_1F_EventScript_IsekaiWardNurse[];
 extern const u8 IsekaiEventScript_AttackedInGrass[];
 extern const u8 IsekaiEventScript_Saving[];
 extern const u8 IsekaiEventScript_FirstGrass[];

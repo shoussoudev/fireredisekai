@@ -251,7 +251,7 @@
 #define VAR_0x40C4                 0x40C4
 #define VAR_ISEKAI_LAST_LOSS_Y                VAR_0x40C4 // FireRed Isekai: Rematch Pass: y
 #define VAR_0x40C5                 0x40C5
-#define VAR_ISEKAI_BLAISIA                    VAR_0x40C5 // FireRed Isekai: Blaisia on Route 3: 0 not yet, 1 waiting (after BROCK), 2 met
+#define VAR_ISEKAI_BLAISIA                    VAR_0x40C5 // FireRed Isekai: Blaisia: 0 not yet, 1 waiting (after BROCK), 2-5 met (2 + thoughtful answers, 0-3)
 #define VAR_0x40C6                 0x40C6
 #define VAR_0x40C7                 0x40C7
 #define VAR_0x40C8                 0x40C8
