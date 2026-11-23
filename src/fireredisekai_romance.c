@@ -42,7 +42,7 @@
 #define META_BROKEN       (1 << 8)
 #define META_FORTUNA      (1 << 9)
 
-#define CALL_EVERY_STEPS  400
+#define CALL_EVERY_STEPS  1200 // v0.14.13: then a 1-in-64 chance per step, so it isn't clockwork
 #define SUSPICION_CAUGHT  100
 
 static u16 RomVar(u8 p)            { return VarGet(VAR_ISEKAI_ROM_0 + p); }
@@ -529,6 +529,8 @@ static void RomPickCaller(void)
     u8 p, n, pick;
 
     if (sCallPending || DatingCount() == 0 || VarGet(VAR_ISEKAI_ROM_CALL_STEPS) < CALL_EVERY_STEPS)
+        return;
+    if ((Random() % 64) != 0)
         return;
     // Someone he hasn't visited since the last BADGE calls first (once): a warning before ghosting.
     for (p = 0; p < ROM_COUNT; p++)
