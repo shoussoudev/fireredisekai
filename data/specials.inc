@@ -78,6 +78,7 @@ gSpecials::
 	def_special IsekaiRomBreakUp
 	def_special IsekaiRomPromise
 	def_special IsekaiRomApologised
+	def_special IsekaiRomAppreciate
 	def_special IsekaiRomTalk
 	def_special IsekaiRomFortunaRead
 	def_special IsekaiRomCheckPerk

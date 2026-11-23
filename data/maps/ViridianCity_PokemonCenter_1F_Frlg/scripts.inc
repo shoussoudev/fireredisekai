@@ -61,9 +61,9 @@ ViridianCity_PokemonCenter_1F_EventScript_IsekaiWardNurse::
 	end
 
 ViridianCity_PokemonCenter_1F_EventScript_IsekaiWardNurseAgain::
-	@ v0.14: her potion trial, then the romance.
-	@ v0.14.8: first, the ward itself (take in / give back Badly Injured POKéMON)
+	@ v0.14.9: one topic per talk. Ward business first, then the romance, then her trial.
 	call IsekaiEventScript_CenterWard
+	goto_if_eq VAR_0x8008, 1, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseEnd
 	setvar VAR_0x8004, ROM_WARD_NURSE
 	special IsekaiRomGetState
 	goto_if_ne VAR_RESULT, ROM_STATE_NONE, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseHub
@@ -74,13 +74,22 @@ ViridianCity_PokemonCenter_1F_EventScript_IsekaiWardNurseAgain::
 	case NURSE_QUEST_DONE, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseResults
 	special IsekaiBufferLives
 	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiWardNurseAgain
+	goto_if_set FLAG_ISEKAI_NURSE_ASKED, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseAskAgain
+	setflag FLAG_ISEKAI_NURSE_ASKED
 	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseVolunteer, MSGBOX_YESNO
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseVolunteerAnswer::
 	goto_if_eq VAR_RESULT, NO, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseNoVolunteer
 	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseIsItSafe
 	setvar VAR_0x8005, NURSE_QUEST_HERBS
 	special IsekaiNurseSetStage
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseEnd::
 	release
 	end
+
+ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseAskAgain::
+	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseChangedMind, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseEnd
+	goto ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseVolunteerAnswer
 
 ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseNoVolunteer::
 	msgbox ViridianCity_PokemonCenter_1F_Text_IsekaiNurseNoVolunteer
@@ -135,12 +144,17 @@ ViridianCity_PokemonCenter_1F_EventScript_IsekaiNurseHub::
 	end
 
 ViridianCity_PokemonCenter_1F_Text_IsekaiNurseVolunteer::
-	.string "…While you're here.\p"
+	.string "…While you're here. Since you're\n"
+	.string "clearly going to keep getting hurt.\p"
 	.string "I'm testing a POTION for humans.\n"
 	.string "I need a volunteer. Interested?$"
 
 ViridianCity_PokemonCenter_1F_Text_IsekaiNurseNoVolunteer::
-	.string "Coward. Sensible, but a coward.$"
+	.string "Coward. Sensible, but a coward.\p"
+	.string "The offer stands.$"
+
+ViridianCity_PokemonCenter_1F_Text_IsekaiNurseChangedMind::
+	.string "Changed your mind about my trial?$"
 
 ViridianCity_PokemonCenter_1F_Text_IsekaiNurseIsItSafe::
 	.string "YOU: Is it safe?\p"

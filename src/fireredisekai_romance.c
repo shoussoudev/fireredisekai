@@ -34,6 +34,7 @@
 #define ROM_GIFT        (1 << 5)
 #define ROM_START_SHIFT 6
 #define ROM_VISIT_SHIFT 10
+#define ROM_REMINDED    (1 << 14) // she phoned to say he hasn't visited
 
 // VAR_ISEKAI_ROM_META: bits 0-3 breakups, 4-7 Glacia chain position, 8 chain broken, 9 Fortuna read.
 #define META_BREAKUPS(m)  ((m) & 0xF)
@@ -151,7 +152,7 @@ static const u8 *const sNames[ROM_COUNT] =
 // ---------------------------------------------------------------------------
 // Lines. Partners not built yet fall back to the generic set.
 // ---------------------------------------------------------------------------
-#define ROMLINE_COUNT 15
+#define ROMLINE_COUNT 17
 
 static const u8 *const sLinesGeneric[ROMLINE_COUNT] =
 {
@@ -161,7 +162,7 @@ static const u8 *const sLinesGeneric[ROMLINE_COUNT] =
     [ROMLINE_ASK]         = COMPOUND_STRING("Wait. Are you seeing anyone?"),
     [ROMLINE_HOLD]        = COMPOUND_STRING("…Thank you for being honest.\nCome back if that changes."),
     [ROMLINE_HEARD]       = COMPOUND_STRING("…I've heard about you.\pKanto is small. No thank you."),
-    [ROMLINE_DATING]      = COMPOUND_STRING("There you are."),
+    [ROMLINE_DATING]      = COMPOUND_STRING("There you are. I was hoping\nyou'd come by."),
     [ROMLINE_CONFRONT]    = COMPOUND_STRING("I know about the others.\nDon't insult me by denying it."),
     [ROMLINE_BREAK_CLEAN] = COMPOUND_STRING("…Thank you for telling me to my face.\nTake care of yourself."),
     [ROMLINE_BREAK_MESSY] = COMPOUND_STRING("Get out."),
@@ -170,6 +171,8 @@ static const u8 *const sLinesGeneric[ROMLINE_COUNT] =
     [ROMLINE_SORRY_DONE]  = COMPOUND_STRING("…Fine. Apology accepted.\nWe're done, but we're even."),
     [ROMLINE_CALL]        = COMPOUND_STRING("Just checking you're alive."),
     [ROMLINE_PROMISE]     = COMPOUND_STRING("…One chance. That's all you get."),
+    [ROMLINE_THANKS]      = COMPOUND_STRING("…Oh. Thank you.\nYou're sweet when you want to be."),
+    [ROMLINE_MISS_YOU]    = COMPOUND_STRING("It's me. You haven't come by in\na while.\pI miss you. Come and see me?"),
 };
 
 static const u8 *const sLinesNurse[ROMLINE_COUNT] =
@@ -180,7 +183,7 @@ static const u8 *const sLinesNurse[ROMLINE_COUNT] =
     [ROMLINE_ASK]         = COMPOUND_STRING("Before I fill in the form.\nAre you seeing anyone?"),
     [ROMLINE_HOLD]        = COMPOUND_STRING("…Honest. That's rare in here.\pCome back if that changes."),
     [ROMLINE_HEARD]       = COMPOUND_STRING("…I've heard about you.\pNurses talk. All of them.\nNo thank you."),
-    [ROMLINE_DATING]      = COMPOUND_STRING("You're back. Of course you're back.\pAny new bruises I should know about?"),
+    [ROMLINE_DATING]      = COMPOUND_STRING("You're back. …Good.\pI keep looking at the door when\nmy shift's quiet. Don't tell anyone."),
     [ROMLINE_CONFRONT]    = COMPOUND_STRING("I've patched up half of Kanto.\nPeople talk on the table.\pI know about the others."),
     [ROMLINE_BREAK_CLEAN] = COMPOUND_STRING("…Thank you for telling me yourself.\pI'll still patch you up.\nThat's the job."),
     [ROMLINE_BREAK_MESSY] = COMPOUND_STRING("Out. And next time you're carried\nin here, it's someone else's shift."),
@@ -189,6 +192,8 @@ static const u8 *const sLinesNurse[ROMLINE_COUNT] =
     [ROMLINE_SORRY_DONE]  = COMPOUND_STRING("…Fine. You've apologised enough to\ncount as treatment. We're even."),
     [ROMLINE_CALL]        = COMPOUND_STRING("NURSE: It's me. From the ward.\nI heard a CENTER buzz you in.\pNo stretcher this time? Good.\nKeep it that way."),
     [ROMLINE_PROMISE]     = COMPOUND_STRING("…One chance. Like a second\nopinion. Don't waste it."),
+    [ROMLINE_THANKS]      = COMPOUND_STRING("YOU: Thank you. For patching me up.\nAll of it.\pNURSE: …You're making me blush on\nshift. Unprofessional.\pDo it again sometime."),
+    [ROMLINE_MISS_YOU]    = COMPOUND_STRING("NURSE: It's me. From the ward.\pYou haven't been in. Not even with\na scratch. I almost miss the scratches.\pCome by VIRIDIAN? Before I start\nwondering."),
 };
 
 static const u8 *const sLinesMum[ROMLINE_COUNT] =
@@ -199,7 +204,7 @@ static const u8 *const sLinesMum[ROMLINE_COUNT] =
     [ROMLINE_ASK]         = COMPOUND_STRING("…Wait. Are you seeing anyone?\nI'm too old for surprises."),
     [ROMLINE_HOLD]        = COMPOUND_STRING("At least you're honest.\nMore than I can say for most.\pCome back when you're free."),
     [ROMLINE_HEARD]       = COMPOUND_STRING("…I've heard about you.\pPallet's a small town.\nI think dinner is all this will be."),
-    [ROMLINE_DATING]      = COMPOUND_STRING("There you are. Sit. You look\nlike you haven't eaten."),
+    [ROMLINE_DATING]      = COMPOUND_STRING("There you are. Sit, sit.\pI made too much again. I always\nmake too much when I hope you'll come."),
     [ROMLINE_CONFRONT]    = COMPOUND_STRING("Sit down.\pThe whole of PALLET knows.\nDid you think I wouldn't?"),
     [ROMLINE_BREAK_CLEAN] = COMPOUND_STRING("…Thank you for saying it to my face.\pThe door's open for dinner.\nJust dinner."),
     [ROMLINE_BREAK_MESSY] = COMPOUND_STRING("Out. Before I find the pan."),
@@ -208,6 +213,8 @@ static const u8 *const sLinesMum[ROMLINE_COUNT] =
     [ROMLINE_SORRY_DONE]  = COMPOUND_STRING("…Alright. I forgive you.\nDon't make me regret it twice."),
     [ROMLINE_CALL]        = COMPOUND_STRING("MUM: Hello? Is this the CENTER?\nI'm looking for a tall, tired man.\p…It's you! Are you eating properly?\nRED never calls either."),
     [ROMLINE_PROMISE]     = COMPOUND_STRING("…One chance.\nThe pan stays by the door."),
+    [ROMLINE_THANKS]      = COMPOUND_STRING("YOU: Thanks. For dinner. For\neverything, really.\pRED'S MOM: Oh, stop it.\n…No, don't stop it."),
+    [ROMLINE_MISS_YOU]    = COMPOUND_STRING("MUM: Hello? It's me.\pThe house is so quiet with both\nof you gone.\pCome home for dinner soon?\nI'll make the good stew."),
 };
 
 static const u8 *const sLinesDaisy[ROMLINE_COUNT] =
@@ -218,7 +225,7 @@ static const u8 *const sLinesDaisy[ROMLINE_COUNT] =
     [ROMLINE_ASK]         = COMPOUND_STRING("Hold on. Are you seeing anyone?\nI run a house. I don't do messes."),
     [ROMLINE_HOLD]        = COMPOUND_STRING("Honest. Annoyingly.\pCome back when you're not\nsomeone else's problem."),
     [ROMLINE_HEARD]       = COMPOUND_STRING("…I've heard about you.\pPallet has two houses and a lab.\nNo thank you."),
-    [ROMLINE_DATING]      = COMPOUND_STRING("You again. Sit. I'm doing the\naccounts, so be quiet and pretty."),
+    [ROMLINE_DATING]      = COMPOUND_STRING("You came. Good.\pSit with me. I'm doing the\naccounts, but I like you here."),
     [ROMLINE_CONFRONT]    = COMPOUND_STRING("I keep this whole house running.\nYou think I can't keep track of you?\pI know about the others."),
     [ROMLINE_BREAK_CLEAN] = COMPOUND_STRING("…Fine. At least you said it to\nmy face. Most people don't."),
     [ROMLINE_BREAK_MESSY] = COMPOUND_STRING("Out.\p…And I'm telling BLUE."),
@@ -227,6 +234,8 @@ static const u8 *const sLinesDaisy[ROMLINE_COUNT] =
     [ROMLINE_SORRY_DONE]  = COMPOUND_STRING("…Fine. Apology accepted.\nI'll tell BLUE to calm down. A bit."),
     [ROMLINE_CALL]        = COMPOUND_STRING("DAISY: It's me. Grandpa's finally\nasleep.\pThe house is quiet. It's weird.\n…Come by sometime."),
     [ROMLINE_PROMISE]     = COMPOUND_STRING("One chance.\pI'm writing this down.\nIn the ledger. In ink."),
+    [ROMLINE_THANKS]      = COMPOUND_STRING("YOU: You hold this whole house\ntogether. I see it.\pDAISY: …Nobody's ever said that.\nSay it again. Slower."),
+    [ROMLINE_MISS_YOU]    = COMPOUND_STRING("DAISY: It's me.\pYou haven't been by since your\nlast BADGE. I noticed.\pDon't make me come and find you."),
 };
 
 static const u8 *const *const sLines[ROM_COUNT] =
@@ -355,10 +364,18 @@ void IsekaiRomTalk(void)
     gSpecialVar_Result = ROM_TALK_NORMAL;
     if ((v & 7) != ROM_STATE_DATING)
         return;
-    v = (v & ~(0xF << ROM_VISIT_SHIFT)) | (BadgeCount() << ROM_VISIT_SHIFT);
+    v = (v & ~((0xF << ROM_VISIT_SHIFT) | ROM_REMINDED)) | (BadgeCount() << ROM_VISIT_SHIFT);
     RomSetVar(p, v);
     if (v & ROM_CAUGHT)
         gSpecialVar_Result = ROM_TALK_CAUGHT;
+}
+
+// "Show appreciation": she softens. A jealous partner calms down a little.
+void IsekaiRomAppreciate(void)
+{
+    u8 p = gSpecialVar_0x8004;
+    u8 sus = Suspicion(p);
+    SetSuspicion(p, sus > 10 ? sus - 10 : 0);
 }
 
 // The Fortuna reading starts the Glacia chain (v0.15 builds her tent).
@@ -426,6 +443,7 @@ void IsekaiRomLongTellsEveryone(void)
 // Center calls and gifts
 // ---------------------------------------------------------------------------
 static EWRAM_DATA u8 sCallPending = 0;      // partner + 1
+static EWRAM_DATA bool8 sCallMissYou = FALSE;
 static EWRAM_DATA u8 sGhostedPending = 0;   // bitmask of partners who left (ghosting), shown one at a time
 
 static const u16 sCenters[][2] =
@@ -481,6 +499,19 @@ void IsekaiRomOnMapWarp(void)
 
     if (!InCenter() || VarGet(VAR_ISEKAI_ROM_CALL_STEPS) < CALL_EVERY_STEPS)
         return;
+    // Someone he hasn't visited since the last BADGE calls first (once): a warning before ghosting.
+    for (p = 0; p < ROM_COUNT; p++)
+    {
+        u16 v = RomVar(p);
+        if ((v & 7) == ROM_STATE_DATING && !(v & ROM_REMINDED)
+         && BadgeCount() >= ((v >> ROM_VISIT_SHIFT) & 0xF) + 1)
+        {
+            RomSetVar(p, v | ROM_REMINDED);
+            sCallPending = p + 1;
+            sCallMissYou = TRUE;
+            return;
+        }
+    }
     // Someone with a gift waiting calls first; otherwise anyone.
     for (p = 0; p < ROM_COUNT; p++)
     {
@@ -546,9 +577,11 @@ bool32 IsekaiRomFieldIdle(void)
         VarSet(VAR_ISEKAI_ROM_CALL_STEPS, 0);
         FlagSet(FLAG_ISEKAI_ROM_CALLED_ONCE);
         gSpecialVar_0x8004 = p;
+        gSpecialVar_0x8007 = sCallMissYou ? ROMLINE_MISS_YOU : ROMLINE_CALL;
+        sCallMissYou = FALSE;
         StringCopy(gStringVar1, sNames[p]);
         gSpecialVar_0x8006 = FALSE;
-        if (GiftReady(p))
+        if (gSpecialVar_0x8007 == ROMLINE_CALL && GiftReady(p))
         {
             u8 i;
             for (i = 0; i < 3 && sGifts[p][i] != ITEM_NONE; i++)

@@ -103,6 +103,7 @@ void IsekaiRomDecline(void);
 void IsekaiRomBreakUp(void);
 void IsekaiRomPromise(void);
 void IsekaiRomApologised(void);
+void IsekaiRomAppreciate(void);
 void IsekaiRomTalk(void);
 void IsekaiRomFortunaRead(void);
 void IsekaiRomCheckPerk(void);

@@ -93,8 +93,15 @@ IsekaiEventScript_RomDating::
 	special IsekaiRomTalk
 	goto_if_eq VAR_RESULT, ROM_TALK_CAUGHT, IsekaiEventScript_RomConfront
 	romline ROMLINE_DATING
-	msgbox IsekaiText_RomTalkAboutUs, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, YES, IsekaiEventScript_RomBreakUpMenu
+	dynmultichoice 0, 0, FALSE, 3, 0, DYN_MULTICHOICE_CB_NONE, IsekaiText_RomOptAppreciate, IsekaiText_RomOptBreakUp, IsekaiText_RomOptJustVisiting
+	switch VAR_RESULT
+	case 0, IsekaiEventScript_RomAppreciate
+	case 1, IsekaiEventScript_RomBreakUpMenu
+	return
+
+IsekaiEventScript_RomAppreciate:
+	special IsekaiRomAppreciate
+	romline ROMLINE_THANKS
 	return
 
 IsekaiEventScript_RomBreakUpMenu:
@@ -158,7 +165,9 @@ IsekaiEventScript_RomCall::
 	playse SE_POKENAV_CALL
 	msgbox IsekaiText_RomBzzz
 	textcolor NPC_TEXT_COLOR_FEMALE
-	romline ROMLINE_CALL
+	copyvar VAR_0x8005, VAR_0x8007
+	special IsekaiRomBufferLine
+	msgbox gStringVar4
 	call EventScript_RestorePrevTextColor
 	goto_if_eq VAR_0x8006, FALSE, IsekaiEventScript_RomCall_End
 	msgbox IsekaiText_RomGift
@@ -191,12 +200,21 @@ IsekaiText_RomYouLie:
 IsekaiText_RomHint:
 	.string "(You're seeing someone now.\n"
 	.string "She might call you at a CENTER.\p"
+	.string "Visit her now and then. Go two\n"
+	.string "BADGES without stopping by, and\l"
+	.string "she'll stop waiting.\p"
 	.string "Dating more than one person is\n"
 	.string "possible. Getting away with it is\l"
 	.string "another matter.)$"
 
-IsekaiText_RomTalkAboutUs:
-	.string "Talk about the two of you?$"
+IsekaiText_RomOptAppreciate:
+	.string "Show appreciation$"
+
+IsekaiText_RomOptBreakUp:
+	.string "Talk about breaking up$"
+
+IsekaiText_RomOptJustVisiting:
+	.string "Just visiting$"
 
 IsekaiText_RomWhatDoYouSay:
 	.string "What do you say?$"

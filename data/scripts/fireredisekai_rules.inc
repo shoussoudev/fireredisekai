@@ -296,9 +296,11 @@ IsekaiText_GameOver:
 @ At the Center counter, after healing: the ward for Badly Injured Pokémon.
 @ ---------------------------------------------------------------------------
 IsekaiEventScript_CenterWard::
+	setvar VAR_0x8008, 0 @ set to 1 if the ward had anything to say
 	call_if_set FLAG_ISEKAI_LIMPING, IsekaiEventScript_TreatAnkle
 	special IsekaiCollectHealedMons
 	goto_if_eq VAR_RESULT, 0, IsekaiEventScript_CenterWard_StillResting
+	setvar VAR_0x8008, 1
 	playfanfare MUS_HEAL
 	msgbox IsekaiText_WardHealed
 	waitfanfare
@@ -308,6 +310,7 @@ IsekaiEventScript_CenterWard_StillResting:
 	call_if_ne VAR_RESULT, 0, IsekaiEventScript_CenterWard_ShowResting
 	special IsekaiCountInjuredInParty
 	goto_if_eq VAR_RESULT, 0, IsekaiEventScript_CenterWard_End
+	setvar VAR_0x8008, 1
 	msgbox IsekaiText_WardOffer, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, IsekaiEventScript_CenterWard_Declined
 	special IsekaiWardQuote
@@ -333,6 +336,7 @@ IsekaiEventScript_CenterWard_CantPay:
 	return
 
 IsekaiEventScript_CenterWard_ShowResting:
+	setvar VAR_0x8008, 1
 	msgbox IsekaiText_WardResting
 	return
 
@@ -375,7 +379,7 @@ IsekaiText_MankeyLeaves:
 
 IsekaiText_WardResting:
 	.string "Your POKéMON in our ward is still\n"
-	.string "resting. Fight {STR_VAR_2} more battle(s)\l"
+	.string "resting. Fight {STR_VAR_2} more TRAINER(S)\l"
 	.string "and come back to any CENTER.$"
 
 IsekaiText_WardOffer:

@@ -47,6 +47,8 @@
 #define ROMLINE_SORRY_DONE   12
 #define ROMLINE_CALL         13
 #define ROMLINE_PROMISE      14
+#define ROMLINE_THANKS       15
+#define ROMLINE_MISS_YOU     16
 
 // Quest progress vars (see vars_frlg.h)
 // Ward nurse: bits 0-2 herbs found (Route 2, Viridian Forest, Route 22), stage in bits 4-7.

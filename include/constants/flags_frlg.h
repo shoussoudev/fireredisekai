@@ -49,7 +49,7 @@
 #define FLAG_ISEKAI_MUSEUM_PAID      FLAG_0x0CA // paid (or was let in) at the museum
 #define FLAG_ISEKAI_SNES_SEEN        FLAG_0x0CB // looked at the broken SNES with Red's mum
 #define FLAG_ISEKAI_LOANER_GREW_UP   FLAG_0x0CC // the loaner saw the BADGE and lost its quirk
-#define FLAG_ISEKAI_FOREST_KID       FLAG_0x0CD // (unused)
+#define FLAG_ISEKAI_NURSE_ASKED      FLAG_0x0CD // the ward nurse has pitched her potion trial once
 #define FLAG_ISEKAI_KEVIN_BEATEN     FLAG_0x0BA // beat KEVIN (FLAG_ISEKAI_KEVIN_DONE = met him)
 
 // Hide/show flags
