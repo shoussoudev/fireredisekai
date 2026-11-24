@@ -1,11 +1,8 @@
 name: CI
 
+# FireRed Isekai: manual only (Actions tab -> Run workflow), so pushes don't use Actions minutes.
 on:
-  push:
-    branches:
-      - master
-      - upcoming
-  pull_request:
+  workflow_dispatch:
 
 env:
   GAME_REVISION: 0

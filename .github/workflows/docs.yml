@@ -1,8 +1,7 @@
 name: Docs
+# FireRed Isekai: manual only, so pushes don't use Actions minutes.
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
 
 jobs:
   deploy:
